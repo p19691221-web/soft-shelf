@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>小軟體收藏館</title>
+<meta name="description" content="收集個人開發的小工具、小網頁和實驗作品。投稿、收藏、留言交流。">
+<meta property="og:title" content="小軟體收藏館">
+<meta property="og:description" content="收集個人開發的小工具、小網頁和實驗作品。投稿、收藏、留言交流。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=Noto+Sans+TC:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root{
+  --bg:#eef2f0; --panel:#ffffff; --fg:#17232b; --muted:#5b6b72; --line:#d3dcd8;
+  --ink:#1f4b63; --ink-soft:#e1ecf1; --tag:#f2c94c; --tag-fg:#3a2c00;
+  --ok:#2f7d55; --warn:#a86a10; --proto:#6b5bb0;
+  --display:"Bricolage Grotesque","Noto Sans TC",system-ui,sans-serif;
+  --body:"Noto Sans TC",system-ui,-apple-system,"PingFang TC",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+  --r:10px; color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#11181c; --panel:#18222a; --fg:#e4ecee; --muted:#93a3aa; --line:#2b3a42;
+  --ink:#8cc3dd; --ink-soft:#1e3340; --tag:#e0b83e; --tag-fg:#241b00;
+  --ok:#6cc79a; --warn:#e3a54a; --proto:#a99bea; color-scheme:dark}}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.6}
+[hidden]{display:none!important}
+img{max-width:100%}
+.wrap{max-width:1080px;margin:0 auto;padding-inline:16px;padding-block:calc(28px + env(safe-area-inset-top,0px)) 64px}
+header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:20px}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(28px,6vw,44px);line-height:1.1;margin:0;text-wrap:balance}
+h1 small{display:block;font-family:var(--mono);font-size:12px;font-weight:400;color:var(--muted);letter-spacing:.06em;margin-bottom:6px}
+.sub{color:var(--muted);margin:6px 0 0;max-width:46ch}
+.stats{display:flex;gap:18px;font-family:var(--mono);font-size:12px;color:var(--muted)}
+.stats b{display:block;font-size:22px;color:var(--fg);font-variant-numeric:tabular-nums}
+button,input,select{font:inherit;color:inherit}
+.btn{border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:7px 14px;cursor:pointer;text-decoration:none;color:var(--fg);display:inline-block}
+.btn:hover{border-color:var(--ink)}
+.btn.primary{background:var(--ink);color:var(--panel);border-color:var(--ink);font-weight:700}
+:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:10px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;border-bottom:1px solid var(--line)}
+.seg{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--panel)}
+.seg button{border:0;background:none;padding:6px 12px;cursor:pointer;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--ink-soft);color:var(--fg);font-weight:700}
+#q{flex:1 1 180px;min-width:0;border:1px solid var(--line);border-radius:999px;padding:7px 14px;background:var(--panel)}
+#sort{border:1px solid var(--line);border-radius:999px;padding:7px 10px;background:var(--panel)}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0 4px}
+.chip{font-family:var(--mono);font-size:12px;border:1px solid var(--line);background:var(--panel);border-radius:4px;padding:2px 8px;cursor:pointer;color:var(--muted)}
+.chip[aria-pressed="true"]{background:var(--tag);color:var(--tag-fg);border-color:var(--tag)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px;margin-top:16px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.card .head{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.card h3{margin:0;font-size:17px;line-height:1.35;overflow-wrap:anywhere}
+.card h3 a{color:inherit;text-decoration:none}
+.card h3 a:hover{color:var(--ink);text-decoration:underline}
+.maker{font-size:13px;color:var(--muted);overflow-wrap:anywhere}
+.mine-badge{font-family:var(--mono);font-size:10px;background:var(--ink-soft);color:var(--ink);padding:1px 6px;border-radius:3px;margin-left:6px}
+.status{font-family:var(--mono);font-size:11px;padding:2px 8px;border-radius:999px;border:1px solid currentColor;white-space:nowrap}
+.s-proto{color:var(--proto)}.s-live{color:var(--ok)}.s-paused{color:var(--warn)}
+.desc{margin:0;overflow-wrap:anywhere;white-space:pre-wrap}
+.card .tags{margin:0}
+.card .chip{cursor:default}
+.foot{margin-top:auto;display:flex;align-items:center;justify-content:space-between;gap:8px;border-top:1px dashed var(--line);padding-top:10px}
+.who{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);min-width:0}
+.who img{width:20px;height:20px;border-radius:50%}
+.who span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.acts{display:flex;gap:6px}
+.icon-btn{border:1px solid var(--line);background:none;border-radius:999px;padding:3px 10px;cursor:pointer;font-family:var(--mono);font-size:12px;font-variant-numeric:tabular-nums;color:var(--muted)}
+.icon-btn[aria-pressed="true"]{background:var(--tag);color:var(--tag-fg);border-color:var(--tag)}
+.empty{grid-column:1/-1;border:1px dashed var(--line);border-radius:var(--r);padding:32px 20px;text-align:center;color:var(--muted)}
+.empty strong{display:block;color:var(--fg);font-family:var(--display);font-size:20px;margin-bottom:4px}
+.note{font-size:13px;color:var(--muted);margin-top:16px}
+.note a{color:var(--ink)}
+.scrim{position:fixed;inset:0;background:rgba(10,20,25,.4);z-index:20}
+.sheet{position:fixed;top:0;right:0;bottom:0;width:min(460px,100%);background:var(--panel);z-index:21;display:flex;flex-direction:column;border-left:1px solid var(--line);padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.sheet header{padding:16px 18px;border-bottom:1px solid var(--line);display:flex;gap:10px;align-items:flex-start;justify-content:space-between}
+.sheet h2{margin:0;font-size:19px;overflow-wrap:anywhere}
+.sheet .body{flex:1;overflow:auto;padding:16px 18px;display:flex;flex-direction:column;gap:14px}
+.sheet .meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:13px;color:var(--muted)}
+.sheet a.go{color:var(--ink);font-weight:700;overflow-wrap:anywhere}
+.cmt{display:flex;gap:10px}
+.cmt img{width:28px;height:28px;border-radius:50%;flex:none}
+.cmt .c{min-width:0;flex:1}
+.cmt .n{font-size:12px;color:var(--muted);display:flex;gap:8px}
+.cmt p{margin:2px 0 0;white-space:pre-wrap;overflow-wrap:anywhere}
+.sheet footer{border-top:1px solid var(--line);padding:12px 18px;display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+@media (prefers-reduced-motion:no-preference){.sheet{animation:slide .2s ease-out}@keyframes slide{from{transform:translateX(24px);opacity:.6}}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1><small>INDIE&nbsp;BUILDS · 個人開發</small>小軟體收藏館</h1>
+      <p class="sub">收集一個人做出來的工具、小網頁、外掛和實驗作品。投稿、收藏、留言交流。</p>
+    </div>
+    <div class="stats">
+      <div><b id="st-apps">–</b>件作品</div>
+      <div><b id="st-makers">–</b>位投稿者</div>
+      <div><b id="st-cmts">–</b>則留言</div>
+    </div>
+  </header>
+
+  <div class="bar">
+    <div class="seg" role="group" aria-label="範圍">
+      <button id="v-all" aria-pressed="true">全部</button>
+      <button id="v-saved" aria-pressed="false">我的收藏</button>
+    </div>
+    <input id="q" type="search" placeholder="搜尋名稱、介紹、作者…" aria-label="搜尋">
+    <select id="sort" aria-label="排序">
+      <option value="new">最新</option>
+      <option value="likes">最多 👍</option>
+      <option value="talk">最多討論</option>
+    </select>
+    <a class="btn primary" id="submit-link" target="_blank" rel="noopener">＋ 投稿作品</a>
+  </div>
+
+  <div class="tags" id="tagbar"></div>
+
+  <div class="grid" id="grid">
+    <div class="empty"><strong>正在載入收藏…</strong>作品清單來自 GitHub，第一次開啟要等一兩秒。</div>
+  </div>
+
+  <p class="note">投稿和留言都在 GitHub 上進行，需要一個免費的 GitHub 帳號。投稿經整理後上架；每件作品的留言區就是它的 GitHub issue。「我的收藏」只存在你這台裝置的瀏覽器。</p>
+</div>
+
+<div class="scrim" id="scrim" hidden></div>
+<aside class="sheet" id="sheet" hidden role="dialog" aria-labelledby="sh-title">
+  <header>
+    <div style="min-width:0"><h2 id="sh-title"></h2><div class="maker" id="sh-maker"></div></div>
+    <button class="btn" id="sh-close">關閉</button>
+  </header>
+  <div class="body" id="sh-body"></div>
+  <footer><span>留言、按 👍 都在 GitHub 上</span><a class="btn primary" id="sh-gh" target="_blank" rel="noopener">到 GitHub 留言</a></footer>
+</aside>
+
+<script>
+/* ===== 設定：改成你的 GitHub 帳號與 repo 名稱 ===== */
+const OWNER = "p19691221-web";
+const REPO  = "soft-shelf";
+const LISTED_LABEL = "listed";
+/* ================================================ */
+
+const $ = s => document.querySelector(s);
+const API = `https://api.github.com/repos/${OWNER}/${REPO}`;
+const STATUS = {"原型":["原型","s-proto"], "可用":["可用","s-live"], "停更":["停更","s-paused"]};
+const S = { apps:[], view:"all", q:"", sort:"new", tag:null, saved:new Set(), openId:null };
+
+$("#submit-link").href = `https://github.com/${OWNER}/${REPO}/issues/new?template=submit.yml`;
+
+try{ S.saved = new Set(JSON.parse(localStorage.getItem("shelf-saved")||"[]")); }catch{}
+function persistSaved(){ try{ localStorage.setItem("shelf-saved", JSON.stringify([...S.saved])); }catch{} }
+
+function el(tag, props={}, ...kids){ const e=document.createElement(tag); for(const[k,v] of Object.entries(props)){ if(k==="text") e.textContent=v; else if(k.startsWith("on")) e.addEventListener(k.slice(2),v); else if(v!==undefined&&v!==null&&v!==false) e.setAttribute(k,v);} for(const k of kids) if(k) e.append(k); return e; }
+function safeUrl(u){ try{ const x=new URL(u); return /^https?:$/.test(x.protocol)?x.href:null; }catch{ return null; } }
+function ago(iso){ const t=Date.parse(iso); if(!t) return ""; const s=(Date.now()-t)/1000; if(s<3600) return Math.max(1,Math.floor(s/60))+" 分鐘前"; if(s<86400) return Math.floor(s/3600)+" 小時前"; if(s<86400*30) return Math.floor(s/86400)+" 天前"; return new Date(t).toLocaleDateString("zh-TW"); }
+
+/* 解析 GitHub issue form 產生的內文：### 標題\n\n內容 */
+function parseForm(body){
+  const out={};
+  const parts=(body||"").split(/^###\s+/m).slice(1);
+  for(const p of parts){ const i=p.indexOf("\n"); const k=p.slice(0,i).trim(); let v=p.slice(i+1).trim(); if(v==="_No response_") v=""; out[k]=v; }
+  return out;
+}
+function toApp(issue){
+  const f=parseForm(issue.body);
+  const tags=[...new Set((f["標籤"]||"").split(/[,，、]/).map(t=>t.trim().replace(/^#/,"")).filter(Boolean).map(t=>t.slice(0,20)))].slice(0,5);
+  return {
+    id: issue.number,
+    title: f["名稱"] || issue.title.replace(/^\[投稿\]\s*/,""),
+    url: safeUrl(f["網址"]||""),
+    desc: f["一句話介紹"]||"",
+    maker: f["製作者"]||"",
+    status: f["狀態"]||"可用",
+    tags, own: /- \[x\]/i.test(f["作者"]||""),
+    likes: (issue.reactions && issue.reactions["+1"]) || 0,
+    comments: issue.comments||0,
+    at: issue.created_at, html: issue.html_url,
+    by: issue.user ? issue.user.login : "", avatar: issue.user ? issue.user.avatar_url : ""
+  };
+}
+
+async function load(){
+  const KEY="shelf-cache-v1";
+  try{ const c=JSON.parse(sessionStorage.getItem(KEY)||"null"); if(c && Date.now()-c.t<5*60*1000){ S.apps=c.apps; render(); return; } }catch{}
+  try{
+    const r=await fetch(`${API}/issues?labels=${encodeURIComponent(LISTED_LABEL)}&state=open&per_page=100`,{headers:{Accept:"application/vnd.github+json"}});
+    if(!r.ok) throw new Error(r.status===403?"rate":"http");
+    const data=await r.json();
+    S.apps=data.filter(i=>!i.pull_request).map(toApp);
+    try{ sessionStorage.setItem(KEY, JSON.stringify({t:Date.now(),apps:S.apps})); }catch{}
+    render();
+  }catch(e){
+    $("#grid").replaceChildren(el("div",{class:"empty"}, el("strong",{text: e.message==="rate"?"GitHub 暫時限流":"載入失敗"}),
+      document.createTextNode(e.message==="rate"?"同一網路一小時內讀取次數到上限，請稍後再開。":"無法從 GitHub 讀取作品清單，請稍後重新整理。")));
+  }
+}
+
+function filtered(){
+  let list=S.apps.slice();
+  if(S.view==="saved") list=list.filter(a=>S.saved.has(a.id));
+  if(S.tag) list=list.filter(a=>a.tags.includes(S.tag));
+  const q=S.q.trim().toLowerCase();
+  if(q) list=list.filter(a=>[a.title,a.desc,a.maker,a.tags.join(" ")].join(" ").toLowerCase().includes(q));
+  const k={new:a=>-Date.parse(a.at), likes:a=>-a.likes, talk:a=>-a.comments}[S.sort];
+  return list.sort((a,b)=>k(a)-k(b) || Date.parse(b.at)-Date.parse(a.at));
+}
+
+function render(){
+  $("#st-apps").textContent=S.apps.length;
+  $("#st-makers").textContent=new Set(S.apps.map(a=>a.by)).size;
+  $("#st-cmts").textContent=S.apps.reduce((n,a)=>n+a.comments,0);
+  for(const v of ["all","saved"]) $("#v-"+v).setAttribute("aria-pressed", S.view===v);
+  const counts={}; S.apps.forEach(a=>a.tags.forEach(t=>counts[t]=(counts[t]||0)+1));
+  const tb=$("#tagbar"); tb.replaceChildren();
+  Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,16).forEach(([t,n])=>
+    tb.append(el("button",{class:"chip","aria-pressed":String(S.tag===t),onclick:()=>{S.tag=S.tag===t?null:t;render();},text:`#${t} ${n}`})));
+  const g=$("#grid"); g.replaceChildren();
+  const list=filtered();
+  if(!list.length){
+    const msg = S.apps.length===0 ? ["收藏館還是空的","按「＋ 投稿作品」推薦第一件。"]
+      : S.view==="saved" ? ["還沒有收藏","在作品卡片按 ☆，就會收進這台裝置的收藏。"]
+      : ["沒有符合的作品","換個關鍵字或取消標籤篩選試試。"];
+    g.append(el("div",{class:"empty"}, el("strong",{text:msg[0]}), document.createTextNode(msg[1])));
+  }
+  for(const a of list){
+    const st=STATUS[a.status]||STATUS["可用"], saved=S.saved.has(a.id);
+    const title = a.url ? el("a",{href:a.url,target:"_blank",rel:"noopener noreferrer",text:a.title}) : document.createTextNode(a.title);
+    g.append(el("article",{class:"card"},
+      el("div",{class:"head"},
+        el("div",{style:"min-width:0"}, el("h3",{},title),
+          el("div",{class:"maker",text:a.maker?"by "+a.maker:""}, a.own?el("span",{class:"mine-badge",text:"作者自薦"}):null)),
+        el("span",{class:"status "+st[1],text:st[0]})),
+      el("p",{class:"desc",text:a.desc}),
+      a.tags.length? el("div",{class:"tags"}, ...a.tags.map(t=>el("span",{class:"chip",text:"#"+t}))) : null,
+      el("div",{class:"foot"},
+        el("div",{class:"who"}, a.avatar?el("img",{src:a.avatar+"&s=40",alt:""}):null, el("span",{text:"@"+a.by+" · "+ago(a.at)})),
+        el("div",{class:"acts"},
+          el("button",{class:"icon-btn","aria-pressed":String(saved),title:saved?"取消收藏":"收藏到這台裝置",onclick:()=>{saved?S.saved.delete(a.id):S.saved.add(a.id);persistSaved();render();}, text:saved?"★":"☆"}),
+          el("button",{class:"icon-btn",title:"👍 數",onclick:()=>openSheet(a.id),text:"👍 "+a.likes}),
+          el("button",{class:"icon-btn",title:"看留言",onclick:()=>openSheet(a.id),text:"💬 "+a.comments})))));
+  }
+}
+
+async function openSheet(id){
+  const a=S.apps.find(x=>x.id===id); if(!a) return;
+  S.openId=id; $("#sheet").hidden=false; $("#scrim").hidden=false;
+  $("#sh-title").textContent=a.title; $("#sh-maker").textContent=a.maker?"by "+a.maker:"";
+  $("#sh-gh").href=a.html;
+  const b=$("#sh-body"); const st=STATUS[a.status]||STATUS["可用"];
+  b.replaceChildren(el("p",{class:"desc",text:a.desc}),
+    el("div",{class:"meta"}, el("span",{class:"status "+st[1],text:st[0]}),
+      a.url?el("a",{class:"go",href:a.url,target:"_blank",rel:"noopener noreferrer",text:"開啟作品 ↗"}):null,
+      el("span",{text:`👍 ${a.likes}`})));
+  const box=el("div",{class:"maker",text:a.comments?"載入留言中…":"還沒有留言。到 GitHub 說說你的使用心得或建議。"}); b.append(box);
+  if(!a.comments) return;
+  try{
+    const r=await fetch(`${API}/issues/${id}/comments?per_page=100`,{headers:{Accept:"application/vnd.github+json"}});
+    if(!r.ok) throw 0;
+    const cs=await r.json(); if(S.openId!==id) return;
+    box.textContent=`留言 ${cs.length}`;
+    for(const c of cs) b.append(el("div",{class:"cmt"}, el("img",{src:c.user.avatar_url+"&s=56",alt:""}),
+      el("div",{class:"c"}, el("div",{class:"n"}, el("span",{text:"@"+c.user.login}), el("span",{text:ago(c.created_at)})), el("p",{text:c.body}))));
+  }catch{ box.textContent="留言暫時載入不了，可以直接到 GitHub 看。"; }
+}
+function closeSheet(){ S.openId=null; $("#sheet").hidden=true; $("#scrim").hidden=true; }
+$("#sh-close").onclick=closeSheet; $("#scrim").onclick=closeSheet;
+document.addEventListener("keydown",e=>{ if(e.key==="Escape"&&S.openId) closeSheet(); });
+for(const v of ["all","saved"]) $("#v-"+v).onclick=()=>{S.view=v;render();};
+$("#q").oninput=e=>{S.q=e.target.value;render();};
+$("#sort").onchange=e=>{S.sort=e.target.value;render();};
+load();
+</script>
+</body>
+</html>
