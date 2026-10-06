@@ -1,0 +1,57 @@
+name: 投稿作品
+description: 推薦一件個人開發的軟體到小軟體收藏館
+title: "[投稿] "
+labels: ["submission"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感謝投稿。審核通過後會出現在收藏館，這則 issue 底下就是這件作品的留言區。
+  - type: input
+    id: name
+    attributes:
+      label: 名稱
+      placeholder: 例如：收款結算小幫手
+    validations:
+      required: true
+  - type: input
+    id: url
+    attributes:
+      label: 網址
+      description: 以 https:// 開頭
+      placeholder: https://
+    validations:
+      required: true
+  - type: textarea
+    id: desc
+    attributes:
+      label: 一句話介紹
+      description: 它解決什麼問題？誰會用？
+    validations:
+      required: true
+  - type: input
+    id: maker
+    attributes:
+      label: 製作者
+      placeholder: 個人名稱或 @帳號
+  - type: dropdown
+    id: status
+    attributes:
+      label: 狀態
+      options:
+        - 可用
+        - 原型
+        - 停更
+      default: 0
+  - type: input
+    id: tags
+    attributes:
+      label: 標籤
+      description: 逗號分隔，最多 5 個
+      placeholder: 網頁工具, 生產力, 開源
+  - type: checkboxes
+    id: own
+    attributes:
+      label: 作者
+      options:
+        - label: 這是我自己做的
