@@ -59,6 +59,10 @@ button,input,select{font:inherit;color:inherit}
 .mine-badge{font-family:var(--mono);font-size:10px;background:var(--ink-soft);color:var(--ink);padding:1px 6px;border-radius:3px;margin-left:6px}
 .status{font-family:var(--mono);font-size:11px;padding:2px 8px;border-radius:999px;border:1px solid currentColor;white-space:nowrap}
 .s-proto{color:var(--proto)}.s-live{color:var(--ok)}.s-paused{color:var(--warn)}
+.plats{display:flex;flex-wrap:wrap;gap:4px}
+.plat{font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-radius:4px;padding:1px 6px;color:var(--fg);white-space:nowrap}
+.dl-note{font-size:12px;color:var(--muted);margin:0}
+#plat{border:1px solid var(--line);border-radius:999px;padding:7px 10px;background:var(--panel)}
 .desc{margin:0;overflow-wrap:anywhere;white-space:pre-wrap}
 .card .tags{margin:0}
 .card .chip{cursor:default}
@@ -108,7 +112,13 @@ button,input,select{font:inherit;color:inherit}
       <button id="v-all" aria-pressed="true">全部</button>
       <button id="v-saved" aria-pressed="false">我的收藏</button>
     </div>
-    <input id="q" type="search" placeholder="搜尋名稱、介紹、作者…" aria-label="搜尋">
+    <input id="q" type="search" placeholder="搜尋名稱、介紹、作者、平台…" aria-label="搜尋">
+    <select id="plat" aria-label="平台">
+      <option value="">所有平台</option>
+      <option value="網頁">網頁</option>
+      <option value="桌機">桌機（Windows／macOS／Linux）</option>
+      <option value="手機">手機（Android／iOS）</option>
+    </select>
     <select id="sort" aria-label="排序">
       <option value="new">最新</option>
       <option value="likes">最多 👍</option>
@@ -145,8 +155,10 @@ const LISTED_LABEL = "listed";
 
 const $ = s => document.querySelector(s);
 const API = `https://api.github.com/repos/${OWNER}/${REPO}`;
+const PLATFORMS = ["網頁","Windows","macOS","Linux","Android","iOS"];
+const GROUP = {"網頁":"網頁", "Windows":"桌機", "macOS":"桌機", "Linux":"桌機", "Android":"手機", "iOS":"手機"};
 const STATUS = {"原型":["原型","s-proto"], "可用":["可用","s-live"], "停更":["停更","s-paused"]};
-const S = { apps:[], view:"all", q:"", sort:"new", tag:null, saved:new Set(), openId:null };
+const S = { apps:[], view:"all", q:"", sort:"new", tag:null, plat:"", saved:new Set(), openId:null };
 
 $("#submit-link").href = `https://github.com/${OWNER}/${REPO}/issues/new?template=submit.yml`;
 
@@ -171,6 +183,9 @@ function toApp(issue){
     id: issue.number,
     title: f["名稱"] || issue.title.replace(/^\[投稿\]\s*/,""),
     url: safeUrl(f["網址"]||""),
+    source: safeUrl(f["原始碼"]||""),
+    /* 舊投稿沒有「平台」欄，視為網頁工具 */
+    plats: (()=>{ const p=(f["平台"]||"").split(/[,，、]/).map(t=>t.trim()).filter(t=>PLATFORMS.includes(t)); return p.length?p:["網頁"]; })(),
     desc: f["一句話介紹"]||"",
     maker: f["製作者"]||"",
     status: f["狀態"]||"可用",
@@ -183,7 +198,7 @@ function toApp(issue){
 }
 
 async function load(){
-  const KEY="shelf-cache-v1";
+  const KEY="shelf-cache-v2";
   try{ const c=JSON.parse(sessionStorage.getItem(KEY)||"null"); if(c && Date.now()-c.t<5*60*1000){ S.apps=c.apps; render(); return; } }catch{}
   try{
     const r=await fetch(`${API}/issues?labels=${encodeURIComponent(LISTED_LABEL)}&state=open&per_page=100`,{headers:{Accept:"application/vnd.github+json"}});
@@ -202,8 +217,9 @@ function filtered(){
   let list=S.apps.slice();
   if(S.view==="saved") list=list.filter(a=>S.saved.has(a.id));
   if(S.tag) list=list.filter(a=>a.tags.includes(S.tag));
+  if(S.plat) list=list.filter(a=>a.plats.some(p=>GROUP[p]===S.plat));
   const q=S.q.trim().toLowerCase();
-  if(q) list=list.filter(a=>[a.title,a.desc,a.maker,a.tags.join(" ")].join(" ").toLowerCase().includes(q));
+  if(q) list=list.filter(a=>[a.title,a.desc,a.maker,a.tags.join(" "),a.plats.join(" ")].join(" ").toLowerCase().includes(q));
   const k={new:a=>-Date.parse(a.at), likes:a=>-a.likes, talk:a=>-a.comments}[S.sort];
   return list.sort((a,b)=>k(a)-k(b) || Date.parse(b.at)-Date.parse(a.at));
 }
@@ -234,6 +250,7 @@ function render(){
           el("div",{class:"maker",text:a.maker?"by "+a.maker:""}, a.own?el("span",{class:"mine-badge",text:"作者自薦"}):null)),
         el("span",{class:"status "+st[1],text:st[0]})),
       el("p",{class:"desc",text:a.desc}),
+      el("div",{class:"plats"}, ...a.plats.map(p=>el("span",{class:"plat",text:p}))),
       a.tags.length? el("div",{class:"tags"}, ...a.tags.map(t=>el("span",{class:"chip",text:"#"+t}))) : null,
       el("div",{class:"foot"},
         el("div",{class:"who"}, a.avatar?el("img",{src:a.avatar+"&s=40",alt:""}):null, el("span",{text:"@"+a.by+" · "+ago(a.at)})),
@@ -244,6 +261,8 @@ function render(){
   }
 }
 
+const isWeb = a => a.plats.length===1 && a.plats[0]==="網頁";
+
 async function openSheet(id){
   const a=S.apps.find(x=>x.id===id); if(!a) return;
   S.openId=id; $("#sheet").hidden=false; $("#scrim").hidden=false;
@@ -252,8 +271,11 @@ async function openSheet(id){
   const b=$("#sh-body"); const st=STATUS[a.status]||STATUS["可用"];
   b.replaceChildren(el("p",{class:"desc",text:a.desc}),
     el("div",{class:"meta"}, el("span",{class:"status "+st[1],text:st[0]}),
-      a.url?el("a",{class:"go",href:a.url,target:"_blank",rel:"noopener noreferrer",text:"開啟作品 ↗"}):null,
-      el("span",{text:`👍 ${a.likes}`})));
+      a.url?el("a",{class:"go",href:a.url,target:"_blank",rel:"noopener noreferrer",text:isWeb(a)?"開啟作品 ↗":"下載頁 ↗"}):null,
+      a.source?el("a",{class:"go",href:a.source,target:"_blank",rel:"noopener noreferrer",text:"原始碼 ↗"}):null,
+      el("span",{text:`👍 ${a.likes}`})),
+    el("div",{class:"plats"}, ...a.plats.map(p=>el("span",{class:"plat",text:p}))),
+    isWeb(a)?null:el("p",{class:"dl-note",text:"需要下載安裝。上架只代表整理者看過介紹與連結，不代表檢查過安裝檔；請從官方下載頁取得，執行前自行確認來源。"}));
   const box=el("div",{class:"maker",text:a.comments?"載入留言中…":"還沒有留言。到 GitHub 說說你的使用心得或建議。"}); b.append(box);
   if(!a.comments) return;
   try{
@@ -271,6 +293,7 @@ document.addEventListener("keydown",e=>{ if(e.key==="Escape"&&S.openId) closeShe
 for(const v of ["all","saved"]) $("#v-"+v).onclick=()=>{S.view=v;render();};
 $("#q").oninput=e=>{S.q=e.target.value;render();};
 $("#sort").onchange=e=>{S.sort=e.target.value;render();};
+$("#plat").onchange=e=>{S.plat=e.target.value;render();};
 load();
 </script>
 </body>
