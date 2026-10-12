@@ -7,6 +7,7 @@ body:
     attributes:
       value: |
         感謝投稿。審核通過後會出現在收藏館，這則 issue 底下就是這件作品的留言區。
+        網頁工具、桌機軟體、手機 App 都可以投稿。需要下載的軟體請附官方下載頁，不要直接貼安裝檔連結。
   - type: input
     id: name
     attributes:
@@ -14,14 +15,35 @@ body:
       placeholder: 例如：收款結算小幫手
     validations:
       required: true
+  - type: dropdown
+    id: platform
+    attributes:
+      label: 平台
+      description: 可複選。網頁工具選「網頁」；需要下載安裝的選對應系統
+      multiple: true
+      options:
+        - 網頁
+        - Windows
+        - macOS
+        - Linux
+        - Android
+        - iOS
+    validations:
+      required: true
   - type: input
     id: url
     attributes:
       label: 網址
-      description: 以 https:// 開頭
+      description: 網頁工具填網址；桌機或手機軟體填下載頁、GitHub Releases 或官網。以 https:// 開頭
       placeholder: https://
     validations:
       required: true
+  - type: input
+    id: source
+    attributes:
+      label: 原始碼
+      description: 公開的原始碼網址（選填）。需要下載安裝的軟體，有原始碼比較容易被信任
+      placeholder: https://github.com/...
   - type: textarea
     id: desc
     attributes:
