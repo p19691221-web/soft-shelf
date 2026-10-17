@@ -711,10 +711,16 @@ function resize(){
   buildConcrete();
   anchor={x:-30,y:H+30};
   nozzle={x:W*.2,y:H*.82};aimAng=-.5;
-  buildChalk();parts=[];startMode();
+  buildChalk();parts=[];if(story)storyIdx=STORIES.indexOf(story.S)-1;startMode();
 }
 let rt=null;
-addEventListener('resize',()=>{if(Math.abs(innerWidth-W)<2&&Math.abs(innerHeight-H)<90)return;clearTimeout(rt);rt=setTimeout(resize,220);});
+let typingT=0;
+document.addEventListener('focusin',e=>{if(e.target.tagName==='INPUT')typingT=Date.now();});
+document.addEventListener('focusout',e=>{if(e.target.tagName==='INPUT')typingT=Date.now();});
+addEventListener('resize',()=>{const dw=Math.abs(innerWidth-W),dh=Math.abs(innerHeight-H);
+  // the on-screen keyboard only changes the height; never restart the story for it
+  if(dw<2&&(dh<90||document.activeElement?.tagName==='INPUT'||Date.now()-typingT<3000))return;
+  clearTimeout(rt);rt=setTimeout(resize,220);});
 
 const HINT={story:'四格故事：水管一格一格畫，畫完一起曬乾',free:'點一下地面，下一灘就流到那裡'};
 let hintT=null;
