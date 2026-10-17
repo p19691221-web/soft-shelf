@@ -137,6 +137,7 @@ function profileShape(v){
     c.translate(-.45,-.57);
     c.beginPath();cr(c,P);c.fill();
     if(v.id==='bun'){fillE(c,.12,.22,.125,.12);}
+    if(v.id==='mom'){fillE(c,.12,.6,.11,.1);}
     if(v.id==='pony'){c.lineWidth=.1;c.beginPath();c.moveTo(.16,.30);c.quadraticCurveTo(-.08,.36,-.06,.68);c.stroke();fillE(c,.15,.30,.06,.06);}
     if(v.id==='cap'){fillE(c,.42,.18,.33,.16);fillP(c,[[.55,.12],[1.0,.18],[.99,.235],[.6,.25]]);}
     if(v.id==='douli'){fillP(c,[[-.16,.34],[.43,-.13],[1.02,.34],[.98,.37],[-.12,.37]]);
@@ -165,12 +166,40 @@ const OTHERS=[
     fillE(c,.39,-.22,.028,.028);fillE(c,.27,-.2,.028,.028);
     cut(c,()=>{c.lineWidth=.03;c.beginPath();for(let a=0;a<4.6*Math.PI;a+=.15){const r=.015+a*.013;const x=r*Math.cos(a),y=-.07+r*Math.sin(a);a===0?c.moveTo(x,y):c.lineTo(x,y);}c.stroke();});}},
   {name:'飛過的鳥',core:[0,.07],draw(c){c.beginPath();c.moveTo(-.48,-.08);c.quadraticCurveTo(-.22,-.3,0,.0);c.quadraticCurveTo(.22,-.3,.48,-.08);
-    c.quadraticCurveTo(.2,-.06,.02,.16);c.quadraticCurveTo(-.2,-.06,-.48,-.08);c.fill();fillE(c,.01,.08,.06,.09);}}
+    c.quadraticCurveTo(.2,-.06,.02,.16);c.quadraticCurveTo(-.2,-.06,-.48,-.08);c.fill();fillE(c,.01,.08,.06,.09);}},
+  {name:'護身符',rot:0,core:[0,.1],draw(c){
+    c.beginPath();c.moveTo(-.28,-.16);c.quadraticCurveTo(0,-.3,.28,-.16);c.lineTo(.28,.36);c.quadraticCurveTo(.28,.42,.22,.42);c.lineTo(-.22,.42);c.quadraticCurveTo(-.28,.42,-.28,.36);c.closePath();c.fill();
+    c.lineWidth=.04;c.beginPath();c.ellipse(0,-.36,.07,.1,0,0,7);c.stroke();fillE(c,0,-.24,.05,.045);
+    c.lineWidth=.035;c.beginPath();c.moveTo(-.02,-.22);c.quadraticCurveTo(-.1,-.12,-.08,-.04);c.moveTo(.02,-.22);c.quadraticCurveTo(.1,-.12,.08,-.04);c.stroke();},
+   cut(c){c.save();c.scale(.01,.01);c.font='900 26px "Noto Serif CJK TC","PMingLiU","Songti TC","LXGW WenKai TC",serif';c.textAlign='center';c.textBaseline='middle';
+    c.fillText('平',0,3);c.fillText('安',0,29);c.restore();}},
+  {name:'交到手上',rot:0,core:[.06,.17],draw(c){
+    c.scale(.84,.84);c.lineWidth=.17;c.beginPath();c.moveTo(-.56,-.46);c.lineTo(-.24,-.22);c.stroke();
+    fillE(c,-.17,-.16,.15,.11,.55);
+    c.lineWidth=.05;c.beginPath();
+    for(const [x,y,ex,ey] of [[-.1,-.24,.06,-.17],[-.06,-.19,.09,-.1],[-.06,-.13,.07,-.03],[-.09,-.08,.02,.01]]){c.moveTo(x,y);c.quadraticCurveTo((x+ex)/2+.02,(y+ey)/2-.02,ex,ey);}
+    c.moveTo(-.2,-.08);c.quadraticCurveTo(-.12,-.02,-.04,-.02);c.stroke();
+    c.lineWidth=.05;c.beginPath();c.moveTo(.06,-.06);c.lineTo(.07,.1);c.stroke();
+    c.beginPath();c.moveTo(.0,.09);c.lineTo(.14,.09);c.lineTo(.14,.3);c.lineTo(.0,.3);c.closePath();c.fill();
+    c.lineWidth=.16;c.beginPath();c.moveTo(.58,.46);c.lineTo(.3,.33);c.stroke();
+    fillE(c,.17,.31,.16,.075,.12);
+    c.lineWidth=.048;c.beginPath();
+    for(const [x,y,ex,ey] of [[.04,.29,-.13,.2],[.04,.33,-.15,.27],[.05,.37,-.13,.33],[.07,.4,-.09,.38]]){c.moveTo(x,y);c.quadraticCurveTo((x+ex)/2,(y+ey)/2+.04,ex,ey);}
+    c.moveTo(.2,.25);c.quadraticCurveTo(.16,.17,.1,.15);c.stroke();}},
+  {name:'背著背包的孩子',rot:0,core:[.05,-.1],draw(c){
+    fillE(c,.13,-.36,.095,.095);
+    c.lineWidth=.14;c.beginPath();c.moveTo(.1,-.24);c.lineTo(.05,.06);c.stroke();
+    c.beginPath();c.moveTo(-.16,-.27);c.lineTo(.0,-.27);c.lineTo(.0,.03);c.lineTo(-.16,.03);c.closePath();c.fill();
+    c.lineWidth=.06;c.beginPath();c.moveTo(.11,-.19);c.quadraticCurveTo(.2,-.08,.24,.02);c.stroke();
+    c.lineWidth=.075;c.beginPath();c.moveTo(.06,.06);c.quadraticCurveTo(.16,.22,.22,.44);c.moveTo(.03,.06);c.quadraticCurveTo(-.04,.24,-.16,.42);c.stroke();
+    c.lineWidth=.05;c.beginPath();c.moveTo(.2,.45);c.lineTo(.3,.45);c.moveTo(-.18,.42);c.lineTo(-.1,.45);c.stroke();
+    c.lineWidth=.02;c.beginPath();c.moveTo(-.16,0);c.lineTo(-.2,.08);c.stroke();
+    c.beginPath();c.moveTo(-.25,.08);c.lineTo(-.15,.08);c.lineTo(-.15,.18);c.lineTo(-.25,.18);c.closePath();c.fill();}}
 ];
 function pickShape(){
   for(let tries=0;tries<10;tries++){
     const useP=cat==='p'||(cat==='all'&&Math.random()<.6);
-    const s=useP?profileShape(PV[Math.floor(Math.random()*PV.length)]):Object.assign({kind:'o',rot:rand(-.25,.25)},OTHERS[Math.floor(Math.random()*OTHERS.length)]);
+    const s=useP?profileShape(PV[Math.floor(Math.random()*PV.length)]):Object.assign({kind:'o',rot:rand(-.25,.25)},OTHERS[Math.floor(Math.random()*7)]);
     if(s.name!==lastName){lastName=s.name;return s;}
   }
   return profileShape(PV[8]);
@@ -281,11 +310,14 @@ function prepareMask(r){
   const data=mctx.getImageData(0,0,GW,GH).data,a=new Float32Array(N);
   for(let i=0;i<N;i++)a[i]=data[i*4+3]/255;
   boxBlur(a);if(s>80)boxBlur(a);
-  const amp=clamp(s/200,.2,.42);
+  const amp=clamp(s/200,.2,.42)*(r.sh.kind==='p'?.6:1);
   const ox=Math.random()*100,oy=Math.random()*100;
   for(let i=0;i<N;i++){const x=i%GW,y=(i/GW)|0;mask[i]=a[i]+(fbm(x/5+ox,y/5+oy)-.5)*amp>.5?1:0;}
   if(r.rect){const x0=Math.floor(r.rect.x/CELL)+1,y0=Math.floor(r.rect.y/CELL)+1,x1=Math.ceil((r.rect.x+r.rect.w)/CELL)-2,y1=Math.ceil((r.rect.y+r.rect.h)/CELL)-2;
     for(let i=0;i<N;i++){const x=i%GW,y=(i/GW)|0;if(x<x0||x>x1||y<y0||y>y1)mask[i]=0;}}
+  if(r.sh.cut){mctx.setTransform(1,0,0,1,0,0);mctx.clearRect(0,0,GW,GH);mctx.save();mctx.translate(r.cx/CELL,r.cy/CELL);mctx.rotate(r.rot);mctx.scale(s,s);
+    mctx.fillStyle='#000';mctx.strokeStyle='#000';r.sh.cut(mctx);mctx.restore();const cd=mctx.getImageData(0,0,GW,GH).data;
+    for(let i=0;i<N;i++)if(cd[i*4+3]>110)mask[i]=0;}
   const sx=clamp(Math.round(ax),1,GW-2),sy=clamp(Math.round(ay),1,GH-2),start=sy*GW+sx;
   for(let yy=-1;yy<=1;yy++)for(let xx=-1;xx<=1;xx++)mask[start+yy*GW+xx]=1;
   // arrival times: water finds its way across rough concrete
@@ -306,15 +338,16 @@ function prepareMask(r){
 }
 
 /* ---------- rounds & stories ---------- */
-const OTHER_IDX={cat:0,egret:1,fish:2,leaf:3,snail:4,bird:5};
-function shapeById(id){const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
+const OTHER_IDX={cat:0,egret:1,fish:2,leaf:3,snail:4,bird:5,amulet:6,hands:7,walker:8};
+function shapeById(id){if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'平安',panels:[['mom','出門前，媽媽叫住他。'],['hands','把護身符放進他手裡。'],['walker','他背起背包，走遠了。'],['amulet','都乾了，平安最後才乾。',0,3.5]]},
   {title:'等',panels:[['pony','她在廣場等一個人。'],['leaf','葉子落了一片。'],['bird','鳥飛過去了。'],['cap','他來了。水也快乾了。',1]]},
   {title:'釣',panels:[['douli','阿伯去溪邊。'],['fish','釣到一條魚。'],['cat','貓聞到了。'],['douli','阿伯回頭，魚不見了。',1]]},
   {title:'慢',panels:[['snail','蝸牛出門了。'],['egret','白鷺鷥來了又走。'],['snail','蝸牛還在。'],['kid','小孩蹲下來，看了很久。',1]]},
   {title:'午後',panels:[['beard','阿公在樹下睡著。'],['cat','貓也睡著。'],['bird','鳥停了一下。'],['beard','阿公醒來，什麼都不知道。']]}
 ];
-let mode='story',story=null,storyIdx=Math.floor(Math.random()*STORIES.length),chalkA=0,freeCount=0;
+let mode='story',story=null,storyIdx=-1,chalkA=0,freeCount=0;
 function storyLayout(){
   const tb=document.querySelector('.tag').getBoundingClientRect(),fb=document.querySelector('.foot').getBoundingClientRect();
   const top=Math.max(tb.bottom+12,60),bot=Math.min(fb.top-8,H-80);
@@ -332,7 +365,7 @@ function planStory(){
   story={S,L:storyLayout(),shapes,capA:[0,0,0,0],jit:S.panels.map(()=>Array.from({length:24},()=>rand(-1.8,1.8)))};
   startPanel(0);
 }
-function startPanel(k){const p=story.S.panels[k];planRound({sh:story.shapes[k],rect:story.L.rects[k],flip:!!p[2],k,keepAcc:k>0});}
+function startPanel(k){const p=story.S.panels[k];planRound({sh:story.shapes[k],rect:story.L.rects[k],flip:!!p[2],k,keepAcc:k>0,lag:p[3]||0});}
 function planRound(opt={}){
   const sh=opt.sh||pickShape();let sPx,cx,cy,nx,ny,flip;
   if(opt.rect){const p=opt.rect;
@@ -350,7 +383,7 @@ function planRound(opt={}){
     fromX:nozzle.x,fromY:nozzle.y,fromA:aimAng,moveDur:clamp(dist/260,.5,1.8),maxArr:0,maxDry:0};
   prepareMask(round);
   if(!opt.keepAcc)acc.fill(0);
-  const lag=round.k>0?round.k*1.4:0;
+  const lag=(round.k>0?round.k*1.4:0)+(opt.lag||0);
   for(let i=0;i<N;i++)if(mask[i]){acc[i]=1;accDry[i]=dryT[i]+lag;}
   if(!opt.rect)freeCount++;
   label();
