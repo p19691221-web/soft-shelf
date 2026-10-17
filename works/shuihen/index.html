@@ -482,7 +482,8 @@ const STORIES=[
 let mode='story',story=null,storyIdx=-1,chalkA=0,freeCount=0;
 function storyLayout(){
   const tb=document.querySelector('.tag').getBoundingClientRect(),fb=document.querySelector('.foot').getBoundingClientRect();
-  const top=Math.max(tb.bottom+12,60),bot=Math.min(fb.top-8,H-80);
+  // measure the control strip from the bottom edge, so an open keyboard cannot squash the frames
+  const top=Math.max(tb.bottom+12,60),bot=Math.min(H-(innerHeight-fb.top)-8,H-80);
   const left=16,AW=W-32,AH=Math.max(200,bot-top),g=14,rects=[];
   let fsz;
   if(W/H>1.25){const pw=(AW-3*g)/4;fsz=clamp(pw/10,15,22);const capH=fsz*3+10;const ph=Math.min(AH-capH,pw*1.45);const y=top+(AH-capH-ph)/2;
