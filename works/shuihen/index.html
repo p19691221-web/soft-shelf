@@ -50,6 +50,23 @@ button:focus-visible{outline:2px solid var(--chalk);outline-offset:2px}
 .seg button:last-child{border-radius:0 5px 4px 0}
 .seg button+button{border-left-width:0}
 .seg button[aria-pressed="true"]{background:var(--scrim-on);color:var(--ink)}
+.sheet{position:fixed;inset:0;z-index:20;background:rgba(20,18,15,.5);display:grid;place-items:center;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:calc(16px + env(safe-area-inset-top,0px)) calc(16px + env(safe-area-inset-bottom,0px))}
+.card{width:min(460px,100%);max-height:78vh;display:grid;grid-template-rows:auto auto minmax(0,1fr);gap:12px;
+  background:rgba(40,36,30,.94);border:1.5px solid var(--chalk-line);border-radius:4px 7px 5px 6px;padding:16px;box-sizing:border-box}
+.card header{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.card h2{margin:0;font-size:22px;letter-spacing:.08em}
+.card input{font:inherit;font-size:17px;color:var(--chalk);background:transparent;border:0;border-bottom:1.5px solid var(--chalk-line);padding:8px 2px;min-width:0}
+.card input:focus-visible{outline:none;border-bottom-color:var(--chalk)}
+.card input::placeholder{color:var(--chalk-dim)}
+.list{list-style:none;margin:0;padding:0;overflow-y:auto;display:grid;gap:6px;align-content:start}
+.list button{width:100%;text-align:left;display:grid;gap:3px;border-radius:3px;background:transparent;-webkit-backdrop-filter:none;backdrop-filter:none}
+.list button[aria-current="true"]{border-color:var(--chalk);background:rgba(247,244,234,.1)}
+.list .t{font-size:18px;font-weight:700}
+.list .c{font-size:14px;color:var(--chalk-dim);line-height:1.45}
+.list mark{background:rgba(247,244,234,.85);color:var(--ink);border-radius:2px;padding:0 1px}
+.empty{color:var(--chalk-dim);font-size:15px;padding:6px 2px}
 </style>
 
 </head>
@@ -65,6 +82,7 @@ button:focus-visible{outline:2px solid var(--chalk);outline-offset:2px}
     <div class="hint" id="hint">四格故事：水管一格一格畫，畫完一起曬乾</div>
     <div class="bar">
       <button id="pause" type="button">暫停</button>
+      <button id="pick" type="button">找故事</button>
       <button id="next" type="button">換下一個</button>
       <button id="speed" type="button">速度 1×</button>
       <button id="sound" type="button" aria-pressed="false">開聲音</button>
@@ -78,6 +96,14 @@ button:focus-visible{outline:2px solid var(--chalk);outline-offset:2px}
         <button type="button" id="c-o" data-cat="o" aria-pressed="false">其他</button>
       </div>
     </div>
+  </div>
+</div>
+
+<div class="sheet" id="sheet" hidden>
+  <div class="card" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
+    <header><h2 id="sheet-title">找故事</h2><button type="button" id="sheet-close">關閉</button></header>
+    <input id="q" type="search" placeholder="輸入關鍵字，例如：貓、護身符、阿伯" autocomplete="off">
+    <ul class="list" id="list"></ul>
   </div>
 </div>
 
@@ -696,7 +722,28 @@ document.querySelectorAll('[data-cat]').forEach(b=>b.addEventListener('click',()
   document.querySelectorAll('[data-cat]').forEach(x=>x.setAttribute('aria-pressed',x===b?'true':'false'));}));
 document.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',()=>{if(b.dataset.mode===mode)return;mode=b.dataset.mode;
   document.querySelectorAll('[data-mode]').forEach(x=>x.setAttribute('aria-pressed',x===b?'true':'false'));
-  $('catseg').hidden=mode==='story';showHint();startMode();}));
+  $('catseg').hidden=mode==='story';$('pick').hidden=mode!=='story';showHint();startMode();}));
+function esc(t){return t.replace(/[&<>"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));}
+function hl(t,q){const e=esc(t);if(!q)return e;const qe=esc(q);return e.split(qe).join('<mark>'+qe+'</mark>');}
+function renderList(){const q=$('q').value.trim(),ul=$('list');ul.replaceChildren();let n=0;
+  STORIES.forEach((S,i)=>{const caps=S.panels.map(p=>p[1]);
+    if(q&&!S.title.includes(q)&&!caps.some(c=>c.includes(q)))return;n++;
+    const li=document.createElement('li'),b=document.createElement('button');b.type='button';
+    if(story&&story.S===S)b.setAttribute('aria-current','true');
+    b.innerHTML=`<span class="t">〈${hl(S.title,q)}〉</span><span class="c">${caps.map(c=>hl(c,q)).join('　')}</span>`;
+    b.addEventListener('click',()=>playStory(i));li.append(b);ul.append(li);});
+  if(!n){const li=document.createElement('li');li.className='empty';li.textContent=`沒有包含「${q}」的故事。換個字試試。`;ul.append(li);}}
+function playStory(i){closeSheet();storyIdx=i-1;
+  if(mode!=='story'){mode='story';document.querySelectorAll('[data-mode]').forEach(x=>x.setAttribute('aria-pressed',x.dataset.mode==='story'?'true':'false'));
+    $('catseg').hidden=true;$('pick').hidden=false;}
+  startMode();}
+function openSheet(){$('sheet').hidden=false;$('q').value='';renderList();setTimeout(()=>{try{$('q').focus();}catch(e){}},30);}
+function closeSheet(){$('sheet').hidden=true;$('pick').focus({preventScroll:true});}
+$('pick').addEventListener('click',openSheet);
+$('sheet-close').addEventListener('click',closeSheet);
+$('sheet').addEventListener('click',e=>{if(e.target===$('sheet'))closeSheet();});
+$('q').addEventListener('input',renderList);
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('sheet').hidden)closeSheet();});
 showHint();
 
 let last=performance.now();
