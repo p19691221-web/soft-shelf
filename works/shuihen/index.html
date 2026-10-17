@@ -425,7 +425,22 @@ const MAIKO=c=>{fillE(c,.36,.16,.38,.22);fillE(c,.04,.36,.15,.13);
   c.lineWidth=.035;c.beginPath();c.moveTo(.5,.02);c.lineTo(.78,-.16);c.moveTo(.26,-.02);c.lineTo(.12,-.2);c.stroke();
   fillE(c,.8,-.18,.05,.05);fillE(c,.84,-.08,.035,.035);fillE(c,.86,.02,.03,.03);fillE(c,.1,-.22,.045,.045);
   fillP(c,[[.3,1.0],[.62,.98],[.8,1.14],[.16,1.14]]);};
+const RIVER=(c,x0,x1,y,h)=>{c.beginPath();const n=24;
+  for(let k=0;k<=n;k++){const x=x0+(x1-x0)*k/n;c.lineTo(x,y+Math.sin(k*.9)*h*.12);}
+  for(let k=n;k>=0;k--){const x=x0+(x1-x0)*k/n;c.lineTo(x,y+h+Math.sin(k*.9+1.3)*h*.12);}c.closePath();c.fill();};
+const RIPPLE=(c,x0,x1,y,h)=>{c.lineWidth=h*.09;for(const f of [.32,.66]){c.beginPath();const n=16;
+  for(let k=0;k<=n;k++){const x=x0+(x1-x0)*(.08+.84*k/n);c.lineTo(x,y+h*f+Math.sin(k*1.3+f*5)*h*.07);}c.stroke();}};
+const CROWN=c=>{fillP(c,[[.14,.2],[.16,-.04],[.27,.1],[.4,-.12],[.52,.07],[.64,-.06],[.68,.16]]);fillE(c,.4,-.13,.035,.035);};
 function shapeById(id){
+  if(id==='kidRiver')return profileShape({id:'kid',name:'第一次看見恆河的孩子',extra:c=>RIVER(c,-.15,1.1,1.28,.22),cutP:c=>RIPPLE(c,-.15,1.1,1.28,.22),box:[1.3,1.6],core:[0,.15]});
+  if(id==='oldKing')return profileShape({id:'beard',name:'六十二歲的國王',extra:CROWN,box:[1.1,1.3],core:[0,.1]});
+  if(id==='lotus'){const PET=[[0,.5,.15],[-.42,.42,.13],[.42,.42,.13],[-.95,.34,.11],[.95,.34,.11]];
+    const petal=(c,a,l,w)=>{c.save();c.translate(0,.22);c.rotate(a);c.beginPath();c.moveTo(0,0);c.bezierCurveTo(-w*1.3,-l*.35,-w*.6,-l*.85,0,-l);c.bezierCurveTo(w*.6,-l*.85,w*1.3,-l*.35,0,0);c.closePath();c.restore();};
+    return {name:'蓮花',kind:'o',rot:0,core:[0,.05],box:[1.05,.95],draw(c){
+      for(const [a,l,w] of PET.slice().reverse()){petal(c,a,l,w);c.fill();}
+      c.beginPath();c.moveTo(-.42,.26);c.quadraticCurveTo(0,.36,.42,.26);c.quadraticCurveTo(0,.3,-.42,.26);c.lineWidth=.05;c.stroke();},
+      cut(c){c.lineWidth=.022;for(const [a,l,w] of PET.slice(0,3)){petal(c,a,l*.97,w);c.stroke();}}};}
+  if(id==='river')return {name:'恆河',kind:'o',rot:0,core:[-.3,.05],box:[1.05,.8],draw(c){RIVER(c,-.5,.5,-.18,.42);},cut(c){RIPPLE(c,-.5,.5,-.18,.42);}};
   if(id==='asker')return profileShape({id:'kid',name:'發問的人',extra:QMARK,box:[1.4,1.15]});
   if(id==='maiko')return profileShape({id:'plain',name:'舞妓',extra:MAIKO,box:[1.25,1.38],core:[0,.08]});
   if(id==='torii')return {name:'鳥居',kind:'o',rot:0,core:[-.29,.3],box:[1.06,.95],draw(c){
@@ -452,6 +467,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'恆河',panels:[['kidRiver','三歲，母親帶他第一次看見恆河。'],['oldKing','六十二歲，髮白皮皺。他問：有什麼不會老？'],['lotus','佛問：三歲看河的那個看見，老了嗎？'],['river','王答：能看見的，沒有老。',0,3.5]]},
   {title:'誰是京都人',panels:[['asker','問：誰是京都人？'],['maiko','有人說：舞妓。'],['torii','有人說：住鳥居旁的人。'],['syrup','答：京都念慈菴。']]},
   {title:'虎克船長的眼罩',panels:[['hook1','小明：虎克船長為什麼要戴眼罩？'],['gull','海鷗飛過，便便剛好掉進他眼睛。'],['hook3','他順手一揉……忘了那是鐵鉤。'],['hook4','從此，戴上眼罩。']]},
   {title:'白羊吃草',panels:[['sheep','白羊走進廣場。'],['grass','低頭一看，縫裡長了草。'],['sheepGraze','吃得很開心。'],['sheepUp','草沒了，羊抬頭看著水管。',1]]},
