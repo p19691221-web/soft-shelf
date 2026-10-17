@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="description" content="老水泥廣場上，一條水管流出的水慢慢漫成人物側臉或其他造型，再從邊緣乾掉。">
+<meta name="description" content="老水泥廣場上，一條水管一格一格用水畫出四格故事，畫完一起曬乾；也可以自由模式隨意流。">
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}[hidden]{display:none!important}</style>
 <title>水泥地水痕</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -24,6 +24,7 @@
   color-scheme:light;
 }
 html,body{height:100%}
+[hidden]{display:none!important}
 body{margin:0;background:var(--ground);color:var(--chalk);font-family:var(--font-chalk);overflow:hidden;-webkit-user-select:none;user-select:none}
 #plaza{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:manipulation;cursor:crosshair}
 .hud{position:fixed;inset:0;pointer-events:none;display:flex;flex-direction:column;justify-content:space-between;
@@ -31,7 +32,8 @@ body{margin:0;background:var(--ground);color:var(--chalk);font-family:var(--font
   padding-block:calc(14px + env(safe-area-inset-top,0px)) calc(14px + env(safe-area-inset-bottom,0px))}
 .tag{display:grid;gap:2px;text-shadow:0 1px 0 rgba(0,0,0,.25),0 0 6px rgba(0,0,0,.18)}
 .no{font-size:30px;font-weight:700;letter-spacing:.06em;line-height:1.1}
-.nm{font-size:19px;line-height:1.3}
+.nm{font-size:19px;line-height:1.3;min-height:1.3em}
+.ph{min-height:1.4em}
 .ph{font-size:14px;color:var(--chalk-dim);letter-spacing:.12em}
 .foot{display:grid;gap:10px;justify-items:start}
 .hint{font-size:15px;color:var(--chalk-dim);text-shadow:0 1px 2px rgba(0,0,0,.3);transition:opacity .8s}
@@ -60,13 +62,17 @@ button:focus-visible{outline:2px solid var(--chalk);outline-offset:2px}
     <div class="ph" id="ph">水管移過去</div>
   </div>
   <div class="foot">
-    <div class="hint" id="hint">點一下地面，下一灘就流到那裡</div>
+    <div class="hint" id="hint">四格故事：水管一格一格畫，畫完一起曬乾</div>
     <div class="bar">
       <button id="pause" type="button">暫停</button>
       <button id="next" type="button">換下一個</button>
       <button id="speed" type="button">速度 1×</button>
       <button id="sound" type="button" aria-pressed="false">開聲音</button>
-      <div class="seg" role="group" aria-label="造型種類">
+      <div class="seg" role="group" aria-label="模式">
+        <button type="button" id="m-story" data-mode="story" aria-pressed="true">四格故事</button>
+        <button type="button" id="m-free" data-mode="free" aria-pressed="false">自由</button>
+      </div>
+      <div class="seg" id="catseg" role="group" aria-label="造型種類" hidden>
         <button type="button" id="c-all" data-cat="all" aria-pressed="true">全部</button>
         <button type="button" id="c-p" data-cat="p" aria-pressed="false">人物</button>
         <button type="button" id="c-o" data-cat="o" aria-pressed="false">其他</button>
@@ -99,9 +105,9 @@ const fbm=(x,y)=>nz(x,y)*.6+nz(x*2.1+17,y*2.1+9)*.28+nz(x*4.3+3,y*4.3+41)*.12;
 
 /* ---------- state ---------- */
 let W=0,H=0,DPR=1,CELL=3,GW=0,GH=0,N=0;
-let wet,stain,mask,arr,dryT,rough,gloss,depth,queue,heapI,heapK,wImg,sImg;
+let acc,accDry,wet,stain,mask,arr,dryT,rough,gloss,depth,queue,heapI,heapK,wImg,sImg;
 let anchor={x:-30,y:0},nozzle={x:0,y:0},aimAng=-.4;
-let round=null,count=0,queuedAt=null,paused=false,speedIdx=0,cat='all',lastName='';
+let round=null,queuedAt=null,paused=false,speedIdx=0,cat='all',lastName='';
 const SPEEDS=[1,2,4];
 const FLOW=50;
 let parts=[];
@@ -262,17 +268,24 @@ function prepareMask(r){
   r.sh.draw(mctx);mctx.restore();mctx.globalCompositeOperation='source-over';
   // rivulet from nozzle to the shape's core
   const cxu=r.sh.core[0]*fx*s,cyu=r.sh.core[1]*s,co=Math.cos(r.rot),si=Math.sin(r.rot);
-  const bx=r.cx/CELL+cxu*co-cyu*si,by=r.cy/CELL+cxu*si+cyu*co;
+  let bx=r.cx/CELL+cxu*co-cyu*si,by=r.cy/CELL+cxu*si+cyu*co;
   const ax=r.nx/CELL+Math.cos(r.toA)*3,ay=r.ny/CELL+Math.sin(r.toA)*3;
+  { // aim the rivulet at the nearest edge of the shape, so the stream stays short
+    const sd=mctx.getImageData(0,0,GW,GH).data;let best=1e9,ex=bx,ey=by;
+    for(let y=0;y<GH;y++)for(let x=0;x<GW;x++){if(sd[(y*GW+x)*4+3]<200)continue;const d=(x-ax)*(x-ax)+(y-ay)*(y-ay);if(d<best){best=d;ex=x;ey=y;}}
+    const ux=bx-ex,uy=by-ey,ul=Math.hypot(ux,uy)||1;bx=ex+ux/ul*3;by=ey+uy/ul*3;}
   const dx=bx-ax,dy=by-ay,L=Math.hypot(dx,dy)||1,px=-dy/L,py=dx/L,seed=Math.random()*50;
-  mctx.lineWidth=2.6;mctx.lineCap='round';mctx.beginPath();mctx.moveTo(ax,ay);
-  for(let k=1;k<=18;k++){const t=k/18,w=(nz(seed+t*3,7.7)-.5)*Math.min(L*.35,14)*Math.sin(Math.PI*t);mctx.lineTo(ax+dx*t+px*w,ay+dy*t+py*w);}
+  mctx.lineWidth=2.2;mctx.lineCap='round';mctx.beginPath();mctx.moveTo(ax,ay);
+  for(let k=1;k<=18;k++){const t=k/18,w=(nz(seed+t*3,7.7)-.5)*Math.min(L*.25,9)*Math.sin(Math.PI*t);mctx.lineTo(ax+dx*t+px*w,ay+dy*t+py*w);}
   mctx.stroke();mctx.beginPath();mctx.arc(ax,ay,3.4,0,7);mctx.fill();
   const data=mctx.getImageData(0,0,GW,GH).data,a=new Float32Array(N);
   for(let i=0;i<N;i++)a[i]=data[i*4+3]/255;
-  boxBlur(a);boxBlur(a);
+  boxBlur(a);if(s>80)boxBlur(a);
+  const amp=clamp(s/200,.2,.42);
   const ox=Math.random()*100,oy=Math.random()*100;
-  for(let i=0;i<N;i++){const x=i%GW,y=(i/GW)|0;mask[i]=a[i]+(fbm(x/5+ox,y/5+oy)-.5)*.42>.5?1:0;}
+  for(let i=0;i<N;i++){const x=i%GW,y=(i/GW)|0;mask[i]=a[i]+(fbm(x/5+ox,y/5+oy)-.5)*amp>.5?1:0;}
+  if(r.rect){const x0=Math.floor(r.rect.x/CELL)+1,y0=Math.floor(r.rect.y/CELL)+1,x1=Math.ceil((r.rect.x+r.rect.w)/CELL)-2,y1=Math.ceil((r.rect.y+r.rect.h)/CELL)-2;
+    for(let i=0;i<N;i++){const x=i%GW,y=(i/GW)|0;if(x<x0||x>x1||y<y0||y>y1)mask[i]=0;}}
   const sx=clamp(Math.round(ax),1,GW-2),sy=clamp(Math.round(ay),1,GH-2),start=sy*GW+sx;
   for(let yy=-1;yy<=1;yy++)for(let xx=-1;xx<=1;xx++)mask[start+yy*GW+xx]=1;
   // arrival times: water finds its way across rough concrete
@@ -292,54 +305,124 @@ function prepareMask(r){
   r.maxArr=maxA;r.maxDry=maxD;
 }
 
-/* ---------- rounds ---------- */
-function planRound(at){
-  const sh=pickShape(),m=Math.min(W,H);
-  let sPx=clamp(m*rand(.48,.64),150,560);sPx=Math.max(120,Math.min(sPx,W-28,H-190));
-  let cx,cy;
-  if(at){cx=at.x;cy=at.y;}else{cx=rand(sPx*.55,W-sPx*.55);cy=rand(sPx*.6+70,H-sPx*.6-90);}
-  cx=clamp(cx,sPx*.5+10,Math.max(sPx*.5+10,W-sPx*.5-10));
-  cy=clamp(cy,sPx*.55+64,Math.max(sPx*.55+64,H-sPx*.55-84));
-  let dx=anchor.x-cx,dy=anchor.y-cy;const d=Math.hypot(dx,dy)||1;dx/=d;dy/=d;
-  const off=sPx*.58+26,nx=clamp(cx+dx*off,18,W-18),ny=clamp(cy+dy*off,18,H-18);
-  const toA=Math.atan2(cy-ny,cx-nx);
-  const dist=Math.hypot(nx-nozzle.x,ny-nozzle.y);
-  round={sh,sPx,cx,cy,nx,ny,toA,flip:Math.random()<.5,rot:sh.rot||0,phase:'move',t:0,F:0,
+/* ---------- rounds & stories ---------- */
+const OTHER_IDX={cat:0,egret:1,fish:2,leaf:3,snail:4,bird:5};
+function shapeById(id){const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
+const STORIES=[
+  {title:'等',panels:[['pony','她在廣場等一個人。'],['leaf','葉子落了一片。'],['bird','鳥飛過去了。'],['cap','他來了。水也快乾了。',1]]},
+  {title:'釣',panels:[['douli','阿伯去溪邊。'],['fish','釣到一條魚。'],['cat','貓聞到了。'],['douli','阿伯回頭，魚不見了。',1]]},
+  {title:'慢',panels:[['snail','蝸牛出門了。'],['egret','白鷺鷥來了又走。'],['snail','蝸牛還在。'],['kid','小孩蹲下來，看了很久。',1]]},
+  {title:'午後',panels:[['beard','阿公在樹下睡著。'],['cat','貓也睡著。'],['bird','鳥停了一下。'],['beard','阿公醒來，什麼都不知道。']]}
+];
+let mode='story',story=null,storyIdx=Math.floor(Math.random()*STORIES.length),chalkA=0,freeCount=0;
+function storyLayout(){
+  const tb=document.querySelector('.tag').getBoundingClientRect(),fb=document.querySelector('.foot').getBoundingClientRect();
+  const top=Math.max(tb.bottom+12,60),bot=Math.min(fb.top-8,H-80);
+  const left=16,AW=W-32,AH=Math.max(200,bot-top),g=14,rects=[];
+  let fsz;
+  if(W/H>1.25){const pw=(AW-3*g)/4;fsz=clamp(pw/10,15,22);const capH=fsz*1.5+10;const ph=Math.min(AH-capH,pw*1.45);const y=top+(AH-capH-ph)/2;
+    for(let k=0;k<4;k++)rects.push({x:left+k*(pw+g),y,w:pw,h:ph});}
+  else{const pw=(AW-g)/2;fsz=clamp(pw/11.5,12,20);const capH=fsz*1.5+10;const ph=Math.min((AH-g-2*capH)/2,pw*1.6);const y0=top+(AH-(2*ph+2*capH+g))/2;
+    for(let k=0;k<4;k++)rects.push({x:left+(k%2)*(pw+g),y:y0+(k>>1)*(ph+capH+g),w:pw,h:ph});}
+  return {rects,fsz};
+}
+function planStory(){
+  storyIdx=(storyIdx+1)%STORIES.length;const S=STORIES[storyIdx],cache={};
+  const shapes=S.panels.map(([id])=>cache[id]||(cache[id]=shapeById(id)));
+  story={S,L:storyLayout(),shapes,capA:[0,0,0,0],jit:S.panels.map(()=>Array.from({length:24},()=>rand(-1.8,1.8)))};
+  startPanel(0);
+}
+function startPanel(k){const p=story.S.panels[k];planRound({sh:story.shapes[k],rect:story.L.rects[k],flip:!!p[2],k,keepAcc:k>0});}
+function planRound(opt={}){
+  const sh=opt.sh||pickShape();let sPx,cx,cy,nx,ny,flip;
+  if(opt.rect){const p=opt.rect;
+    sPx=sh.kind==='p'?Math.min(p.w*.84,p.h/1.24):Math.min(p.w,p.h)*.86;
+    cx=p.x+p.w/2;cy=p.y+p.h/2;nx=p.x+p.w*.13;ny=p.y+p.h*.88;flip=!!opt.flip;
+  }else{const at=opt.at,m=Math.min(W,H);
+    sPx=clamp(m*rand(.48,.64),150,560);sPx=Math.max(120,Math.min(sPx,W-28,H-190));
+    if(at){cx=at.x;cy=at.y;}else{cx=rand(sPx*.55,W-sPx*.55);cy=rand(sPx*.6+70,H-sPx*.6-90);}
+    cx=clamp(cx,sPx*.5+10,Math.max(sPx*.5+10,W-sPx*.5-10));
+    cy=clamp(cy,sPx*.55+64,Math.max(sPx*.55+64,H-sPx*.55-84));
+    let dx=anchor.x-cx,dy=anchor.y-cy;const d=Math.hypot(dx,dy)||1;dx/=d;dy/=d;
+    const off=sPx*.58+26;nx=clamp(cx+dx*off,18,W-18);ny=clamp(cy+dy*off,18,H-18);flip=Math.random()<.5;}
+  const toA=Math.atan2(cy-ny,cx-nx),dist=Math.hypot(nx-nozzle.x,ny-nozzle.y);
+  round={sh,sPx,cx,cy,nx,ny,toA,flip,rot:sh.rot||0,rect:opt.rect||null,k:opt.k??-1,phase:'move',t:0,F:0,
     fromX:nozzle.x,fromY:nozzle.y,fromA:aimAng,moveDur:clamp(dist/260,.5,1.8),maxArr:0,maxDry:0};
-  count++;prepareMask(round);
-  $('no').textContent=`第 ${count} 灘`;$('nm').textContent=sh.name;setPhase();
+  prepareMask(round);
+  if(!opt.keepAcc)acc.fill(0);
+  const lag=round.k>0?round.k*1.4:0;
+  for(let i=0;i<N;i++)if(mask[i]){acc[i]=1;accDry[i]=dryT[i]+lag;}
+  if(!opt.rect)freeCount++;
+  label();
+}
+function label(){
+  if(round.rect&&story){$('no').textContent=`〈${story.S.title}〉`;$('nm').textContent=`第 ${round.k+1} 格，共 4 格`;}
+  else{$('no').textContent=`第 ${freeCount} 灘`;$('nm').textContent=round.sh.name;}
+  lastPh='';setPhase();
 }
 const PH={move:'水管移過去',flow:'水流中',hold:'漫開了',dry:'正在乾',rest:'乾了'};
 let lastPh='';
 function setPhase(){const p=PH[round.phase];if(p!==lastPh){$('ph').textContent=p;lastPh=p;}}
 function angLerp(a,b,k){let d=b-a;while(d>Math.PI)d-=2*Math.PI;while(d<-Math.PI)d+=2*Math.PI;return a+d*k;}
+function accMaxDry(){let m=0;for(let i=0;i<N;i++)if(acc[i]&&accDry[i]>m)m=accDry[i];return m;}
 
 function step(dt){
-  const r=round;r.t+=dt;
+  const r=round,inStory=!!r.rect&&!!story;r.t+=dt;
+  chalkA=inStory?(r.phase==='rest'?Math.max(0,chalkA-dt/1.2):Math.min(1,chalkA+dt*.8)):Math.max(0,chalkA-dt);
+  if(inStory)for(let k=0;k<=r.k;k++)if(k<r.k||r.phase!=='move')story.capA[k]=Math.min(1,story.capA[k]+dt*1.2);
   if(r.phase==='move'){const k=ease(clamp(r.t/r.moveDur,0,1));nozzle.x=lerp(r.fromX,r.nx,k);nozzle.y=lerp(r.fromY,r.ny,k);aimAng=angLerp(r.fromA,r.toA,k);
     if(r.t>=r.moveDur){r.phase='flow';r.t=0;}}
   else if(r.phase==='flow'){r.F+=dt*FLOW;if(r.F>r.maxArr+14){r.phase='hold';r.t=0;}}
-  else if(r.phase==='hold'){r.F+=dt*FLOW;if(r.t>2.4){r.phase='dry';r.t=0;}}
+  else if(r.phase==='hold'){r.F+=dt*FLOW;
+    if(inStory&&r.k<3){if(r.t>1){startPanel(r.k+1);return;}}
+    else if(r.t>(inStory?3:2.4)){r.maxDry=accMaxDry();r.phase='dry';r.t=0;}}
   else if(r.phase==='dry'){if(r.t>r.maxDry+1.6){r.phase='rest';r.t=0;}}
-  else if(r.phase==='rest'){if(r.t>.9){const at=queuedAt;queuedAt=null;planRound(at);return;}}
+  else if(r.phase==='rest'){if(r.t>(inStory?1.8:.9)){
+    if(mode==='story')planStory();else{const at=queuedAt;queuedAt=null;planRound({at});}return;}}
   setPhase();
   const ph=r.phase,F=r.F,td=r.t,kW=Math.min(1,dt*5),kD=dt*.8,kR=dt*1.4,sd=Math.exp(-dt/50);
   const wetting=ph==='flow'||ph==='hold',drying=ph==='dry';
   for(let i=0;i<N;i++){let w=wet[i];
-    if(mask[i]&&ph!=='move'){
-      if(wetting){if(arr[i]<F)w+=(1-w)*kW;}
-      else if(drying){if(td>dryT[i]&&w>0){if(w>.4&&stain[i]<.1)stain[i]=.1;w-=kD;}}
-      else if(w>0)w-=kR;
+    if(acc[i]){
+      if(drying){if(td>accDry[i]&&w>0){if(w>.4&&stain[i]<.1)stain[i]=.1;w-=kD;}}
+      else if(wetting&&mask[i]&&arr[i]<F)w+=(1-w)*kW;
     }else if(w>0){if(w>.4&&stain[i]<.08)stain[i]=.08;w-=kR;}
     wet[i]=w<0?0:w;stain[i]*=sd;}
   // splashes
   if(wetting){const ax=Math.cos(aimAng),ay=Math.sin(aimAng),tx=nozzle.x+ax*12,ty=nozzle.y+ay*12;
-    const n=dt*40;for(let k=0;k<n||Math.random()<n-k;k++){if(k>=n)break;const a=aimAng+rand(-1.6,1.6),sp=rand(15,70);
+    const n=Math.floor(dt*40+Math.random());for(let k=0;k<n;k++){const a=aimAng+rand(-1.6,1.6),sp=rand(15,70);
       parts.push({x:tx+ax*rand(2,10),y:ty+ay*rand(2,10),vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,l:rand(.2,.5),m:0,s:rand(.8,2)});}}
   else if(drying&&td<3&&Math.random()<dt*2.5){const ax=Math.cos(aimAng),ay=Math.sin(aimAng);
     parts.push({x:nozzle.x+ax*12,y:nozzle.y+ay*12,vx:0,vy:0,l:.6,m:0,s:2.2});drip();}
   for(const p of parts){p.m+=dt;p.x+=p.vx*dt;p.y+=p.vy*dt;p.vx*=.92;p.vy*=.92;}
   parts=parts.filter(p=>p.m<p.l);
+}
+
+/* ---------- chalk frames & captions ---------- */
+let chalk=null,chx=null,speck=null;
+function buildChalk(){chalk=document.createElement('canvas');chalk.width=Math.round(W*DPR);chalk.height=Math.round(H*DPR);chx=chalk.getContext('2d');
+  const t=document.createElement('canvas');t.width=t.height=96;const x=t.getContext('2d');
+  for(let k=0;k<900;k++){x.fillStyle=`rgba(0,0,0,${Math.random().toFixed(2)})`;x.fillRect(Math.random()*96,Math.random()*96,1+Math.random()*1.4,1);}
+  speck=chx.createPattern(t,'repeat');}
+function chalkLine(x1,y1,x2,y2,j){chx.beginPath();chx.moveTo(x1+j[0],y1+j[1]);chx.quadraticCurveTo((x1+x2)/2+j[2],(y1+y2)/2+j[3],x2+j[4],y2+j[5]);chx.stroke();}
+function drawChalkLayer(){
+  if(chalkA<=.01||!story)return;
+  chx.setTransform(DPR,0,0,DPR,0,0);chx.clearRect(0,0,W,H);
+  const {rects,fsz}=story.L,face='"LXGW WenKai TC","Kaiti TC","BiauKai",serif';
+  chx.lineCap='round';chx.textBaseline='top';
+  rects.forEach((p,k)=>{const j=story.jit[k];
+    for(const [col,o] of [['rgba(30,27,23,.3)',1.2],['rgba(247,244,234,.88)',0]]){
+      chx.strokeStyle=col;chx.lineWidth=2.4;chx.save();chx.translate(o,o);
+      chalkLine(p.x,p.y,p.x+p.w,p.y,j.slice(0,6));chalkLine(p.x+p.w,p.y,p.x+p.w,p.y+p.h,j.slice(6,12));
+      chalkLine(p.x+p.w,p.y+p.h,p.x,p.y+p.h,j.slice(12,18));chalkLine(p.x,p.y+p.h,p.x,p.y,j.slice(18,24));
+      chx.fillStyle=col;chx.font=`700 ${Math.round(fsz*1.1)}px ${face}`;chx.fillText(String(k+1),p.x+8,p.y+6);
+      const a=story.capA[k];
+      if(a>0){chx.globalAlpha=a;chx.font=`${Math.round(fsz)}px ${face}`;chx.fillText(story.S.panels[k][1],p.x+2,p.y+p.h+8,p.w);chx.globalAlpha=1;}
+      chx.restore();}
+  });
+  chx.globalCompositeOperation='destination-out';chx.globalAlpha=.45;chx.fillStyle=speck;chx.fillRect(0,0,W,H);
+  chx.globalAlpha=1;chx.globalCompositeOperation='source-over';
+  ctx.save();ctx.globalAlpha=chalkA;ctx.drawImage(chalk,0,0,W,H);ctx.restore();
 }
 
 /* ---------- render ---------- */
@@ -363,6 +446,7 @@ function render(){
   ctx.globalCompositeOperation='multiply';ctx.drawImage(wc,0,0,GW*CELL,GH*CELL);
   ctx.globalCompositeOperation='screen';ctx.drawImage(sc,0,0,GW*CELL,GH*CELL);
   ctx.globalCompositeOperation='source-over';
+  drawChalkLayer();
   drawHose(wetting);
   for(const p of parts){const a=1-p.m/p.l;ctx.fillStyle=`rgba(238,245,250,${(a*.8).toFixed(3)})`;ctx.beginPath();ctx.arc(p.x,p.y,p.s,0,7);ctx.fill();}
 }
@@ -447,8 +531,8 @@ document.addEventListener('visibilitychange',syncAudio);
 function resize(){
   W=innerWidth;H=innerHeight;DPR=Math.min(2,window.devicePixelRatio||1);
   cv.width=Math.round(W*DPR);cv.height=Math.round(H*DPR);
-  CELL=Math.max(W,H)>1100?4:3;GW=Math.ceil(W/CELL);GH=Math.ceil(H/CELL);N=GW*GH;
-  wet=new Float32Array(N);stain=new Float32Array(N);mask=new Uint8Array(N);arr=new Float32Array(N);
+  CELL=Math.max(W,H)>1600?4:(Math.min(W,H)<700?2:3);GW=Math.ceil(W/CELL);GH=Math.ceil(H/CELL);N=GW*GH;
+  acc=new Uint8Array(N);accDry=new Float32Array(N);wet=new Float32Array(N);stain=new Float32Array(N);mask=new Uint8Array(N);arr=new Float32Array(N);
   dryT=new Float32Array(N);rough=new Float32Array(N);gloss=new Float32Array(N);depth=new Int16Array(N);queue=new Int32Array(N);
   heapI=new Int32Array(N*8);heapK=new Float32Array(N*8);
   for(let i=0;i<N;i++){const x=i%GW,y=(i/GW)|0;rough[i]=fbm(x/7+40,y/7+11);gloss[i]=Math.pow(fbm(x/10+90,y/14+3),2.2)*1.6;}
@@ -457,25 +541,35 @@ function resize(){
   buildConcrete();
   anchor={x:-30,y:H+30};
   nozzle={x:W*.2,y:H*.82};aimAng=-.5;
-  parts=[];planRound(null);
+  buildChalk();parts=[];startMode();
 }
 let rt=null;
 addEventListener('resize',()=>{if(Math.abs(innerWidth-W)<2&&Math.abs(innerHeight-H)<90)return;clearTimeout(rt);rt=setTimeout(resize,220);});
 
+const HINT={story:'四格故事：水管一格一格畫，畫完一起曬乾',free:'點一下地面，下一灘就流到那裡'};
+let hintT=null;
+function showHint(){$('hint').textContent=HINT[mode];$('hint').classList.remove('gone');clearTimeout(hintT);hintT=setTimeout(()=>$('hint').classList.add('gone'),8000);}
+function startMode(){story=null;queuedAt=null;acc.fill(0);if(mode==='story')planStory();else planRound({});}
 function skipTo(at){
-  const ph=round.phase;
-  if(ph==='move'){planRound(at);return;}
+  const r=round,ph=r.phase;
+  if(mode==='story'){if(ph==='rest'){r.t=99;return;}
+    if(ph==='dry'){r.phase='rest';r.t=.4;return;}
+    r.maxDry=accMaxDry();r.phase='dry';r.t=0;return;}
+  if(ph==='move'){planRound({at});return;}
   queuedAt=at;
-  if(ph==='flow'||ph==='hold'){round.phase='dry';round.t=0;}
-  else if(ph==='dry'){round.phase='rest';round.t=.5;}
+  if(ph==='flow'||ph==='hold'){r.maxDry=accMaxDry();r.phase='dry';r.t=0;}
+  else if(ph==='dry'){r.phase='rest';r.t=.5;}
 }
-cv.addEventListener('pointerdown',e=>{skipTo({x:e.clientX,y:e.clientY});$('hint').classList.add('gone');});
+cv.addEventListener('pointerdown',e=>{if(mode==='free')skipTo({x:e.clientX,y:e.clientY});$('hint').classList.add('gone');});
 $('next').addEventListener('click',()=>skipTo(null));
 $('pause').addEventListener('click',()=>{paused=!paused;$('pause').textContent=paused?'繼續':'暫停';syncAudio();});
 $('speed').addEventListener('click',()=>{speedIdx=(speedIdx+1)%SPEEDS.length;$('speed').textContent=`速度 ${SPEEDS[speedIdx]}×`;});
-document.querySelectorAll('.seg button').forEach(b=>b.addEventListener('click',()=>{cat=b.dataset.cat;
-  document.querySelectorAll('.seg button').forEach(x=>x.setAttribute('aria-pressed',x===b?'true':'false'));}));
-setTimeout(()=>$('hint').classList.add('gone'),9000);
+document.querySelectorAll('[data-cat]').forEach(b=>b.addEventListener('click',()=>{cat=b.dataset.cat;
+  document.querySelectorAll('[data-cat]').forEach(x=>x.setAttribute('aria-pressed',x===b?'true':'false'));}));
+document.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',()=>{if(b.dataset.mode===mode)return;mode=b.dataset.mode;
+  document.querySelectorAll('[data-mode]').forEach(x=>x.setAttribute('aria-pressed',x===b?'true':'false'));
+  $('catseg').hidden=mode==='story';showHint();startMode();}));
+showHint();
 
 let last=performance.now();
 function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;
