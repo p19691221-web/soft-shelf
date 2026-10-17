@@ -369,12 +369,30 @@ const RIFLE=c=>{fillP(c,[[.6,.52],[.95,.47],[.97,.62],[.72,.70],[.6,.66]]);
   c.lineWidth=.075;c.beginPath();c.moveTo(1.32,.49);c.lineTo(2.02,.49);c.stroke();
   fillP(c,[[1.0,.33],[1.32,.33],[1.32,.41],[1.0,.41]]);fillP(c,[[.97,.31],[1.02,.31],[1.02,.43],[.97,.43]]);
   c.lineWidth=.04;c.beginPath();c.moveTo(1.1,.41);c.lineTo(1.1,.45);c.moveTo(1.24,.41);c.lineTo(1.24,.45);c.stroke();};
+const GRASS=(c,x,y,h)=>{c.lineWidth=.04;c.beginPath();
+  for(const [dx,a,k] of [[-.06,-1.9,.75],[-.03,-1.75,1],[0,-1.6,.85],[.03,-1.45,1.05],[.06,-1.3,.7],[-.01,-1.68,.6],[.02,-1.52,.55]]){
+    c.moveTo(x+dx,y);c.quadraticCurveTo(x+dx+Math.cos(a)*h*k*.4,y+Math.sin(a)*h*k*.6,x+dx+Math.cos(a)*h*k*.75+(a<-1.6?-.03:.03),y+Math.sin(a)*h*k);}
+  c.stroke();fillE(c,x,y,.08,.025);};
+function sheepShape(mode){return {name:'白羊',kind:'o',rot:0,core:[0,0],box:mode==='graze'?[1.15,.95]:[1.05,1],draw(c){
+  fillE(c,0,0,.3,.17);
+  for(let k=0;k<12;k++){const a=k/12*Math.PI*2;fillE(c,Math.cos(a)*.27,Math.sin(a)*.15,.085,.085);}
+  fillE(c,-.34,-.06,.05,.05);
+  c.lineWidth=.05;c.beginPath();
+  for(const [x,dx] of [[-.19,-.01],[-.09,.01],[.11,-.01],[.2,.02]]){c.moveTo(x,.12);c.lineTo(x+dx,.37);}c.stroke();
+  c.lineWidth=.08;c.beginPath();
+  if(mode==='graze'){c.moveTo(.24,-.02);c.lineTo(.36,.17);c.stroke();fillE(c,.39,.22,.07,.09,-.5);fillE(c,.31,.13,.05,.025,.6);GRASS(c,.47,.38,.22);}
+  else if(mode==='up'){c.moveTo(.24,-.06);c.lineTo(.31,-.24);c.stroke();fillE(c,.35,-.3,.09,.065,-.7);fillE(c,.27,-.27,.05,.025,.4);}
+  else{c.moveTo(.24,-.06);c.lineTo(.33,-.13);c.stroke();fillE(c,.39,-.15,.09,.065,.35);fillE(c,.31,-.2,.05,.025,-.3);}
+}};}
 function shapeById(id){
+  if(id==='sheep')return sheepShape('walk');if(id==='sheepGraze')return sheepShape('graze');if(id==='sheepUp')return sheepShape('up');
+  if(id==='grass')return {name:'縫裡的草',kind:'o',rot:0,core:[0,.3],box:[.8,.9],draw(c){GRASS(c,-.15,.38,.6);GRASS(c,.12,.4,.45);c.lineWidth=.03;c.beginPath();c.moveTo(-.45,.4);c.lineTo(.45,.4);c.stroke();}};
   if(id==='ladyA')return profileShape({id:'long',name:'閨蜜Ａ'});
   if(id==='ladyTea')return profileShape({id:'plain',bun:1,name:'喝茶的閨蜜Ｂ',extra:TEA,box:[1.22,1.12]});
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'白羊吃草',panels:[['sheep','白羊走進廣場。'],['grass','低頭一看，縫裡長了草。'],['sheepGraze','吃得很開心。'],['sheepUp','草沒了，羊抬頭看著水管。',1]]},
   {title:'睜一隻眼',panels:[['ladyA','Ａ：結婚這麼多年，你們怎麼相處的？'],['ladyTea','Ｂ（喝口茶）：睜一隻眼，閉一隻眼。'],['ladyWow','Ａ：哇，妳也太能包容了吧！',0,0,-.1],['ladyAim','Ｂ：妳誤會了，我在用狙擊槍瞄他。']]},
   {title:'會飛的車',panels:[['car','新車停在廣場上。'],['carflip','衝上彎道，倒過來了。'],['carthrust','噴一口氣，翻了一圈。'],['douli','阿伯看了一眼，繼續沖地。',1]]},
   {title:'平安',panels:[['mom','出門前，媽媽叫住他。'],['hands','把護身符放進他手裡。'],['walker','他背起背包，走遠了。'],['amulet','都乾了，平安最後才乾。',0,3.5]]},
