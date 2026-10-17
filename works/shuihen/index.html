@@ -153,7 +153,8 @@ const PV=[
   {id:'kid',name:'仰著頭的小孩'},{id:'flat',name:'理平頭的人'},{id:'plain',name:'路過的人'}
 ];
 function profileShape(v){
-  const nose=rand(-.01,.06),lip=rand(0,.02),chin=rand(-.04,.03),brow=rand(0,.025),fore=rand(-.03,.02);
+  let nose=rand(-.01,.06),lip=rand(0,.02),chin=rand(-.04,.03),brow=rand(0,.025),fore=rand(-.03,.02);
+  if(v.fixed){nose=.035;lip=.01;chin=0;brow=.012;fore=0;}
   const P=[[.30,1.10],[.27,.88],[.18,.72],[.10,.48],[.17,.20],[.40,.04],[.62,.08],[.72+fore,.24],[.76+brow,.38],[.745,.45],
     [.80+nose,.58],[.765,.63],[.785+lip,.69],[.76,.725],[.775+lip,.765],[.745,.80],[.765+chin,.88],[.66,.95],[.60,.98],[.60,1.10]];
   if(v.id==='kid'){P[10]=[.775,.58];P[16]=[.735,.87];P[7]=[.76,.25];P[3]=[.06,.46];P[4]=[.13,.16];P[5]=[.38,.0];P[8]=[.765,.38];}
@@ -431,7 +432,17 @@ const RIVER=(c,x0,x1,y,h)=>{c.beginPath();const n=24;
 const RIPPLE=(c,x0,x1,y,h)=>{c.lineWidth=h*.09;for(const f of [.32,.66]){c.beginPath();const n=16;
   for(let k=0;k<=n;k++){const x=x0+(x1-x0)*(.08+.84*k/n);c.lineTo(x,y+h*f+Math.sin(k*1.3+f*5)*h*.07);}c.stroke();}};
 const CROWN=c=>{fillP(c,[[.14,.2],[.16,-.04],[.27,.1],[.4,-.12],[.52,.07],[.64,-.06],[.68,.16]]);fillE(c,.4,-.13,.035,.035);};
+const MIRROR=c=>{fillE(c,.7,.17,.13,.13);c.lineWidth=.04;c.beginPath();c.moveTo(.6,.2);c.lineTo(.2,.24);c.stroke();};
+const MIRROR_CUT=c=>{fillE(c,.7,.17,.035,.035);c.lineWidth=.02;c.beginPath();c.arc(.7,.17,.09,0,7);c.stroke();};
+const DOTS=c=>{fillE(c,.88,.16,.04,.04);fillE(c,.97,.05,.05,.05);fillE(c,1.07,-.07,.065,.065);};
+const MOUTH=c=>{fillP(c,[[.9,.69],[.72,.735],[.9,.79]]);};
+const BUBBLE=c=>{fillE(c,1.25,-.02,.32,.21);fillP(c,[[1.0,.1],[.9,.32],[1.14,.17]]);};
+const BUBBLE_DOTS=c=>{for(const x of [1.12,1.25,1.38])fillE(c,x,-.02,.035,.035);};
 function shapeById(id){
+  if(id==='doctor')return profileShape({id:'flat',name:'醫生',extra:MIRROR,cutP:MIRROR_CUT,box:[1.12,1.12]});
+  if(id==='ptThink')return profileShape({id:'plain',fixed:1,name:'想了很久的人',extra:DOTS,box:[1.32,1.3],core:[0,.1]});
+  if(id==='ptOpen')return profileShape({id:'plain',fixed:1,name:'張開嘴的人',cutP:MOUTH});
+  if(id==='ptSay')return profileShape({id:'plain',fixed:1,name:'開口說話的人',extra:BUBBLE,cutP:BUBBLE_DOTS,scale:.75,shift:-.22,box:[1.4,1.1],core:[-.22,0]});
   if(id==='kidRiver')return profileShape({id:'kid',name:'第一次看見恆河的孩子',extra:c=>RIVER(c,-.15,1.1,1.28,.22),cutP:c=>RIPPLE(c,-.15,1.1,1.28,.22),box:[1.3,1.6],core:[0,.15]});
   if(id==='oldKing')return profileShape({id:'beard',name:'六十二歲的國王',extra:CROWN,box:[1.1,1.3],core:[0,.1]});
   if(id==='lotus'){const PET=[[0,.5,.15],[-.42,.42,.13],[.42,.42,.13],[-.95,.34,.11],[.95,.34,.11]];
@@ -467,6 +478,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'很難說',panels:[['doctor','醫生：失語症恢復得怎麼樣了？',1],['ptThink','他想了很久。'],['ptOpen','張開嘴……'],['ptSay','「很難說……」']]},
   {title:'恆河',panels:[['kidRiver','三歲，母親帶他第一次看見恆河。'],['oldKing','六十二歲，髮白皮皺。他問：有什麼不會老？'],['lotus','佛問：三歲看河的那個看見，老了嗎？'],['river','王答：能看見的，沒有老。',0,3.5]]},
   {title:'誰是京都人',panels:[['asker','問：誰是京都人？'],['maiko','有人說：舞妓。'],['torii','有人說：住鳥居旁的人。'],['syrup','答：京都念慈菴。']]},
   {title:'虎克船長的眼罩',panels:[['hook1','小明：虎克船長為什麼要戴眼罩？'],['gull','海鷗飛過，便便剛好掉進他眼睛。'],['hook3','他順手一揉……忘了那是鐵鉤。'],['hook4','從此，戴上眼罩。']]},
