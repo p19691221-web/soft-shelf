@@ -145,6 +145,12 @@ function profileShape(v){
     if(v.id==='beard'){c.beginPath();cr(c,[[.79,.77],[.81,.90],[.73,1.05],[.58,1.07],[.50,.92],[.62,.84]]);c.fill();}
   }};
 }
+
+function carBody(c){c.beginPath();c.moveTo(-.48,.05);c.lineTo(-.47,-.04);c.quadraticCurveTo(-.42,-.08,-.3,-.09);c.lineTo(-.17,-.1);
+  c.quadraticCurveTo(-.04,-.23,.12,-.2);c.quadraticCurveTo(.25,-.14,.33,-.08);c.lineTo(.46,-.04);c.quadraticCurveTo(.51,-.01,.49,.05);
+  c.lineTo(.42,.08);c.lineTo(-.42,.08);c.closePath();c.fill();fillE(c,-.29,.08,.095,.095);fillE(c,.29,.08,.095,.095);}
+function carCut(c){c.beginPath();c.moveTo(-.11,-.11);c.quadraticCurveTo(0,-.19,.11,-.175);c.quadraticCurveTo(.19,-.13,.22,-.1);c.lineTo(-.11,-.1);c.closePath();c.fill();
+  fillE(c,-.29,.08,.035,.035);fillE(c,.29,.08,.035,.035);}
 const OTHERS=[
   {name:'坐著的貓',core:[0,.15],draw(c){fillE(c,0,.15,.27,.33);fillE(c,.1,-.27,.17,.17);
     fillP(c,[[-.03,-.33],[-.01,-.53],[.11,-.40]]);fillP(c,[[.13,-.40],[.25,-.53],[.27,-.31]]);
@@ -194,7 +200,16 @@ const OTHERS=[
     c.lineWidth=.075;c.beginPath();c.moveTo(.06,.06);c.quadraticCurveTo(.16,.22,.22,.44);c.moveTo(.03,.06);c.quadraticCurveTo(-.04,.24,-.16,.42);c.stroke();
     c.lineWidth=.05;c.beginPath();c.moveTo(.2,.45);c.lineTo(.3,.45);c.moveTo(-.18,.42);c.lineTo(-.1,.45);c.stroke();
     c.lineWidth=.02;c.beginPath();c.moveTo(-.16,0);c.lineTo(-.2,.08);c.stroke();
-    c.beginPath();c.moveTo(-.25,.08);c.lineTo(-.15,.08);c.lineTo(-.15,.18);c.lineTo(-.25,.18);c.closePath();c.fill();}}
+    c.beginPath();c.moveTo(-.25,.08);c.lineTo(-.15,.08);c.lineTo(-.15,.18);c.lineTo(-.25,.18);c.closePath();c.fill();}},
+  {name:'一台新車',rot:0,core:[0,0],draw(c){carBody(c);},cut(c){carCut(c);}},
+  {name:'倒過來的車',rot:0,core:[-.44,.3],draw(c){
+    c.lineWidth=.075;c.beginPath();c.moveTo(-.46,.46);c.lineTo(-.44,.1);c.arc(0,.08,.44,Math.PI,Math.PI*2.02,false);c.lineTo(.46,.46);c.stroke();
+    c.save();c.translate(0,-.25);c.rotate(Math.PI);c.scale(.66,.66);carBody(c);c.restore();},
+   cut(c){c.save();c.translate(0,-.25);c.rotate(Math.PI);c.scale(.66,.66);carCut(c);c.restore();}},
+  {name:'噴氣翻身的車',rot:0,core:[.05,-.05],draw(c){
+    c.save();c.translate(.08,-.08);c.rotate(-.75);c.scale(.8,.8);carBody(c);c.restore();
+    for(const [x,y,r] of [[-.1,.2,.07],[-.2,.29,.06],[-.28,.37,.05],[-.35,.43,.04],[-.06,.27,.045],[-.15,.36,.04],[-.22,.44,.03]])fillE(c,x,y,r,r);},
+   cut(c){c.save();c.translate(.08,-.08);c.rotate(-.75);c.scale(.8,.8);carCut(c);c.restore();}}
 ];
 function pickShape(){
   for(let tries=0;tries<10;tries++){
@@ -338,9 +353,10 @@ function prepareMask(r){
 }
 
 /* ---------- rounds & stories ---------- */
-const OTHER_IDX={cat:0,egret:1,fish:2,leaf:3,snail:4,bird:5,amulet:6,hands:7,walker:8};
+const OTHER_IDX={cat:0,egret:1,fish:2,leaf:3,snail:4,bird:5,amulet:6,hands:7,walker:8,car:9,carflip:10,carthrust:11};
 function shapeById(id){if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'會飛的車',panels:[['car','新車停在廣場上。'],['carflip','衝上彎道，倒過來了。'],['carthrust','噴一口氣，翻了一圈。'],['douli','阿伯看了一眼，繼續沖地。',1]]},
   {title:'平安',panels:[['mom','出門前，媽媽叫住他。'],['hands','把護身符放進他手裡。'],['walker','他背起背包，走遠了。'],['amulet','都乾了，平安最後才乾。',0,3.5]]},
   {title:'等',panels:[['pony','她在廣場等一個人。'],['leaf','葉子落了一片。'],['bird','鳥飛過去了。'],['cap','他來了。水也快乾了。',1]]},
   {title:'釣',panels:[['douli','阿伯去溪邊。'],['fish','釣到一條魚。'],['cat','貓聞到了。'],['douli','阿伯回頭，魚不見了。',1]]},
