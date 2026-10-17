@@ -133,10 +133,11 @@ function profileShape(v){
   if(v.id==='kid'){P[10]=[.775,.58];P[16]=[.735,.87];P[7]=[.76,.25];P[3]=[.06,.46];P[4]=[.13,.16];P[5]=[.38,.0];P[8]=[.765,.38];}
   if(v.id==='flat'){P[4]=[.18,.13];P[5]=[.40,.07];P[6]=[.64,.07];}
   if(v.id==='long'){P[0]=[.26,1.12];P[1]=[.06,1.04];P[2]=[.04,.78];}
-  return {name:v.name,kind:'p',core:[0,.02],rot:v.id==='kid'?-.14:rand(-.04,.04),draw(c){
-    c.translate(-.45,-.57);
+  return {name:v.name,kind:'p',core:v.core||[0,.02],box:v.box||[1.07,1.12],rot:v.id==='kid'?-.14:rand(-.04,.04),draw(c){
+    if(v.scale){c.translate(v.shift||0,0);c.scale(v.scale,v.scale);}
+    c.translate(-.45,-.57);if(v.extra)v.extra(c);
     c.beginPath();cr(c,P);c.fill();
-    if(v.id==='bun'){fillE(c,.12,.22,.125,.12);}
+    if(v.id==='bun'||v.bun){fillE(c,.12,.22,.125,.12);}
     if(v.id==='mom'){fillE(c,.12,.6,.11,.1);}
     if(v.id==='pony'){c.lineWidth=.1;c.beginPath();c.moveTo(.16,.30);c.quadraticCurveTo(-.08,.36,-.06,.68);c.stroke();fillE(c,.15,.30,.06,.06);}
     if(v.id==='cap'){fillE(c,.42,.18,.33,.16);fillP(c,[[.55,.12],[1.0,.18],[.99,.235],[.6,.25]]);}
@@ -337,9 +338,14 @@ function prepareMask(r){
   for(let yy=-1;yy<=1;yy++)for(let xx=-1;xx<=1;xx++)mask[start+yy*GW+xx]=1;
   // arrival times: water finds its way across rough concrete
   arr.fill(Infinity);arr[start]=0;hn=0;hpush(start,0);
-  while(hn){const i=hpop(),k=popK;if(k>arr[i])continue;const x=i%GW,y=(i/GW)|0;
+  const flood=()=>{while(hn){const i=hpop(),k=popK;if(k>arr[i])continue;const x=i%GW,y=(i/GW)|0;
     for(const [ddx,ddy,c] of NB){const X=x+ddx,Y=y+ddy;if(X<0||Y<0||X>=GW||Y>=GH)continue;const j=Y*GW+X;if(!mask[j])continue;
-      const nk=k+c*(.6+rough[j]*.9);if(nk<arr[j]){arr[j]=nk;if(hn<heapI.length)hpush(j,nk);}}}
+      const nk=k+c*(.6+rough[j]*.9);if(nk<arr[j]){arr[j]=nk;if(hn<heapI.length)hpush(j,nk);}}}};
+  flood();
+  // islands the stream cannot reach get splashed: they start wetting when the front passes their distance
+  for(let it=0;it<24;it++){let bi=-1,bd=1e18;
+    for(let i=0;i<N;i++){if(!mask[i]||arr[i]!==Infinity)continue;const x=i%GW,y=(i/GW)|0,d=(x-sx)*(x-sx)+(y-sy)*(y-sy);if(d<bd){bd=d;bi=i;}}
+    if(bi<0)break;arr[bi]=Math.sqrt(bd)*1.1;hn=0;hpush(bi,arr[bi]);flood();}
   let maxA=0;for(let i=0;i<N;i++){if(mask[i]){if(arr[i]===Infinity)mask[i]=0;else if(arr[i]>maxA)maxA=arr[i];}}
   // depth from edge: thin parts dry first
   let qh=0,qt=0;depth.fill(0);
@@ -354,8 +360,22 @@ function prepareMask(r){
 
 /* ---------- rounds & stories ---------- */
 const OTHER_IDX={cat:0,egret:1,fish:2,leaf:3,snail:4,bird:5,amulet:6,hands:7,walker:8,car:9,carflip:10,carthrust:11};
-function shapeById(id){if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
+const TEA=c=>{c.beginPath();c.moveTo(.8,.64);c.lineTo(1.08,.64);c.lineTo(1.05,.84);c.quadraticCurveTo(.96,.9,.85,.84);c.closePath();c.fill();
+  c.lineWidth=.045;c.beginPath();c.ellipse(1.13,.72,.045,.055,0,0,7);c.stroke();};
+const STAR=(c,x,y,r)=>{c.beginPath();for(let k=0;k<8;k++){const a=k*Math.PI/4,rr=k%2?r*.3:r;c.lineTo(x+Math.cos(a)*rr,y+Math.sin(a)*rr);}c.closePath();c.fill();};
+const WOW=c=>{STAR(c,.9,.1,.13);STAR(c,1.0,.3,.1);STAR(c,.78,-.08,.09);};
+const RIFLE=c=>{fillP(c,[[.6,.52],[.95,.47],[.97,.62],[.72,.70],[.6,.66]]);
+  fillP(c,[[.95,.44],[1.34,.44],[1.34,.57],[1.1,.57],[1.05,.66],[.98,.66],[.97,.57]]);
+  c.lineWidth=.075;c.beginPath();c.moveTo(1.32,.49);c.lineTo(2.02,.49);c.stroke();
+  fillP(c,[[1.0,.33],[1.32,.33],[1.32,.41],[1.0,.41]]);fillP(c,[[.97,.31],[1.02,.31],[1.02,.43],[.97,.43]]);
+  c.lineWidth=.04;c.beginPath();c.moveTo(1.1,.41);c.lineTo(1.1,.45);c.moveTo(1.24,.41);c.lineTo(1.24,.45);c.stroke();};
+function shapeById(id){
+  if(id==='ladyA')return profileShape({id:'long',name:'閨蜜Ａ'});
+  if(id==='ladyTea')return profileShape({id:'plain',bun:1,name:'喝茶的閨蜜Ｂ',extra:TEA,box:[1.22,1.12]});
+  if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
+  if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'睜一隻眼',panels:[['ladyA','Ａ：結婚這麼多年，你們怎麼相處的？'],['ladyTea','Ｂ（喝口茶）：睜一隻眼，閉一隻眼。'],['ladyWow','Ａ：哇，妳也太能包容了吧！',0,0,-.1],['ladyAim','Ｂ：妳誤會了，我在用狙擊槍瞄他。']]},
   {title:'會飛的車',panels:[['car','新車停在廣場上。'],['carflip','衝上彎道，倒過來了。'],['carthrust','噴一口氣，翻了一圈。'],['douli','阿伯看了一眼，繼續沖地。',1]]},
   {title:'平安',panels:[['mom','出門前，媽媽叫住他。'],['hands','把護身符放進他手裡。'],['walker','他背起背包，走遠了。'],['amulet','都乾了，平安最後才乾。',0,3.5]]},
   {title:'等',panels:[['pony','她在廣場等一個人。'],['leaf','葉子落了一片。'],['bird','鳥飛過去了。'],['cap','他來了。水也快乾了。',1]]},
@@ -369,9 +389,9 @@ function storyLayout(){
   const top=Math.max(tb.bottom+12,60),bot=Math.min(fb.top-8,H-80);
   const left=16,AW=W-32,AH=Math.max(200,bot-top),g=14,rects=[];
   let fsz;
-  if(W/H>1.25){const pw=(AW-3*g)/4;fsz=clamp(pw/10,15,22);const capH=fsz*1.5+10;const ph=Math.min(AH-capH,pw*1.45);const y=top+(AH-capH-ph)/2;
+  if(W/H>1.25){const pw=(AW-3*g)/4;fsz=clamp(pw/10,15,22);const capH=fsz*3+10;const ph=Math.min(AH-capH,pw*1.45);const y=top+(AH-capH-ph)/2;
     for(let k=0;k<4;k++)rects.push({x:left+k*(pw+g),y,w:pw,h:ph});}
-  else{const pw=(AW-g)/2;fsz=clamp(pw/11.5,12,20);const capH=fsz*1.5+10;const ph=Math.min((AH-g-2*capH)/2,pw*1.6);const y0=top+(AH-(2*ph+2*capH+g))/2;
+  else{const pw=(AW-g)/2;fsz=clamp(pw/11.5,12,20);const capH=fsz*3+10;const ph=Math.min((AH-g-2*capH)/2,pw*1.6);const y0=top+(AH-(2*ph+2*capH+g))/2;
     for(let k=0;k<4;k++)rects.push({x:left+(k%2)*(pw+g),y:y0+(k>>1)*(ph+capH+g),w:pw,h:ph});}
   return {rects,fsz};
 }
@@ -381,11 +401,11 @@ function planStory(){
   story={S,L:storyLayout(),shapes,capA:[0,0,0,0],jit:S.panels.map(()=>Array.from({length:24},()=>rand(-1.8,1.8)))};
   startPanel(0);
 }
-function startPanel(k){const p=story.S.panels[k];planRound({sh:story.shapes[k],rect:story.L.rects[k],flip:!!p[2],k,keepAcc:k>0,lag:p[3]||0});}
+function startPanel(k){const p=story.S.panels[k];planRound({sh:story.shapes[k],rect:story.L.rects[k],flip:!!p[2],k,keepAcc:k>0,lag:p[3]||0,rot:p[4]});}
 function planRound(opt={}){
   const sh=opt.sh||pickShape();let sPx,cx,cy,nx,ny,flip;
   if(opt.rect){const p=opt.rect;
-    sPx=sh.kind==='p'?Math.min(p.w*.84,p.h/1.24):Math.min(p.w,p.h)*.86;
+    const bx=sh.box||[1.05,1.05];sPx=Math.min(p.w*.9/bx[0],p.h*.9/bx[1]);
     cx=p.x+p.w/2;cy=p.y+p.h/2;nx=p.x+p.w*.13;ny=p.y+p.h*.88;flip=!!opt.flip;
   }else{const at=opt.at,m=Math.min(W,H);
     sPx=clamp(m*rand(.48,.64),150,560);sPx=Math.max(120,Math.min(sPx,W-28,H-190));
@@ -395,7 +415,7 @@ function planRound(opt={}){
     let dx=anchor.x-cx,dy=anchor.y-cy;const d=Math.hypot(dx,dy)||1;dx/=d;dy/=d;
     const off=sPx*.58+26;nx=clamp(cx+dx*off,18,W-18);ny=clamp(cy+dy*off,18,H-18);flip=Math.random()<.5;}
   const toA=Math.atan2(cy-ny,cx-nx),dist=Math.hypot(nx-nozzle.x,ny-nozzle.y);
-  round={sh,sPx,cx,cy,nx,ny,toA,flip,rot:sh.rot||0,rect:opt.rect||null,k:opt.k??-1,phase:'move',t:0,F:0,
+  round={sh,sPx,cx,cy,nx,ny,toA,flip,rot:opt.rot??(sh.rot||0),rect:opt.rect||null,k:opt.k??-1,phase:'move',t:0,F:0,
     fromX:nozzle.x,fromY:nozzle.y,fromA:aimAng,moveDur:clamp(dist/260,.5,1.8),maxArr:0,maxDry:0};
   prepareMask(round);
   if(!opt.keepAcc)acc.fill(0);
@@ -454,6 +474,11 @@ function buildChalk(){chalk=document.createElement('canvas');chalk.width=Math.ro
   for(let k=0;k<900;k++){x.fillStyle=`rgba(0,0,0,${Math.random().toFixed(2)})`;x.fillRect(Math.random()*96,Math.random()*96,1+Math.random()*1.4,1);}
   speck=chx.createPattern(t,'repeat');}
 function chalkLine(x1,y1,x2,y2,j){chx.beginPath();chx.moveTo(x1+j[0],y1+j[1]);chx.quadraticCurveTo((x1+x2)/2+j[2],(y1+y2)/2+j[3],x2+j[4],y2+j[5]);chx.stroke();}
+function wrapChalk(t,x,y,maxW,lh){const lines=[];let cur='';
+  for(const ch of t){if(cur&&!'，。！？、）」：…'.includes(ch)&&chx.measureText(cur+ch).width>maxW){lines.push(cur);cur=ch;}else cur+=ch;}
+  if(cur)lines.push(cur);
+  if(lines.length>2){lines[1]=lines.slice(1).join('');}
+  lines.slice(0,2).forEach((l,i)=>chx.fillText(l,x,y+i*lh,maxW));}
 function drawChalkLayer(){
   if(chalkA<=.01||!story)return;
   chx.setTransform(DPR,0,0,DPR,0,0);chx.clearRect(0,0,W,H);
@@ -466,7 +491,7 @@ function drawChalkLayer(){
       chalkLine(p.x+p.w,p.y+p.h,p.x,p.y+p.h,j.slice(12,18));chalkLine(p.x,p.y+p.h,p.x,p.y,j.slice(18,24));
       chx.fillStyle=col;chx.font=`700 ${Math.round(fsz*1.1)}px ${face}`;chx.fillText(String(k+1),p.x+8,p.y+6);
       const a=story.capA[k];
-      if(a>0){chx.globalAlpha=a;chx.font=`${Math.round(fsz)}px ${face}`;chx.fillText(story.S.panels[k][1],p.x+2,p.y+p.h+8,p.w);chx.globalAlpha=1;}
+      if(a>0){chx.globalAlpha=a;chx.font=`${Math.round(fsz)}px ${face}`;wrapChalk(story.S.panels[k][1],p.x+2,p.y+p.h+8,p.w-4,fsz*1.45);chx.globalAlpha=1;}
       chx.restore();}
   });
   chx.globalCompositeOperation='destination-out';chx.globalAlpha=.45;chx.fillStyle=speck;chx.fillRect(0,0,W,H);
