@@ -65,6 +65,7 @@ button:focus-visible{outline:2px solid var(--chalk);outline-offset:2px}
       <button id="pause" type="button">暫停</button>
       <button id="next" type="button">換下一個</button>
       <button id="speed" type="button">速度 1×</button>
+      <button id="sound" type="button" aria-pressed="false">開聲音</button>
       <div class="seg" role="group" aria-label="造型種類">
         <button type="button" id="c-all" data-cat="all" aria-pressed="true">全部</button>
         <button type="button" id="c-p" data-cat="p" aria-pressed="false">人物</button>
@@ -336,7 +337,7 @@ function step(dt){
     const n=dt*40;for(let k=0;k<n||Math.random()<n-k;k++){if(k>=n)break;const a=aimAng+rand(-1.6,1.6),sp=rand(15,70);
       parts.push({x:tx+ax*rand(2,10),y:ty+ay*rand(2,10),vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,l:rand(.2,.5),m:0,s:rand(.8,2)});}}
   else if(drying&&td<3&&Math.random()<dt*2.5){const ax=Math.cos(aimAng),ay=Math.sin(aimAng);
-    parts.push({x:nozzle.x+ax*12,y:nozzle.y+ay*12,vx:0,vy:0,l:.6,m:0,s:2.2});}
+    parts.push({x:nozzle.x+ax*12,y:nozzle.y+ay*12,vx:0,vy:0,l:.6,m:0,s:2.2});drip();}
   for(const p of parts){p.m+=dt;p.x+=p.vx*dt;p.y+=p.vy*dt;p.vx*=.92;p.vy*=.92;}
   parts=parts.filter(p=>p.m<p.l);
 }
@@ -387,6 +388,61 @@ function drawHose(running){
   ctx.restore();
 }
 
+/* ---------- sound (all synthesized live) ---------- */
+let AC=null,SN=null,soundOn=false;
+function mkNoise(ac,kind){const len=ac.sampleRate*3,b=ac.createBuffer(1,len,ac.sampleRate),d=b.getChannelData(0);let last=0;
+  for(let i=0;i<len;i++){const w=Math.random()*2-1;if(kind==='brown'){last=(last+.02*w)/1.02;d[i]=last*3.5;}else d[i]=w;}
+  const s=ac.createBufferSource();s.buffer=b;s.loop=true;s.start(0,Math.random()*2);return s;}
+function panner(ac,v){if(!ac.createStereoPanner)return ac.createGain();const p=ac.createStereoPanner();p.pan.value=v;return p;}
+function initSound(){
+  const ac=new (window.AudioContext||window.webkitAudioContext)();AC=ac;
+  const master=ac.createGain(),comp=ac.createDynamicsCompressor();master.gain.value=0;master.connect(comp);comp.connect(ac.destination);
+  // hose: two bands of hiss plus a spattering top layer
+  const wn=mkNoise(ac,'white'),b1=ac.createBiquadFilter(),b2=ac.createBiquadFilter(),g1=ac.createGain(),g2=ac.createGain(),wg=ac.createGain();
+  b1.type='bandpass';b1.frequency.value=1100;b1.Q.value=.9;b2.type='bandpass';b2.frequency.value=3200;b2.Q.value=1.2;
+  g1.gain.value=.9;g2.gain.value=.4;wg.gain.value=0;
+  wn.connect(b1);wn.connect(b2);b1.connect(g1);b2.connect(g2);g1.connect(wg);g2.connect(wg);wg.connect(master);
+  const lfo=ac.createOscillator(),lg=ac.createGain();lfo.frequency.value=.37;lg.gain.value=180;lfo.connect(lg);lg.connect(b1.frequency);lfo.start();
+  const sp=mkNoise(ac,'white'),hp=ac.createBiquadFilter(),spg=ac.createGain(),spOut=ac.createGain();
+  hp.type='highpass';hp.frequency.value=4200;spg.gain.value=.12;spOut.gain.value=0;
+  const mod=mkNoise(ac,'brown'),mg=ac.createGain();mg.gain.value=.3;mod.connect(mg);mg.connect(spg.gain);
+  sp.connect(hp);hp.connect(spg);spg.connect(spOut);spOut.connect(master);
+  // cicadas: bandpassed noise pulsed at a few dozen Hz
+  const cicada=(f,rate,pan)=>{const n=mkNoise(ac,'white'),bp=ac.createBiquadFilter(),am=ac.createGain(),o=ac.createOscillator(),og=ac.createGain(),out=ac.createGain(),p=panner(ac,pan);
+    bp.type='bandpass';bp.frequency.value=f;bp.Q.value=5;am.gain.value=.5;o.type='triangle';o.frequency.value=rate;og.gain.value=.5;
+    o.connect(og);og.connect(am.gain);o.start();out.gain.value=.03;n.connect(bp);bp.connect(am);am.connect(out);out.connect(p);p.connect(master);return out;};
+  const cic=[cicada(5400,46,-.5),cicada(6100,53,.6)];
+  // distant town hum
+  const an=mkNoise(ac,'brown'),al=ac.createBiquadFilter(),ag=ac.createGain();al.type='lowpass';al.frequency.value=320;ag.gain.value=.22;
+  an.connect(al);al.connect(ag);ag.connect(master);
+  master.gain.setTargetAtTime(.8,ac.currentTime,.6);
+  SN={master,wg,spOut,cic,nextSwell:0,nextScooter:ac.currentTime+rand(6,16),water:-1};
+}
+function scooter(){const t=AC.currentTime,d=rand(4,6.5),f=rand(95,130);
+  const o=AC.createOscillator(),o2=AC.createOscillator(),lp=AC.createBiquadFilter(),g=AC.createGain(),p=panner(AC,0);
+  o.type='sawtooth';o2.type='square';
+  o.frequency.setValueAtTime(f*1.06,t);o.frequency.linearRampToValueAtTime(f*.94,t+d);
+  o2.frequency.setValueAtTime(f*.53,t);o2.frequency.linearRampToValueAtTime(f*.47,t+d);
+  lp.type='lowpass';lp.frequency.value=420;
+  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(rand(.025,.045),t+d*.5);g.gain.linearRampToValueAtTime(0,t+d);
+  if(p.pan){const s=Math.random()<.5?-1:1;p.pan.setValueAtTime(-.8*s,t);p.pan.linearRampToValueAtTime(.8*s,t+d);}
+  o.connect(lp);o2.connect(lp);lp.connect(g);g.connect(p);p.connect(SN.master);o.start(t);o2.start(t);o.stop(t+d+.1);o2.stop(t+d+.1);}
+function drip(){if(!AC||!soundOn||AC.state!=='running')return;const t=AC.currentTime,o=AC.createOscillator(),g=AC.createGain(),f=rand(900,1500);
+  o.type='sine';o.frequency.setValueAtTime(f,t);o.frequency.exponentialRampToValueAtTime(f*.45,t+.08);
+  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.12,t+.004);g.gain.exponentialRampToValueAtTime(.001,t+.14);
+  o.connect(g);g.connect(SN.master);o.start(t);o.stop(t+.16);}
+function soundTick(){if(!AC||!soundOn||AC.state!=='running')return;const t=AC.currentTime,ph=round.phase;
+  const target=(ph==='flow'||ph==='hold')?.55:0;
+  if(target!==SN.water){SN.water=target;SN.wg.gain.setTargetAtTime(target,t,target?.25:.6);SN.spOut.gain.setTargetAtTime(target?.5:0,t,target?.3:.5);}
+  if(t>SN.nextSwell){for(const c of SN.cic)c.gain.setTargetAtTime(Math.random()<.2?0:rand(.015,.07),t,rand(1.5,3));SN.nextSwell=t+rand(6,14);}
+  if(t>SN.nextScooter){scooter();SN.nextScooter=t+rand(18,45);}}
+function syncAudio(){if(!AC)return;if(soundOn&&!paused&&!document.hidden)AC.resume();else AC.suspend();}
+$('sound').addEventListener('click',()=>{
+  soundOn=!soundOn;
+  if(soundOn&&!AC){try{initSound();}catch(e){soundOn=false;$('sound').textContent='這個瀏覽器無法播放';return;}}
+  syncAudio();$('sound').textContent=soundOn?'關聲音':'開聲音';$('sound').setAttribute('aria-pressed',soundOn?'true':'false');});
+document.addEventListener('visibilitychange',syncAudio);
+
 /* ---------- setup ---------- */
 function resize(){
   W=innerWidth;H=innerHeight;DPR=Math.min(2,window.devicePixelRatio||1);
@@ -415,7 +471,7 @@ function skipTo(at){
 }
 cv.addEventListener('pointerdown',e=>{skipTo({x:e.clientX,y:e.clientY});$('hint').classList.add('gone');});
 $('next').addEventListener('click',()=>skipTo(null));
-$('pause').addEventListener('click',()=>{paused=!paused;$('pause').textContent=paused?'繼續':'暫停';});
+$('pause').addEventListener('click',()=>{paused=!paused;$('pause').textContent=paused?'繼續':'暫停';syncAudio();});
 $('speed').addEventListener('click',()=>{speedIdx=(speedIdx+1)%SPEEDS.length;$('speed').textContent=`速度 ${SPEEDS[speedIdx]}×`;});
 document.querySelectorAll('.seg button').forEach(b=>b.addEventListener('click',()=>{cat=b.dataset.cat;
   document.querySelectorAll('.seg button').forEach(x=>x.setAttribute('aria-pressed',x===b?'true':'false'));}));
@@ -423,7 +479,7 @@ setTimeout(()=>$('hint').classList.add('gone'),9000);
 
 let last=performance.now();
 function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;
-  if(!paused)step(dt*SPEEDS[speedIdx]);render();requestAnimationFrame(frame);}
+  if(!paused)step(dt*SPEEDS[speedIdx]);render();soundTick();requestAnimationFrame(frame);}
 resize();requestAnimationFrame(frame);
 })();
 </script>
