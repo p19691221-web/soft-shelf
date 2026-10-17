@@ -438,7 +438,21 @@ const DOTS=c=>{fillE(c,.88,.16,.04,.04);fillE(c,.97,.05,.05,.05);fillE(c,1.07,-.
 const MOUTH=c=>{fillP(c,[[.9,.69],[.72,.735],[.9,.79]]);};
 const BUBBLE=c=>{fillE(c,1.25,-.02,.32,.21);fillP(c,[[1.0,.1],[.9,.32],[1.14,.17]]);};
 const BUBBLE_DOTS=c=>{for(const x of [1.12,1.25,1.38])fillE(c,x,-.02,.035,.035);};
+const WALL=c=>{fillP(c,[[-.52,-.42],[-.4,-.42],[-.4,.42],[-.52,.42]]);};
+const WALL_CUT=c=>{c.lineWidth=.018;c.beginPath();for(let y=-.3;y<.42;y+=.14){c.moveTo(-.52,y);c.lineTo(-.4,y);}c.stroke();};
+const CLOCK=c=>{fillE(c,1.42,.36,.3,.3);};
+const CLOCK_CUT=c=>{const cx=1.42,cy=.36;c.lineWidth=.045;c.beginPath();
+  c.lineWidth=.055;c.moveTo(cx,cy);c.lineTo(cx+.924*.17,cy+.383*.17);c.moveTo(cx,cy);c.lineTo(cx-.23,cy);c.stroke();
+  c.lineWidth=.02;c.beginPath();c.arc(cx,cy,.25,0,7);c.stroke();
+  for(const [dx,dy] of [[0,-1],[1,0],[0,1],[-1,0]])fillE(c,cx+dx*.2,cy+dy*.2,.022,.022);};
 function shapeById(id){
+  if(id==='carWall')return {name:'倒車的車',kind:'o',rot:0,core:[.1,.05],box:[1.05,.9],draw(c){WALL(c);c.save();c.translate(.1,.12);c.scale(.8,.8);carBody(c);c.restore();},
+    cut(c){WALL_CUT(c);c.save();c.translate(.1,.12);c.scale(.8,.8);carCut(c);c.restore();}};
+  if(id==='carCrash')return {name:'撞上牆的車',kind:'o',rot:0,core:[.05,.05],box:[1.05,.9],draw(c){WALL(c);c.save();c.translate(-.01,.12);c.scale(.8,.8);carBody(c);c.restore();
+    c.beginPath();for(let k=0;k<20;k++){const a=k/20*Math.PI*2,r=k%2?.07:.19;c.lineTo(-.38+Math.cos(a)*r,-.22+Math.sin(a)*r);}c.closePath();c.fill();},
+    cut(c){WALL_CUT(c);c.save();c.translate(-.01,.12);c.scale(.8,.8);carCut(c);c.restore();}};
+  if(id==='kidWatch')return profileShape({id:'kid',fixed:1,name:'盯著看的兒子'});
+  if(id==='kidClock')return profileShape({id:'kid',fixed:1,name:'看時鐘的兒子',extra:CLOCK,cutP:CLOCK_CUT,scale:.72,shift:-.2,box:[1.3,1.0],core:[-.2,0]});
   if(id==='doctor')return profileShape({id:'flat',name:'醫生',extra:MIRROR,cutP:MIRROR_CUT,box:[1.12,1.12]});
   if(id==='ptThink')return profileShape({id:'plain',fixed:1,name:'想了很久的人',extra:DOTS,box:[1.32,1.3],core:[0,.1]});
   if(id==='ptOpen')return profileShape({id:'plain',fixed:1,name:'張開嘴的人',cutP:MOUTH});
@@ -478,6 +492,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'撞到告訴我',panels:[['carWall','我倒車，叫兒子：撞到牆告訴我。'],['kidWatch','兒子盯著看。',1],['carCrash','砰！'],['kidClock','兒子：「下午 3 點 45 分。」']]},
   {title:'很難說',panels:[['doctor','醫生：失語症恢復得怎麼樣了？',1],['ptThink','他想了很久。'],['ptOpen','張開嘴……'],['ptSay','「很難說……」']]},
   {title:'恆河',panels:[['kidRiver','三歲，母親帶他第一次看見恆河。'],['oldKing','六十二歲，髮白皮皺。他問：有什麼不會老？'],['lotus','佛問：三歲看河的那個看見，老了嗎？'],['river','王答：能看見的，沒有老。',0,3.5]]},
   {title:'誰是京都人',panels:[['asker','問：誰是京都人？'],['maiko','有人說：舞妓。'],['torii','有人說：住鳥居旁的人。'],['syrup','答：京都念慈菴。']]},
