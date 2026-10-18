@@ -472,7 +472,17 @@ const WALKMAN=c=>{fillE(c,.08,-.36,.095,.095);c.lineWidth=.12;c.beginPath();c.mo
   c.lineWidth=.07;c.beginPath();c.moveTo(.03,.06);c.quadraticCurveTo(.13,.22,.19,.44);c.moveTo(.0,.06);c.quadraticCurveTo(-.07,.24,-.19,.42);c.stroke();
   c.lineWidth=.045;c.beginPath();c.moveTo(.17,.45);c.lineTo(.27,.45);c.moveTo(-.21,.42);c.lineTo(-.13,.45);c.stroke();
   for(const [x,y,r] of [[-.36,.36,.1],[-.42,.22,.08],[-.3,.24,.07]])fillE(c,x,y,r,r);c.lineWidth=.03;c.beginPath();c.moveTo(-.36,.36);c.lineTo(-.36,.46);c.stroke();};
+const MOON=c=>{fillE(c,1.12,-.08,.13,.13);};
+const MOON_CUT=c=>{fillE(c,1.18,-.13,.12,.12);};
+const BOTTLE=c=>{c.beginPath();c.moveTo(1.0,1.36);c.lineTo(1.0,1.02);c.quadraticCurveTo(1.0,.94,1.06,.9);c.lineTo(1.06,.8);c.lineTo(1.12,.8);c.lineTo(1.12,.9);
+  c.quadraticCurveTo(1.18,.94,1.18,1.02);c.lineTo(1.18,1.36);c.closePath();c.fill();};
+const CIG=c=>{c.lineWidth=.035;c.beginPath();c.moveTo(.78,.74);c.lineTo(.98,.7);c.stroke();for(const [x,y,r] of [[1.02,.6,.035],[1.06,.48,.045],[1.02,.34,.055]])fillE(c,x,y,r,r);};
+const PIN=c=>{c.save();c.translate(1.02,.62);c.rotate(-.7);fillP(c,[[-.22,-.06],[.22,-.06],[.22,.06],[-.22,.06]]);c.lineWidth=.045;c.beginPath();c.moveTo(-.22,0);c.lineTo(-.34,0);c.moveTo(.22,0);c.lineTo(.34,0);c.stroke();c.restore();};
 function shapeById(id){
+  if(id==='cop')return profileShape({id:'flat',fixed:1,name:'夜裡的警察',extra:c=>{PEAKCAP(c);MOON(c);},cutP:MOON_CUT,box:[1.32,1.25],core:[0,.05]});
+  if(id==='copQ')return profileShape({id:'flat',fixed:1,name:'追問的警察',extra:c=>{PEAKCAP(c);QMARK(c);},box:[1.4,1.15]});
+  if(id==='oldman')return profileShape({id:'beard',fixed:1,name:'深夜出門的老人',extra:c=>{BOTTLE(c);CIG(c);},scale:.86,shift:-.1,box:[1.2,1.3],core:[-.1,.12]});
+  if(id==='wifePin')return profileShape({id:'plain',bun:1,fixed:1,name:'等門的妻子',extra:c=>{ANGER(c);PIN(c);},box:[1.38,1.15]});
   if(id==='parkWalk')return {name:'在公園散步',kind:'o',rot:0,core:[0,-.05],box:[1,1],draw:WALKMAN};
   if(id==='bench2')return {name:'垂頭喪氣的兩個人',kind:'o',rot:0,core:[0,0],box:[1,1],draw(c){BENCH(c,-.42,.42);SIT(c,-.18,'down');SIT(c,.12,'down');}};
   if(id==='bench2up')return {name:'抬頭的人',kind:'o',rot:0,core:[0,0],box:[1,1],draw(c){BENCH(c,-.42,.42);SIT(c,-.18,'down');SIT(c,.12,'up');}};
@@ -547,6 +557,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'深夜講座',panels:[['cop','凌晨兩點，警察攔下老人：「這麼晚去哪？」'],['oldman','「去聽講座，講喝酒、抽菸、熬夜的危害。」',1],['copQ','「這種時間，誰在講？」'],['wifePin','「我老婆。」',1,3.5]]},
   {title:'坐下',panels:[['parkWalk','一個男人在公園散步。'],['bench2','長椅上兩個人垂頭喪氣。他問：「怎麼了？」'],['bench2up','其中一人抬頭：「坐下，我告訴你。」'],['bench3','他坐下。「油漆還沒乾。」']]},
   {title:'露台',panels:[['rain','這陣子天氣很糟。'],['wifeWin','我太太一直盯著露台的窗戶看。',1],['storm','天氣越來越壞。'],['wifeOut','再壞下去，可能得讓她進來了。',1,3.5]]},
   {title:'塗成藍色',panels:[['ghost','老獨裁者的幽靈，出現在新領袖夢裡。'],['leader','新領袖：怎樣讓國家再次偉大？',1],['palace','幽靈：處決一半人口，把宮殿塗成藍色。'],['leaderQ','「為何是藍色？」「就知道你不問前半句。」',1]]},
