@@ -511,7 +511,21 @@ const PLANE=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);fillE(c,0,0,.45,.
   fillP(c,[[-.06,.02],[.12,.02],[-.12,.24],[-.2,.24]]);fillP(c,[[-.06,-.02],[.08,-.02],[-.08,-.14],[-.14,-.14]]);c.restore();};
 const ROLLEYES=c=>{fillE(c,.64,.42,.05,.035);};
 const ROLLEYES_CUT=c=>{fillE(c,.65,.395,.022,.014);};
+const HANDSET=(c,x,y,k,a)=>{c.save();c.translate(x,y);c.rotate(a);c.scale(k,k);
+  c.lineWidth=.12;c.lineCap='round';c.beginPath();c.moveTo(-.28,.0);c.quadraticCurveTo(0,-.16,.28,0);c.stroke();fillE(c,-.3,.04,.1,.07,.3);fillE(c,.3,.04,.1,.07,-.3);c.restore();};
+const GLASSES_CUT=c=>{c.lineWidth=.02;c.beginPath();c.arc(.66,.43,.06,0,7);c.moveTo(.6,.43);c.lineTo(.36,.4);c.stroke();};
 function shapeById(id){
+  if(id==='phoneRing')return {name:'響起的電話',kind:'o',rot:0,core:[-.35,.25],box:[1,.9],draw(c){
+    c.beginPath();c.moveTo(-.32,.36);c.lineTo(-.26,.02);c.lineTo(.26,.02);c.lineTo(.32,.36);c.closePath();c.fill();HANDSET(c,0,-.06,1.05,0);
+    c.lineWidth=.035;for(const sx of [-1,1])for(const r of [.5,.6]){c.beginPath();c.arc(0,0,r,sx>0?-.5:Math.PI-.4,sx>0?.4:Math.PI+.5);c.stroke();}},
+    cut(c){for(let k=0;k<3;k++)for(let j=0;j<3;j++)fillE(c,-.1+j*.1,.12+k*.07,.025,.02);}};
+  if(id==='teacherCall')return profileShape({id:'plain',bun:1,fixed:1,name:'打電話的老師',cutP:GLASSES_CUT});
+  if(id==='meCall')return profileShape({id:'flat',fixed:1,name:'接電話的我'});
+  if(id==='familyPhoto')return {name:'沒有兒子的全家福',kind:'o',rot:0,core:[-.4,.3],box:[1,1],draw(c){
+    fillP(c,[[-.42,-.36],[.42,-.36],[.42,.42],[-.42,.42]]);},
+    cut(c){fillP(c,[[-.35,-.29],[.35,-.29],[.35,.35],[-.35,.35]]);c.globalCompositeOperation='destination-out';
+      for(const x of [-.14,.14]){fillE(c,x,-.04,.08,.09);c.beginPath();c.moveTo(x-.15,.36);c.quadraticCurveTo(x-.15,.09,x,.09);c.quadraticCurveTo(x+.15,.09,x+.15,.36);c.closePath();c.fill();}
+      c.globalCompositeOperation='source-over';}};
   if(id==='bags3')return {name:'三件行李',kind:'o',rot:0,core:[-.27,.25],box:[1,.8],draw(c){SUITCASE(c,-.32,.1,.32);SUITCASE(c,.02,.04,.4);SUITCASE(c,.33,.14,.26);},
     cut(c){SUITCASE_CUT(c,-.32,.1,.32);SUITCASE_CUT(c,.02,.04,.4);SUITCASE_CUT(c,.33,.14,.26);}};
   if(id==='bags3go')return {name:'各寄一地',kind:'o',rot:0,core:[-.27,.28],box:[1,.95],draw(c){SUITCASE(c,-.3,.28,.24);SUITCASE(c,.0,.28,.24);SUITCASE(c,.3,.28,.24);
@@ -635,6 +649,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'很會說謊',panels:[['phoneRing','學校打電話來。'],['teacherCall','老師：「您兒子一直在說謊。」',1],['meCall','我：「告訴他，他很會說謊。」'],['familyPhoto','「我沒有兒子。」',0,3.5]]},
   {title:'三件行李',panels:[['bags3','我要托運三件行李。'],['bags3go','「這件寄新奧爾良，這件西雅圖，這件芝加哥。」'],['agentRoll','地勤翻白眼：「這不可能！」',1],['planeScatter','「為什麼？你們上週就這麼做了啊。」',0,3.5]]},
   {title:'一半是空的',panels:[['bra','問：聚攏型胸罩和一包洋芋片，有什麼共同點？'],['bag','答：看起來都很飽滿。'],['bagOpen','打開才發現……'],['braOpen','……一半是空的。',0,3.5]]},
   {title:'一塊錢',panels:[['kidStore','小時候，一塊錢就能在商店買一大堆。'],['goods','兩包洋芋片、一大瓶汽水、六包糖果、六根牛肉乾。'],['adultNow','現在不行了。'],['cctv','店裡到處都裝了監視器。',0,3.5]]},
