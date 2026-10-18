@@ -523,7 +523,21 @@ const RRECT=(c,x0,y0,x1,y1,r)=>{c.beginPath();c.moveTo(x0+r,y0);c.lineTo(x1-r,y0
 const PHONE=c=>RRECT(c,-.27,-.46,.27,.46,.07);
 const PHONE_SCREEN=(c,bub)=>{RRECT(c,-.22,-.36,.22,.34,.02);c.globalCompositeOperation='destination-out';
   for(const b of bub){RRECT(c,b[0],b[1],b[2],b[3],.04);fillP(c,b[4]);}c.globalCompositeOperation='source-over';};
+const PODIUM=(c,y0)=>{fillP(c,[[-.12,y0-.22],[.12,y0-.22],[.12,y0+.2],[-.12,y0+.2]]);fillP(c,[[-.38,y0-.08],[-.13,y0-.08],[-.13,y0+.2],[-.38,y0+.2]]);fillP(c,[[.13,y0],[.38,y0],[.38,y0+.2],[.13,y0+.2]]);};
+const PODIUM_CUT=(c,y0)=>{TXT(c,'1',0,y0-.04,16);TXT(c,'2',-.255,y0+.06,14);TXT(c,'3',.255,y0+.1,14);};
+const STAND=(c,x,yb)=>{fillE(c,x,yb-.3,.05,.05);c.lineWidth=.06;c.beginPath();c.moveTo(x,yb-.24);c.lineTo(x,yb-.1);c.stroke();
+  c.lineWidth=.04;c.beginPath();c.moveTo(x,yb-.1);c.lineTo(x-.04,yb);c.moveTo(x,yb-.1);c.lineTo(x+.04,yb);c.moveTo(x,yb-.2);c.lineTo(x-.07,yb-.3);c.moveTo(x,yb-.2);c.lineTo(x+.07,yb-.3);c.stroke();};
 function shapeById(id){
+  if(id==='medal')return {name:'獎牌',kind:'o',rot:0,core:[0,.42],box:[.8,1],draw(c){
+    fillP(c,[[-.2,-.46],[-.08,-.46],[.04,-.06],[-.06,-.04]]);fillP(c,[[.2,-.46],[.08,-.46],[-.04,-.06],[.06,-.04]]);fillE(c,0,.16,.24,.24);},
+    cut(c){c.lineWidth=.02;c.beginPath();c.arc(0,.16,.19,0,7);c.stroke();TXT(c,'懶',0,.17,18);}};
+  if(id==='podium')return {name:'頒獎台',kind:'o',rot:0,core:[-.35,.35],box:[.9,.95],draw(c){PODIUM(c,.24);STAND(c,0,.02);STAND(c,-.255,.16);STAND(c,.255,.24);},cut(c){PODIUM_CUT(c,.24);}};
+  if(id==='four')return {name:'第四名',kind:'o',rot:0,core:[0,.38],box:[.8,1],draw(c){TXT(c,'4',0,.0,80);c.lineWidth=.035;c.beginPath();c.moveTo(-.3,.4);c.lineTo(.3,.4);c.stroke();}};
+  if(id==='podiumLazy')return {name:'第四名躺在旁邊',kind:'o',rot:0,core:[-.45,.4],box:[1.05,.95],draw(c){
+    c.save();c.translate(-.16,-.04);c.scale(.78,.78);PODIUM(c,.18);STAND(c,0,-.04);STAND(c,-.255,.1);STAND(c,.255,.18);c.restore();
+    c.lineWidth=.03;c.beginPath();c.moveTo(-.5,.42);c.lineTo(.5,.42);c.stroke();
+    fillE(c,.17,.34,.05,.05);c.lineWidth=.06;c.beginPath();c.moveTo(.23,.35);c.lineTo(.38,.35);c.stroke();c.lineWidth=.04;c.beginPath();c.moveTo(.38,.35);c.lineTo(.48,.37);c.moveTo(.38,.35);c.lineTo(.47,.31);c.stroke();},
+    cut(c){c.save();c.translate(-.16,-.04);c.scale(.78,.78);PODIUM_CUT(c,.18);c.restore();}};
   if(id==='msgLazy')return {name:'說我懶的訊息',kind:'o',rot:0,core:[-.27,.3],box:[.75,1],draw:PHONE,cut(c){
     PHONE_SCREEN(c,[[-.18,-.28,.1,-.1,[[-.16,-.12],[-.2,-.04],[-.08,-.11]]]]);TXT(c,'很懶',-.04,-.19,11);fillE(c,0,.41,.035,.035);}};
   if(id==='meMad')return profileShape({id:'flat',fixed:1,name:'不爽的我',extra:ANGER});
@@ -679,6 +693,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'第四名',panels:[['medal','如果懶惰是奧運項目……'],['podium','前三名都要走上頒獎台。'],['four','我寧願拿第四名……'],['podiumLazy','……這樣就不用走上去了。',0,3.5]]},
   {title:'懶得回',panels:[['msgLazy','今天有人說我懶。'],['meMad','我很不爽，決定回他。'],['msgTyping','打了幾個字……'],['meLazy','……算了，懶得回。',0,3.5,-1.5708]]},
   {title:'倫理學',panels:[['prof','教授：「你的倫理學不及格。」'],['gradeF','倫理學：F。'],['bribe','我把二十塊美金推過桌面……'],['meNow','「……那現在呢？」',1,3.5]]},
   {title:'閉眼說瞎話',panels:[['bigQ','說謊的人死後會做什麼？'],['liarAwake','活著的時候，他睜眼說瞎話。'],['liarDead','死了以後，他躺著……',0,0,-1.5708],['liarDeadTalk','……改成閉眼說瞎話。',0,3.5,-1.5708]]},
