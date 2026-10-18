@@ -567,8 +567,8 @@ function couple(point){const H=profileShape({id:'flat',fixed:1,name:''}),W=profi
     c.save();c.translate(.24,.06);c.scale(-.44,.44);W.draw(c);c.restore();
     if(point){c.lineWidth=.06;c.lineCap='round';c.beginPath();c.moveTo(-.12,.3);c.quadraticCurveTo(-.02,.36,.02,.2);c.stroke();fillE(c,.03,.17,.03,.03);}
     else{for(const [x,y] of [[-.42,-.28],[.04,-.22]]){c.beginPath();c.moveTo(x,y-.06);c.quadraticCurveTo(x+.04,y,x,y+.03);c.quadraticCurveTo(x-.04,y,x,y-.06);c.fill();}}}};}
-const NAMETAG=c=>{RRECT(c,.62,1.02,1.08,1.26,.03);};
-const NAMETAG_CUT=c=>{TXT(c,'金口',.85,1.14,15);};
+const NAMETAG=c=>{RRECT(c,.5,.98,1.2,1.36,.04);};
+const NAMETAG_CUT=c=>{TXT(c,'金口',.85,1.17,24);};
 const ZIP=c=>{c.lineWidth=.02;c.beginPath();c.moveTo(.68,.72);c.lineTo(.84,.72);for(const x of [.71,.75,.79]){c.moveTo(x,.69);c.lineTo(x,.75);}c.stroke();};
 function shapeById(id){
   if(id==='tellerMum')return profileShape({id:'flat',fixed:1,name:'不說話的櫃員',extra:NAMETAG,cutP:c=>{NAMETAG_CUT(c);ZIP(c);},scale:.85,shift:-.06,box:[1.05,1.15],core:[-.06,.12]});
