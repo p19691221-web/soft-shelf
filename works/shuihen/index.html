@@ -532,7 +532,21 @@ const MASK=c=>{fillP(c,[[.3,.36],[.82,.36],[.82,.48],[.3,.48]]);};
 const MASK_CUT=c=>{fillE(c,.66,.42,.045,.03);};
 const TORCH=c=>{fillP(c,[[.86,.86],[1.02,.8],[1.06,.9],[.9,.96]]);c.beginPath();c.moveTo(1.04,.84);c.lineTo(1.5,.62);c.lineTo(1.5,1.16);c.lineTo(1.06,.9);c.closePath();c.globalAlpha=.55;c.fill();c.globalAlpha=1;};
 const BANG=c=>{TXT(c,'！',1.02,.15,50);};
+const BODY=(c,arms)=>{c.lineWidth=.1;c.lineCap='round';c.beginPath();c.moveTo(0,-.1);c.lineTo(0,.2);c.stroke();
+  c.lineWidth=.07;c.beginPath();c.moveTo(0,.2);c.lineTo(-.1,.44);c.moveTo(0,.2);c.lineTo(.1,.44);
+  if(arms==='up'){c.moveTo(0,-.04);c.lineTo(-.16,-.2);c.moveTo(0,-.04);c.lineTo(.16,-.2);}
+  else if(arms==='guitar'){c.moveTo(0,-.04);c.lineTo(.14,.1);c.moveTo(0,-.04);c.lineTo(-.1,.12);}
+  else{c.moveTo(0,-.04);c.lineTo(-.14,.14);c.moveTo(0,-.04);c.lineTo(.14,.14);}c.stroke();};
+const GUITAR=c=>{c.save();c.translate(.02,.12);c.rotate(-.6);fillE(c,-.02,.06,.1,.08);fillE(c,-.02,-.04,.08,.065);c.lineWidth=.035;c.beginPath();c.moveTo(-.02,-.08);c.lineTo(-.02,-.36);c.stroke();c.restore();};
+const NOTES=c=>{for(const [x,y,k] of [[.3,-.36,1],[-.32,-.3,.8],[.36,-.08,.7]]){fillE(c,x,y,.04*k,.03*k,-.4);c.lineWidth=.02*k;c.beginPath();c.moveTo(x+.035*k,y);c.lineTo(x+.035*k,y-.14*k);c.lineTo(x+.09*k,y-.1*k);c.stroke();}};
+const HAT=c=>{fillE(c,.3,.43,.12,.025);fillE(c,.3,.4,.06,.045);};
 function shapeById(id){
+  if(id==='headOff')return {name:'頭斷掉的人',kind:'o',rot:0,core:[0,.4],box:[.8,1],draw(c){BODY(c,'up');fillE(c,.06,-.38,.1,.1);
+    c.lineWidth=.025;c.beginPath();for(const a of [-.6,0,.6]){c.moveTo(.06+Math.sin(a)*.14,-.24+Math.cos(a)*.0);c.lineTo(.06+Math.sin(a)*.2,-.2);}c.stroke();}};
+  if(id==='briefcase')return {name:'一種職業',kind:'o',rot:0,core:[-.37,.2],box:[.9,.8],draw(c){SUITCASE(c,0,.04,.8);},cut(c){SUITCASE_CUT(c,0,.04,.8);TXT(c,'職業',0,.12,15);}};
+  if(id==='busker')return {name:'街頭藝人',kind:'o',rot:0,core:[0,.4],box:[.8,1],draw(c){BODY(c,'guitar');fillE(c,0,-.2,.1,.1);GUITAR(c);HAT(c);NOTES(c);}};
+  if(id==='headOn')return {name:'接回去了',kind:'o',rot:0,core:[0,.4],box:[.8,1],draw(c){BODY(c,'down');fillE(c,0,-.2,.1,.1);NOTES(c);HAT(c);},
+    cut(c){c.lineWidth=.016;c.beginPath();c.moveTo(-.07,-.11);c.lineTo(.07,-.11);for(const x of [-.05,0,.05]){c.moveTo(x,-.14);c.lineTo(x,-.08);}c.stroke();}};
   if(id==='mrLee')return profileShape({id:'flat',fixed:1,name:'李先生',extra:c=>{fillE(c,1.1,.2,.22,.22);},cutP:c=>TXT(c,'李',1.1,.21,30),box:[1.4,1.12]});
   if(id==='sling')return {name:'吊著的手臂',kind:'o',rot:0,core:[-.3,-.32],box:[1,1],draw(c){
     c.lineWidth=.04;c.beginPath();c.moveTo(-.3,-.44);c.lineTo(.26,.14);c.moveTo(.3,-.44);c.lineTo(-.22,.14);c.stroke();
@@ -727,6 +741,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'找誰接',panels:[['headOff','頭斷掉了，要找誰接？'],['briefcase','提示：一種職業。'],['busker','答案是——'],['headOn','街頭藝人（接頭藝人）。',0,3.5]]},
   {title:'半手李',panels:[['mrLee','這是李先生。'],['sling','有一天，他摔斷了手臂。'],['bigQ','請問：他會變成什麼？'],['gift','半手李（伴手禮）。',0,3.5]]},
   {title:'一起找',panels:[['sleepy','昨晚正要睡覺……',0,0,-1.5708],['thief','看到小偷在我家翻錢。'],['wakeUp','我立刻跳起來——',1],['searchTogether','……跟他一起找。',0,3.5]]},
   {title:'誰是白痴',panels:[['shouter','一個男人在廣場大喊：「總統是白痴！」'],['cuffs','警察把他銬起來：「侮辱我們的總統違法！」'],['shouterExplain','「誤會了，我說的是鄰國的總統。」'],['chief','警長：「騙不了我們，大家都知道誰是白痴。」',1,3.5]]},
