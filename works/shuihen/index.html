@@ -514,7 +514,14 @@ const ROLLEYES_CUT=c=>{fillE(c,.65,.395,.022,.014);};
 const HANDSET=(c,x,y,k,a)=>{c.save();c.translate(x,y);c.rotate(a);c.scale(k,k);
   c.lineWidth=.12;c.lineCap='round';c.beginPath();c.moveTo(-.28,.0);c.quadraticCurveTo(0,-.16,.28,0);c.stroke();fillE(c,-.3,.04,.1,.07,.3);fillE(c,.3,.04,.1,.07,-.3);c.restore();};
 const GLASSES_CUT=c=>{c.lineWidth=.02;c.beginPath();c.arc(.66,.43,.06,0,7);c.moveTo(.6,.43);c.lineTo(.36,.4);c.stroke();};
+const EYE_OPEN=c=>{fillE(c,.64,.43,.045,.035);};
+const BED=c=>{c.lineWidth=.06;c.beginPath();c.moveTo(-.04,-.25);c.lineTo(-.04,1.35);c.stroke();fillE(c,.05,.45,.07,.24);};
+const EYE_SHUT=c=>{c.lineWidth=.022;c.beginPath();c.moveTo(.58,.43);c.quadraticCurveTo(.64,.47,.7,.43);c.stroke();};
 function shapeById(id){
+  if(id==='bigQ')return {name:'問號',kind:'o',rot:0,core:[0,.38],box:[.8,1],draw(c){c.save();c.scale(.01,.01);c.font='900 92px '+SERIF;c.textAlign='center';c.textBaseline='middle';c.fillText('？',0,0);c.restore();}};
+  if(id==='liarAwake')return profileShape({id:'plain',fixed:1,name:'睜眼說瞎話的人',extra:BUBBLE,cutP:c=>{EYE_OPEN(c);BUBBLE_DOTS(c);},scale:.75,shift:-.22,box:[1.4,1.1],core:[-.22,0]});
+  if(id==='liarDead')return profileShape({id:'plain',fixed:1,name:'躺著的人',extra:BED,cutP:EYE_SHUT,box:[1.12,1.5],core:[0,.15]});
+  if(id==='liarDeadTalk')return profileShape({id:'plain',fixed:1,name:'閉眼說瞎話的人',extra:c=>{BED(c);BUBBLE(c);},cutP:c=>{EYE_SHUT(c);BUBBLE_DOTS(c);},scale:.75,shift:-.22,box:[1.4,1.1],core:[-.22,0]});
   if(id==='phoneRing')return {name:'響起的電話',kind:'o',rot:0,core:[-.35,.25],box:[1,.9],draw(c){
     c.beginPath();c.moveTo(-.32,.36);c.lineTo(-.26,.02);c.lineTo(.26,.02);c.lineTo(.32,.36);c.closePath();c.fill();HANDSET(c,0,-.06,1.05,0);
     c.lineWidth=.035;for(const sx of [-1,1])for(const r of [.5,.6]){c.beginPath();c.arc(0,0,r,sx>0?-.5:Math.PI-.4,sx>0?.4:Math.PI+.5);c.stroke();}},
@@ -649,6 +656,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'閉眼說瞎話',panels:[['bigQ','說謊的人死後會做什麼？'],['liarAwake','活著的時候，他睜眼說瞎話。'],['liarDead','死了以後，他躺著……',0,0,-1.5708],['liarDeadTalk','……改成閉眼說瞎話。',0,3.5,-1.5708]]},
   {title:'很會說謊',panels:[['phoneRing','學校打電話來。'],['teacherCall','老師：「您兒子一直在說謊。」',1],['meCall','我：「告訴他，他很會說謊。」'],['familyPhoto','「我沒有兒子。」',0,3.5]]},
   {title:'三件行李',panels:[['bags3','我要托運三件行李。'],['bags3go','「這件寄新奧爾良，這件西雅圖，這件芝加哥。」'],['agentRoll','地勤翻白眼：「這不可能！」',1],['planeScatter','「為什麼？你們上週就這麼做了啊。」',0,3.5]]},
   {title:'一半是空的',panels:[['bra','問：聚攏型胸罩和一包洋芋片，有什麼共同點？'],['bag','答：看起來都很飽滿。'],['bagOpen','打開才發現……'],['braOpen','……一半是空的。',0,3.5]]},
