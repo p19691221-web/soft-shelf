@@ -462,7 +462,23 @@ const CLOUD=(c,x,y,k)=>{fillE(c,x,y,.2*k,.11*k);fillE(c,x-.17*k,y+.03*k,.13*k,.0
 const DROPS=(c,pts,w)=>{c.lineWidth=w;c.lineCap='round';c.beginPath();for(const [x,y] of pts){c.moveTo(x,y);c.lineTo(x-.03,y+.1);}c.stroke();};
 const WINDOW_CUT=c=>{c.lineWidth=.035;c.strokeRect(-.04,-.02,1.0,1.16);c.beginPath();c.moveTo(.46,-.02);c.lineTo(.46,1.14);c.moveTo(-.04,.56);c.lineTo(.96,.56);c.stroke();};
 const GLASS_RAIN=c=>{c.lineWidth=.018;c.beginPath();for(const [x,y] of [[.2,.15],[.62,.3],[.3,.8],[.7,.9],[.12,.45],[.58,.7]]){c.moveTo(x,y);c.lineTo(x-.02,y+.12);}c.stroke();};
+const BENCH=(c,x0,x1)=>{fillP(c,[[x0,.12],[x1,.12],[x1,.18],[x0,.18]]);
+  for(const y of [-.12,-.02])fillP(c,[[x0,y],[x1,y],[x1,y+.05],[x0,y+.05]]);
+  c.lineWidth=.04;c.beginPath();for(const x of [x0+.05,x1-.05]){c.moveTo(x,.18);c.lineTo(x,.42);c.moveTo(x,-.12);c.lineTo(x,.12);}c.stroke();};
+const SIT=(c,x,mood)=>{fillE(c,x,-.04,.075,.15);const hy=mood==='down'?-.2:mood==='up'?-.34:-.3,hx=mood==='down'?x+.05:x;
+  fillE(c,hx,hy,.07,.07);c.lineWidth=.06;c.beginPath();c.moveTo(x,-.16);c.lineTo(hx,hy);c.stroke();c.lineWidth=.05;c.beginPath();c.moveTo(x,.12);c.lineTo(x+.12,.14);c.lineTo(x+.13,.42);c.stroke();};
+const WALKMAN=c=>{fillE(c,.08,-.36,.095,.095);c.lineWidth=.12;c.beginPath();c.moveTo(.06,-.24);c.lineTo(.02,.06);c.stroke();
+  c.lineWidth=.055;c.beginPath();c.moveTo(.06,-.18);c.quadraticCurveTo(.16,-.06,.2,.04);c.moveTo(.05,-.18);c.quadraticCurveTo(-.06,-.06,-.12,.02);c.stroke();
+  c.lineWidth=.07;c.beginPath();c.moveTo(.03,.06);c.quadraticCurveTo(.13,.22,.19,.44);c.moveTo(.0,.06);c.quadraticCurveTo(-.07,.24,-.19,.42);c.stroke();
+  c.lineWidth=.045;c.beginPath();c.moveTo(.17,.45);c.lineTo(.27,.45);c.moveTo(-.21,.42);c.lineTo(-.13,.45);c.stroke();
+  for(const [x,y,r] of [[-.36,.36,.1],[-.42,.22,.08],[-.3,.24,.07]])fillE(c,x,y,r,r);c.lineWidth=.03;c.beginPath();c.moveTo(-.36,.36);c.lineTo(-.36,.46);c.stroke();};
 function shapeById(id){
+  if(id==='parkWalk')return {name:'在公園散步',kind:'o',rot:0,core:[0,-.05],box:[1,1],draw:WALKMAN};
+  if(id==='bench2')return {name:'垂頭喪氣的兩個人',kind:'o',rot:0,core:[0,0],box:[1,1],draw(c){BENCH(c,-.42,.42);SIT(c,-.18,'down');SIT(c,.12,'down');}};
+  if(id==='bench2up')return {name:'抬頭的人',kind:'o',rot:0,core:[0,0],box:[1,1],draw(c){BENCH(c,-.42,.42);SIT(c,-.18,'down');SIT(c,.12,'up');}};
+  if(id==='bench3')return {name:'三個人與告示牌',kind:'o',rot:0,core:[-.1,0],box:[1.05,1],draw(c){BENCH(c,-.5,.26);SIT(c,-.36,'down');SIT(c,-.12,'down');SIT(c,.12,'up');
+    c.lineWidth=.035;c.beginPath();c.moveTo(.42,.44);c.lineTo(.42,-.08);c.stroke();fillP(c,[[.28,-.46],[.58,-.46],[.58,-.06],[.28,-.06]]);},
+    cut(c){c.save();c.scale(.01,.01);c.font='900 15px '+SERIF;c.textAlign='center';c.textBaseline='middle';c.fillText('未',43,-35);c.fillText('乾',43,-17);c.restore();}};
   if(id==='rain')return {name:'下雨',kind:'o',rot:0,core:[0,-.1],box:[1,1],draw(c){CLOUD(c,0,-.18,1.4);
     DROPS(c,[[-.28,.12],[-.12,.2],[.04,.12],[.2,.22],[.32,.12],[-.2,.36],[-.02,.38],[.16,.4]],.035);}};
   if(id==='storm')return {name:'暴風雨',kind:'o',rot:0,core:[0,-.1],box:[1,1],draw(c){CLOUD(c,0,-.24,1.6);
@@ -531,6 +547,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'坐下',panels:[['parkWalk','一個男人在公園散步。'],['bench2','長椅上兩個人垂頭喪氣。他問：「怎麼了？」'],['bench2up','其中一人抬頭：「坐下，我告訴你。」'],['bench3','他坐下。「油漆還沒乾。」']]},
   {title:'露台',panels:[['rain','這陣子天氣很糟。'],['wifeWin','我太太一直盯著露台的窗戶看。',1],['storm','天氣越來越壞。'],['wifeOut','再壞下去，可能得讓她進來了。',1,3.5]]},
   {title:'塗成藍色',panels:[['ghost','老獨裁者的幽靈，出現在新領袖夢裡。'],['leader','新領袖：怎樣讓國家再次偉大？',1],['palace','幽靈：處決一半人口，把宮殿塗成藍色。'],['leaderQ','「為何是藍色？」「就知道你不問前半句。」',1]]},
   {title:'四個孩子的爸',panels:[['dad6','他有六個孩子，老愛叫老婆「六個孩子的媽」。'],['momMad','她很不高興。',1],['dadShout','聚會上他大喊：「六個孩子的媽，走了！」'],['mom4','她：「馬上來，四個孩子的爸。」',1,3.5]]},
