@@ -488,7 +488,21 @@ const BARS_CUT=c=>{c.lineWidth=.035;c.beginPath();for(const x of [-.16,0,.16]){c
 const EYE_CUT=c=>{fillE(c,.64,.44,.04,.028);};
 const EYE_RED=c=>{fillE(c,.64,.44,.045,.032);c.lineWidth=.012;c.beginPath();c.moveTo(.6,.47);c.lineTo(.56,.5);c.moveTo(.62,.4);c.lineTo.call(c,.58,.36);c.stroke();};
 const EYE_DULL=c=>{c.lineWidth=.022;c.beginPath();c.moveTo(.59,.44);c.lineTo(.69,.44);c.stroke();};
+const SUITCASE=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);
+  c.beginPath();c.moveTo(-.4,-.2);c.lineTo(.4,-.2);c.quadraticCurveTo(.46,-.2,.46,-.14);c.lineTo(.46,.3);c.quadraticCurveTo(.46,.36,.4,.36);c.lineTo(-.4,.36);c.quadraticCurveTo(-.46,.36,-.46,.3);c.lineTo(-.46,-.14);c.quadraticCurveTo(-.46,-.2,-.4,-.2);c.closePath();c.fill();
+  c.lineWidth=.06;c.beginPath();c.moveTo(-.12,-.2);c.lineTo(-.12,-.32);c.lineTo(.12,-.32);c.lineTo(.12,-.2);c.stroke();c.restore();};
+const SUITCASE_CUT=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.lineWidth=.016/Math.max(k,.5);c.beginPath();c.moveTo(-.28,-.14);c.lineTo(-.28,.3);c.moveTo(.28,-.14);c.lineTo(.28,.3);c.stroke();
+  fillP(c,[[-.04,-.12],[.04,-.12],[.04,-.04],[-.04,-.04]]);c.restore();};
 function shapeById(id){
+  if(id==='suitcase')return {name:'收好的行李',kind:'o',rot:0,core:[-.41,.1],box:[1,.8],draw(c){SUITCASE(c,0,0,1);},cut(c){SUITCASE_CUT(c,0,0,1);}};
+  if(id==='door')return {name:'門口',kind:'o',rot:0,core:[-.3,.3],box:[.9,1.05],draw(c){
+    c.lineWidth=.06;c.strokeRect(-.32,-.46,.5,.92);
+    c.beginPath();c.moveTo(-.29,-.43);c.lineTo(-.05,-.36);c.lineTo(-.05,.39);c.lineTo(-.29,.43);c.closePath();c.fill();
+    SUITCASE(c,.32,.3,.36);},
+    cut(c){fillE(c,-.1,.02,.025,.025);SUITCASE_CUT(c,.32,.3,.36);}};
+  if(id==='wifeCurse')return profileShape({id:'plain',bun:1,fixed:1,name:'送別的妻子',extra:ANGER,box:[1.12,1.12]});
+  if(id==='manStay')return profileShape({id:'flat',fixed:1,name:'回頭的我',extra:c=>{SUITCASE(c,1.0,1.18,.45);c.lineWidth=.05;c.beginPath();c.moveTo(.6,.98);c.quadraticCurveTo(.9,1.0,1.0,1.02);c.stroke();QMARK(c);},
+    cutP:c=>SUITCASE_CUT(c,1.0,1.18,.45),box:[1.42,1.45],core:[0,.15]});
   if(id==='copEye')return profileShape({id:'flat',fixed:1,name:'起疑的警察',extra:PEAKCAP,cutP:EYE_DULL,box:[1.12,1.12]});
   if(id==='meRed')return profileShape({id:'plain',fixed:1,name:'眼睛紅紅的我',cutP:EYE_RED});
   if(id==='donut')return {name:'甜甜圈',kind:'o',rot:0,core:[-.33,0],box:[1,.9],draw(c){fillE(c,0,0,.42,.32);},
@@ -578,6 +592,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'所以要我留下',panels:[['suitcase','老婆幫我收好行李，叫我走。'],['door','我提著行李走到門口。'],['wifeCurse','她：「祝你死得漫長、緩慢、痛苦。」',1],['manStay','我：「所以……你要我留下來？」',0,3.5]]},
   {title:'甜甜圈',panels:[['car','我被警察攔下來。'],['copEye','警察：「你眼睛紅紅的，吸了大麻？」'],['meRed','我：「你眼神呆滯……」',1],['donut','「……吃了甜甜圈？」',0,3.5]]},
   {title:'兩根菸',panels:[['smoke2','他總是一次抽兩根菸。'],['cell','「一根給我，一根給坐牢的哥哥。」'],['smoke1','後來只抽一根。「你哥出獄了？」'],['cellSmoke','「沒有，是我戒菸了。」',0,3.5]]},
   {title:'深夜講座',panels:[['cop','凌晨兩點，警察攔下老人：「這麼晚去哪？」'],['oldman','「去聽講座，講喝酒、抽菸、熬夜的危害。」',1],['copQ','「這種時間，誰在講？」'],['wifePin','「我老婆。」',1,3.5]]},
