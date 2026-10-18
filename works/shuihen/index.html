@@ -518,7 +518,19 @@ const EYE_OPEN=c=>{fillE(c,.64,.43,.045,.035);};
 const BED=c=>{c.lineWidth=.06;c.beginPath();c.moveTo(-.04,-.25);c.lineTo(-.04,1.35);c.stroke();fillE(c,.05,.45,.07,.24);};
 const EYE_SHUT=c=>{c.lineWidth=.022;c.beginPath();c.moveTo(.58,.43);c.quadraticCurveTo(.64,.47,.7,.43);c.stroke();};
 const TXT=(c,t,x,y,px)=>{c.save();c.scale(.01,.01);c.font='900 '+px+'px '+SERIF;c.textAlign='center';c.textBaseline='middle';c.fillText(t,x*100,y*100);c.restore();};
+const RRECT=(c,x0,y0,x1,y1,r)=>{c.beginPath();c.moveTo(x0+r,y0);c.lineTo(x1-r,y0);c.quadraticCurveTo(x1,y0,x1,y0+r);c.lineTo(x1,y1-r);c.quadraticCurveTo(x1,y1,x1-r,y1);
+  c.lineTo(x0+r,y1);c.quadraticCurveTo(x0,y1,x0,y1-r);c.lineTo(x0,y0+r);c.quadraticCurveTo(x0,y0,x0+r,y0);c.closePath();c.fill();};
+const PHONE=c=>RRECT(c,-.27,-.46,.27,.46,.07);
+const PHONE_SCREEN=(c,bub)=>{RRECT(c,-.22,-.36,.22,.34,.02);c.globalCompositeOperation='destination-out';
+  for(const b of bub){RRECT(c,b[0],b[1],b[2],b[3],.04);fillP(c,b[4]);}c.globalCompositeOperation='source-over';};
 function shapeById(id){
+  if(id==='msgLazy')return {name:'說我懶的訊息',kind:'o',rot:0,core:[-.27,.3],box:[.75,1],draw:PHONE,cut(c){
+    PHONE_SCREEN(c,[[-.18,-.28,.1,-.1,[[-.16,-.12],[-.2,-.04],[-.08,-.11]]]]);TXT(c,'很懶',-.04,-.19,11);fillE(c,0,.41,.035,.035);}};
+  if(id==='meMad')return profileShape({id:'flat',fixed:1,name:'不爽的我',extra:ANGER});
+  if(id==='msgTyping')return {name:'打到一半的回覆',kind:'o',rot:0,core:[-.27,.3],box:[.75,1],draw:PHONE,cut(c){
+    PHONE_SCREEN(c,[[-.18,-.28,.1,-.1,[[-.16,-.12],[-.2,-.04],[-.08,-.11]]],[-.04,.04,.18,.2,[[.16,.18],[.2,.26],[.08,.19]]]]);
+    TXT(c,'很懶',-.04,-.19,11);for(const x of [.02,.07,.12])fillE(c,x,.12,.018,.018);fillE(c,0,.41,.035,.035);}};
+  if(id==='meLazy')return profileShape({id:'flat',fixed:1,name:'懶得回的我',extra:BED,cutP:EYE_SHUT,box:[1.12,1.5],core:[0,.15]});
   if(id==='prof')return profileShape({id:'beard',fixed:1,name:'教授',cutP:GLASSES_CUT});
   if(id==='gradeF')return {name:'不及格的成績單',kind:'o',rot:0,core:[-.33,.3],box:[.85,1],draw(c){fillP(c,[[-.34,-.44],[.34,-.44],[.34,.44],[-.34,.44]]);},
     cut(c){TXT(c,'倫理學',0,-.3,14);c.lineWidth=.012;c.beginPath();for(const y of [-.2,-.14]){c.moveTo(-.24,y);c.lineTo(.24,y);}c.stroke();
@@ -667,6 +679,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'懶得回',panels:[['msgLazy','今天有人說我懶。'],['meMad','我很不爽，決定回他。'],['msgTyping','打了幾個字……'],['meLazy','……算了，懶得回。',0,3.5,-1.5708]]},
   {title:'倫理學',panels:[['prof','教授：「你的倫理學不及格。」'],['gradeF','倫理學：F。'],['bribe','我把二十塊美金推過桌面……'],['meNow','「……那現在呢？」',1,3.5]]},
   {title:'閉眼說瞎話',panels:[['bigQ','說謊的人死後會做什麼？'],['liarAwake','活著的時候，他睜眼說瞎話。'],['liarDead','死了以後，他躺著……',0,0,-1.5708],['liarDeadTalk','……改成閉眼說瞎話。',0,3.5,-1.5708]]},
   {title:'很會說謊',panels:[['phoneRing','學校打電話來。'],['teacherCall','老師：「您兒子一直在說謊。」',1],['meCall','我：「告訴他，他很會說謊。」'],['familyPhoto','「我沒有兒子。」',0,3.5]]},
