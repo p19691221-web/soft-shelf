@@ -493,7 +493,22 @@ const SUITCASE=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);
   c.lineWidth=.06;c.beginPath();c.moveTo(-.12,-.2);c.lineTo(-.12,-.32);c.lineTo(.12,-.32);c.lineTo(.12,-.2);c.stroke();c.restore();};
 const SUITCASE_CUT=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.lineWidth=.016/Math.max(k,.5);c.beginPath();c.moveTo(-.28,-.14);c.lineTo(-.28,.3);c.moveTo(.28,-.14);c.lineTo(.28,.3);c.stroke();
   fillP(c,[[-.04,-.12],[.04,-.12],[.04,-.04],[-.04,-.04]]);c.restore();};
+const CHIPS=(c,x,y,w,h)=>{c.beginPath();const n=6;c.moveTo(x-w,y-h);for(let k=0;k<=n;k++)c.lineTo(x-w+2*w*k/n,y-h+(k%2?-.03:0));
+  c.quadraticCurveTo(x+w*1.12,y,x+w,y+h);for(let k=n;k>=0;k--)c.lineTo(x-w+2*w*k/n,y+h+(k%2?.03:0));c.quadraticCurveTo(x-w*1.12,y,x-w,y-h);c.closePath();c.fill();};
+const SODA=(c,x,y,k)=>{c.beginPath();c.moveTo(x-.08*k,y+.4*k);c.lineTo(x-.08*k,y-.08*k);c.quadraticCurveTo(x-.08*k,y-.2*k,x-.03*k,y-.28*k);c.lineTo(x-.03*k,y-.36*k);
+  c.lineTo(x+.03*k,y-.36*k);c.lineTo(x+.03*k,y-.28*k);c.quadraticCurveTo(x+.08*k,y-.2*k,x+.08*k,y-.08*k);c.lineTo(x+.08*k,y+.4*k);c.closePath();c.fill();};
 function shapeById(id){
+  if(id==='kidStore')return profileShape({id:'kid',fixed:1,name:'小時候的我',extra:c=>{c.save();c.font='900 30px '+SERIF;c.scale(.01,.01);c.textAlign='center';c.textBaseline='middle';c.fillText('$1',108,30);c.restore();},box:[1.35,1.15]});
+  if(id==='goods')return {name:'一堆零食',kind:'o',rot:0,core:[-.36,.2],box:[1.05,1],draw(c){
+    CHIPS(c,-.3,-.04,.13,.2);CHIPS(c,-.1,.02,.13,.2);SODA(c,.14,0,1);
+    for(let k=0;k<3;k++)for(let j=0;j<2;j++)fillP(c,[[.26+j*.12,-.2+k*.15],[.36+j*.12,-.2+k*.15],[.36+j*.12,-.1+k*.15],[.26+j*.12,-.1+k*.15]]);
+    c.lineWidth=.032;c.beginPath();for(let k=0;k<6;k++){const x=-.4+k*.07;c.moveTo(x,.3);c.lineTo(x+.05,.46);}c.stroke();},
+    cut(c){c.lineWidth=.014;c.beginPath();for(const x of [-.3,-.1]){c.moveTo(x-.07,-.02);c.lineTo(x+.07,-.02);}c.moveTo(.08,.04);c.lineTo(.2,.04);c.stroke();}};
+  if(id==='adultNow')return profileShape({id:'flat',fixed:1,name:'長大的我'});
+  if(id==='cctv')return {name:'監視器',kind:'o',rot:0,core:[-.36,-.2],box:[1,.9],draw(c){
+    fillP(c,[[-.46,-.4],[-.38,-.4],[-.38,.0],[-.46,.0]]);c.lineWidth=.05;c.beginPath();c.moveTo(-.38,-.2);c.lineTo(-.16,-.12);c.stroke();
+    c.save();c.translate(.08,0);c.rotate(.42);fillP(c,[[-.3,-.14],[.28,-.14],[.28,.14],[-.3,.14]]);fillP(c,[[.28,-.17],[.4,-.17],[.4,.17],[.28,.17]]);fillE(c,.42,0,.07,.15);c.restore();},
+    cut(c){c.save();c.translate(.08,0);c.rotate(.42);c.lineWidth=.03;c.beginPath();c.ellipse(.42,0,.035,.09,0,0,7);c.stroke();c.lineWidth=.016;c.beginPath();c.moveTo(-.24,-.06);c.lineTo(.16,-.06);c.stroke();fillE(c,-.2,.06,.025,.025);c.restore();}};
   if(id==='suitcase')return {name:'收好的行李',kind:'o',rot:0,core:[-.41,.1],box:[1,.8],draw(c){SUITCASE(c,0,0,1);},cut(c){SUITCASE_CUT(c,0,0,1);}};
   if(id==='door')return {name:'門口',kind:'o',rot:0,core:[-.3,.3],box:[.9,1.05],draw(c){
     c.lineWidth=.06;c.strokeRect(-.32,-.46,.5,.92);
@@ -592,6 +607,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'一塊錢',panels:[['kidStore','小時候，一塊錢就能在商店買一大堆。'],['goods','兩包洋芋片、一大瓶汽水、六包糖果、六根牛肉乾。'],['adultNow','現在不行了。'],['cctv','店裡到處都裝了監視器。',0,3.5]]},
   {title:'所以要我留下',panels:[['suitcase','老婆幫我收好行李，叫我走。'],['door','我提著行李走到門口。'],['wifeCurse','她：「祝你死得漫長、緩慢、痛苦。」',1],['manStay','我：「所以……你要我留下來？」',0,3.5]]},
   {title:'甜甜圈',panels:[['car','我被警察攔下來。'],['copEye','警察：「你眼睛紅紅的，吸了大麻？」'],['meRed','我：「你眼神呆滯……」',1],['donut','「……吃了甜甜圈？」',0,3.5]]},
   {title:'兩根菸',panels:[['smoke2','他總是一次抽兩根菸。'],['cell','「一根給我，一根給坐牢的哥哥。」'],['smoke1','後來只抽一根。「你哥出獄了？」'],['cellSmoke','「沒有，是我戒菸了。」',0,3.5]]},
