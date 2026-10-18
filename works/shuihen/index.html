@@ -618,6 +618,14 @@ const EARTH=(c,x,y,r)=>{fillE(c,x,y,r,r);};
 const EARTH_CUT=(c,x,y,r)=>{c.save();c.translate(x,y);c.scale(r,r);c.beginPath();c.moveTo(-.6,-.5);c.quadraticCurveTo(-.2,-.7,0,-.3);c.quadraticCurveTo(-.1,0,-.5,.1);c.closePath();c.fill();
   c.beginPath();c.moveTo(.2,.1);c.quadraticCurveTo(.6,-.1,.7,.3);c.quadraticCurveTo(.4,.7,.1,.5);c.closePath();c.fill();c.restore();};
 function shapeById(id){
+  if(id==='meAnx')return profileShape({id:'flat',fixed:1,name:'焦慮的我',extra:SWEAT,cutP:c=>{MOUTH(c);EYE_OPEN(c);},scale:.85,shift:-.06,box:[1.2,1.0],core:[-.06,0]});
+  if(id==='doorEmpty')return {name:'空門口',kind:'o',rot:0,core:[-.3,.3],box:[.9,1.05],draw(c){
+    c.lineWidth=.06;c.strokeRect(-.32,-.46,.5,.92);c.beginPath();c.moveTo(-.29,-.43);c.lineTo(-.05,-.36);c.lineTo(-.05,.39);c.lineTo(-.29,.43);c.closePath();c.fill();
+    for(const [x,y] of [[.28,.36],[.36,.24],[.32,.1]])fillE(c,x,y,.035,.05);},cut(c){fillE(c,-.1,.02,.025,.025);}};
+  if(id==='teaCup')return {name:'一杯茶',kind:'o',rot:0,core:[-.3,.3],box:[.9,.9],draw(c){
+    c.beginPath();c.moveTo(-.28,-.06);c.lineTo(.22,-.06);c.lineTo(.18,.26);c.quadraticCurveTo(-.03,.36,-.24,.26);c.closePath();c.fill();
+    c.lineWidth=.06;c.beginPath();c.ellipse(.28,.08,.08,.1,0,0,7);c.stroke();fillE(c,-.03,.36,.36,.06);
+    c.lineWidth=.035;c.beginPath();for(const x of [-.16,-.03,.1]){c.moveTo(x,-.12);c.quadraticCurveTo(x+.07,-.22,x,-.32);c.quadraticCurveTo(x-.06,-.4,x+.02,-.46);}c.stroke();}};
   if(id==='bossOrder')return profileShape({id:'beard',fixed:1,name:'老闆',extra:c=>{TIE(c);POINT(c);},box:[1.25,1.3],core:[0,.1]});
   if(id==='guardOk')return profileShape({id:'flat',fixed:1,name:'保全',extra:c=>{PEAKCAP(c);},cutP:SMILE,box:[1.12,1.12]});
   if(id==='tvOffice')return {name:'電視上的《辦公室》',kind:'o',rot:0,core:[-.38,.3],box:[1,.95],draw(c){TV(c,0,.04,1.25);},
@@ -945,6 +953,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'沒安全感',panels:[['meAnx','我老婆離開我了……'],['momMad','因為她說我太沒安全感。',1],['doorEmpty','等等，她回來了。'],['teaCup','她只是去泡杯茶。',0,3.5]]},
   {title:'看辦公室',panels:[['bossOrder','老闆：「你是保全，工作就是看辦公室。」'],['guardOk','我：「沒問題。」',1],['tvOffice','我已經看到第六季了。'],['guardWatch','還是不懂這跟保全有什麼關係。',0,3.5]]},
   {title:'太晚了',panels:[['ufo','外星人降落地球。'],['alienTalk','「我們是來毀滅地球的。」'],['earthHot','地球：已經在發燒了。'],['activist','環保人士：「你們來得有點晚了吧？」',1,3.5]]},
   {title:'看穿',panels:[['ghost','為什麼鬼不擅長說謊？'],['ghostLie','鬼：「我才沒偷吃餅乾。」'],['bigEye','因為……'],['ghostSee','……你一眼就能看穿它們。',0,3.5]]},
