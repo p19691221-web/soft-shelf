@@ -528,6 +528,13 @@ const PODIUM_CUT=(c,y0)=>{TXT(c,'1',0,y0-.04,16);TXT(c,'2',-.255,y0+.06,14);TXT(
 const STAND=(c,x,yb)=>{fillE(c,x,yb-.3,.05,.05);c.lineWidth=.06;c.beginPath();c.moveTo(x,yb-.24);c.lineTo(x,yb-.1);c.stroke();
   c.lineWidth=.04;c.beginPath();c.moveTo(x,yb-.1);c.lineTo(x-.04,yb);c.moveTo(x,yb-.1);c.lineTo(x+.04,yb);c.moveTo(x,yb-.2);c.lineTo(x-.07,yb-.3);c.moveTo(x,yb-.2);c.lineTo(x+.07,yb-.3);c.stroke();};
 function shapeById(id){
+  if(id==='shouter')return profileShape({id:'plain',fixed:1,name:'大喊的人',extra:SHOUT,cutP:MOUTH,scale:.82,shift:-.12,box:[1.3,1.0],core:[-.12,0]});
+  if(id==='cuffs')return {name:'手銬',kind:'o',rot:0,core:[-.27,.18],box:[1,.8],draw(c){
+    c.lineWidth=.07;for(const x of [-.27,.27]){c.beginPath();c.arc(x,.08,.17,0,7);c.stroke();}
+    fillP(c,[[-.14,-.12],[-.08,-.12],[-.08,-.02],[-.14,-.02]]);fillP(c,[[.08,-.12],[.14,-.12],[.14,-.02],[.08,-.02]]);
+    c.lineWidth=.03;for(const x of [-.05,.0,.05]){c.beginPath();c.ellipse(x,-.08,.03,.02,0,0,7);c.stroke();}}};
+  if(id==='shouterExplain')return profileShape({id:'plain',fixed:1,name:'辯解的人',extra:BUBBLE,cutP:BUBBLE_DOTS,scale:.75,shift:-.22,box:[1.4,1.1],core:[-.22,0]});
+  if(id==='chief')return profileShape({id:'beard',fixed:1,name:'警長',extra:PEAKCAP,box:[1.12,1.12]});
   if(id==='medal')return {name:'獎牌',kind:'o',rot:0,core:[0,.42],box:[.8,1],draw(c){
     fillP(c,[[-.2,-.46],[-.08,-.46],[.04,-.06],[-.06,-.04]]);fillP(c,[[.2,-.46],[.08,-.46],[-.04,-.06],[.06,-.04]]);fillE(c,0,.16,.24,.24);},
     cut(c){c.lineWidth=.02;c.beginPath();c.arc(0,.16,.19,0,7);c.stroke();TXT(c,'懶',0,.17,18);}};
@@ -693,6 +700,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'誰是白痴',panels:[['shouter','一個男人在廣場大喊：「總統是白痴！」'],['cuffs','警察把他銬起來：「侮辱我們的總統違法！」'],['shouterExplain','「誤會了，我說的是鄰國的總統。」'],['chief','警長：「騙不了我們，大家都知道誰是白痴。」',1,3.5]]},
   {title:'第四名',panels:[['medal','如果懶惰是奧運項目……'],['podium','前三名都要走上頒獎台。'],['four','我寧願拿第四名……'],['podiumLazy','……這樣就不用走上去了。',0,3.5]]},
   {title:'懶得回',panels:[['msgLazy','今天有人說我懶。'],['meMad','我很不爽，決定回他。'],['msgTyping','打了幾個字……'],['meLazy','……算了，懶得回。',0,3.5,-1.5708]]},
   {title:'倫理學',panels:[['prof','教授：「你的倫理學不及格。」'],['gradeF','倫理學：F。'],['bribe','我把二十塊美金推過桌面……'],['meNow','「……那現在呢？」',1,3.5]]},
@@ -816,7 +824,7 @@ function buildChalk(){chalk=document.createElement('canvas');chalk.width=Math.ro
   speck=chx.createPattern(t,'repeat');}
 function chalkLine(x1,y1,x2,y2,j){chx.beginPath();chx.moveTo(x1+j[0],y1+j[1]);chx.quadraticCurveTo((x1+x2)/2+j[2],(y1+y2)/2+j[3],x2+j[4],y2+j[5]);chx.stroke();}
 function wrapChalk(t,x,y,maxW,lh){const lines=[];let cur='';
-  for(const ch of t){if(cur&&!'，。！？、）」：…'.includes(ch)&&chx.measureText(cur+ch).width>maxW){lines.push(cur);cur=ch;}else cur+=ch;}
+  for(const ch of t){if(cur&&!'，。！？、）」：…'.includes(ch)&&chx.measureText(cur+ch).width>maxW){if(cur.endsWith('「')){lines.push(cur.slice(0,-1));cur='「'+ch;}else{lines.push(cur);cur=ch;}}else cur+=ch;}
   if(cur)lines.push(cur);
   if(lines.length>2){lines[1]=lines.slice(1).join('');}
   lines.slice(0,2).forEach((l,i)=>chx.fillText(l,x,y+i*lh,maxW));}
