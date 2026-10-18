@@ -584,7 +584,14 @@ const SMALLPLANE=(c,spin)=>{fillE(c,0,0,.36,.09);fillP(c,[[-.34,-.02],[-.28,-.02
 const GOGGLE_CAP=c=>{fillE(c,.42,.2,.38,.2);fillP(c,[[.06,.2],[.34,.2],[.3,.62],[.12,.62]]);fillE(c,.6,.28,.09,.07);};
 const GOGGLE_CUT=c=>{c.lineWidth=.02;c.beginPath();c.ellipse(.6,.28,.055,.04,0,0,7);c.stroke();};
 const SWEAT=c=>{for(const [x,y,r] of [[.95,.18,.08],[1.1,.44,.07],[1.0,.7,.06],[.02,.08,.07]]){c.beginPath();c.moveTo(x,y-r*1.6);c.quadraticCurveTo(x+r*1.2,y+r*.4,x,y+r);c.quadraticCurveTo(x-r*1.2,y+r*.4,x,y-r*1.6);c.fill();}};
+const JELLY=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.beginPath();c.moveTo(-.3,0);c.bezierCurveTo(-.32,-.42,.32,-.42,.3,0);
+  for(let i=0;i<=6;i++){const xx=.3-i*.1;c.quadraticCurveTo(xx+.05,.06,xx-.05,0);}c.closePath();c.fill();
+  c.lineWidth=.03;c.lineCap='round';for(const [x0,a] of [[-.2,.6],[-.07,-.4],[.07,.5],[.2,-.6]]){c.beginPath();c.moveTo(x0,.02);c.bezierCurveTo(x0+a*.1,.18,x0-a*.1,.3,x0+a*.05,.46);c.stroke();}c.restore();};
 function shapeById(id){
+  if(id==='jelly')return {name:'水母',kind:'o',rot:0,core:[0,.42],box:[.85,1],draw(c){JELLY(c,0,-.06,1.1);},cut(c){c.lineWidth=.02;c.setLineDash([.03,.03]);c.beginPath();c.ellipse(0,-.22,.1,.07,0,0,7);c.stroke();c.setLineDash([]);TXT(c,'?',0,-.22,11);}};
+  if(id==='jellyOld')return {name:'六億五千萬年',kind:'o',rot:0,core:[-.43,.25],box:[1,1],draw(c){JELLY(c,0,-.22,.75);RRECT(c,-.44,.14,.44,.42,.05);},cut(c){TXT(c,'6.5億年',0,.29,24);}};
+  if(id==='humanThink')return profileShape({id:'flat',fixed:1,name:'想到人類的我',extra:DOTS,box:[1.2,1.2]});
+  if(id==='humanHope')return profileShape({id:'flat',fixed:1,name:'重燃希望的我',extra:WOW,cutP:SMILE,box:[1.25,1.2]});
   if(id==='planeSpin')return {name:'轉動的螺旋槳',kind:'o',rot:0,core:[-.36,.0],box:[1,.65],draw(c){SMALLPLANE(c,true);}};
   if(id==='pilotCool')return profileShape({id:'flat',fixed:1,name:'涼快的駕駛',extra:c=>{GOGGLE_CAP(c);c.lineWidth=.03;c.beginPath();for(const y of [.4,.55,.7]){c.moveTo(1.3,y);c.lineTo(1.0,y);}c.stroke();},cutP:c=>{GOGGLE_CUT(c);SMILE(c);},scale:.8,shift:-.16,box:[1.3,1.0],core:[-.16,0]});
   if(id==='planeStop')return {name:'停住的螺旋槳',kind:'o',rot:0,core:[-.36,.0],box:[1,.65],draw(c){SMALLPLANE(c,false);}};
@@ -868,6 +875,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'重燃希望',panels:[['jelly','水母沒有大腦。'],['jellyOld','卻已經活了六億五千萬年。'],['humanThink','這讓我想到人類……'],['humanHope','……突然又有希望了。',0,3.5]]},
   {title:'螺旋槳',panels:[['planeSpin','小飛機的螺旋槳，其實是給駕駛吹涼的。'],['pilotCool','轉得越快，他越涼快。'],['planeStop','直到它停下來……'],['pilotSweat','……駕駛就開始冒汗了。',0,3.5]]},
   {title:'很甜',panels:[['kidCone','孩子和冰淇淋有什麼共同點？'],['kidSweet','都很甜。'],['coneMelt','但有時候……'],['headache','……會讓人頭痛。',0,3.5]]},
   {title:'週一休息',panels:[['custQ','顧客：「你們有哪些口味？」'],['clerkPoint','店員：「牆上的牌子都有寫。」',1],['flavorSign','他看了看牌子……'],['cone','「那給我兩球『週一休息』。」',0,3.5]]},
