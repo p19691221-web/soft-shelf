@@ -497,7 +497,19 @@ const CHIPS=(c,x,y,w,h)=>{c.beginPath();const n=6;c.moveTo(x-w,y-h);for(let k=0;
   c.quadraticCurveTo(x+w*1.12,y,x+w,y+h);for(let k=n;k>=0;k--)c.lineTo(x-w+2*w*k/n,y+h+(k%2?.03:0));c.quadraticCurveTo(x-w*1.12,y,x-w,y-h);c.closePath();c.fill();};
 const SODA=(c,x,y,k)=>{c.beginPath();c.moveTo(x-.08*k,y+.4*k);c.lineTo(x-.08*k,y-.08*k);c.quadraticCurveTo(x-.08*k,y-.2*k,x-.03*k,y-.28*k);c.lineTo(x-.03*k,y-.36*k);
   c.lineTo(x+.03*k,y-.36*k);c.lineTo(x+.03*k,y-.28*k);c.quadraticCurveTo(x+.08*k,y-.2*k,x+.08*k,y-.08*k);c.lineTo(x+.08*k,y+.4*k);c.closePath();c.fill();};
+const HANGER=c=>{c.lineWidth=.035;c.beginPath();c.moveTo(0,-.32);c.lineTo(0,-.38);c.arc(.05,-.38,.05,Math.PI,Math.PI*1.9);c.moveTo(0,-.32);c.lineTo(-.42,-.12);c.lineTo(.42,-.12);c.closePath();c.stroke();};
+const BRA=c=>{HANGER(c);c.lineWidth=.03;c.beginPath();c.moveTo(-.3,-.12);c.lineTo(-.2,.04);c.moveTo(.3,-.12);c.lineTo(.2,.04);c.stroke();
+  for(const sx of [-1,1]){c.beginPath();c.moveTo(sx*.02,.24);c.quadraticCurveTo(sx*.04,.02,sx*.2,.02);c.quadraticCurveTo(sx*.36,.02,sx*.38,.24);c.closePath();c.fill();}
+  fillP(c,[[-.46,.22],[.46,.22],[.46,.28],[-.46,.28]]);};
+const BRA_HOLLOW=c=>{for(const sx of [-1,1]){c.beginPath();c.moveTo(sx*.06,.15);c.quadraticCurveTo(sx*.08,.06,sx*.2,.06);c.quadraticCurveTo(sx*.32,.06,sx*.34,.15);c.closePath();c.fill();}};
+const BAG=(c)=>CHIPS(c,0,0,.3,.42);
+const BAG_HALF=c=>{c.beginPath();c.moveTo(-.25,-.36);c.lineTo(.25,-.36);c.quadraticCurveTo(.31,-.1,.27,.02);c.lineTo(-.27,.02);c.quadraticCurveTo(-.31,-.1,-.25,-.36);c.closePath();c.fill();
+  c.lineWidth=.02;c.beginPath();for(const [x,y] of [[-.18,.06],[-.04,.04],[.1,.07],[.2,.05]]){c.moveTo(x-.06,y+.03);c.quadraticCurveTo(x,y-.03,x+.06,y+.03);}c.stroke();};
 function shapeById(id){
+  if(id==='bra')return {name:'衣架上的胸罩',kind:'o',rot:0,core:[-.44,.25],box:[1,.9],draw:BRA};
+  if(id==='bag')return {name:'一包洋芋片',kind:'o',rot:0,core:[-.29,.3],box:[.8,1],draw:BAG,cut(c){c.lineWidth=.016;c.beginPath();c.moveTo(-.16,-.1);c.lineTo(.16,-.1);c.moveTo(-.12,-.02);c.lineTo(.12,-.02);c.stroke();}};
+  if(id==='bagOpen')return {name:'打開的洋芋片',kind:'o',rot:0,core:[-.29,.3],box:[.8,1],draw:BAG,cut:BAG_HALF};
+  if(id==='braOpen')return {name:'一半是空的',kind:'o',rot:0,core:[-.44,.25],box:[1,.9],draw:BRA,cut:BRA_HOLLOW};
   if(id==='kidStore')return profileShape({id:'kid',fixed:1,name:'小時候的我',extra:c=>{c.save();c.font='900 30px '+SERIF;c.scale(.01,.01);c.textAlign='center';c.textBaseline='middle';c.fillText('$1',108,30);c.restore();},box:[1.35,1.15]});
   if(id==='goods')return {name:'一堆零食',kind:'o',rot:0,core:[-.36,.2],box:[1.05,1],draw(c){
     CHIPS(c,-.3,-.04,.13,.2);CHIPS(c,-.1,.02,.13,.2);SODA(c,.14,0,1);
@@ -607,6 +619,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'一半是空的',panels:[['bra','問：聚攏型胸罩和一包洋芋片，有什麼共同點？'],['bag','答：看起來都很飽滿。'],['bagOpen','打開才發現……'],['braOpen','……一半是空的。',0,3.5]]},
   {title:'一塊錢',panels:[['kidStore','小時候，一塊錢就能在商店買一大堆。'],['goods','兩包洋芋片、一大瓶汽水、六包糖果、六根牛肉乾。'],['adultNow','現在不行了。'],['cctv','店裡到處都裝了監視器。',0,3.5]]},
   {title:'所以要我留下',panels:[['suitcase','老婆幫我收好行李，叫我走。'],['door','我提著行李走到門口。'],['wifeCurse','她：「祝你死得漫長、緩慢、痛苦。」',1],['manStay','我：「所以……你要我留下來？」',0,3.5]]},
   {title:'甜甜圈',panels:[['car','我被警察攔下來。'],['copEye','警察：「你眼睛紅紅的，吸了大麻？」'],['meRed','我：「你眼神呆滯……」',1],['donut','「……吃了甜甜圈？」',0,3.5]]},
