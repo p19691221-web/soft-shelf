@@ -517,7 +517,18 @@ const GLASSES_CUT=c=>{c.lineWidth=.02;c.beginPath();c.arc(.66,.43,.06,0,7);c.mov
 const EYE_OPEN=c=>{fillE(c,.64,.43,.045,.035);};
 const BED=c=>{c.lineWidth=.06;c.beginPath();c.moveTo(-.04,-.25);c.lineTo(-.04,1.35);c.stroke();fillE(c,.05,.45,.07,.24);};
 const EYE_SHUT=c=>{c.lineWidth=.022;c.beginPath();c.moveTo(.58,.43);c.quadraticCurveTo(.64,.47,.7,.43);c.stroke();};
+const TXT=(c,t,x,y,px)=>{c.save();c.scale(.01,.01);c.font='900 '+px+'px '+SERIF;c.textAlign='center';c.textBaseline='middle';c.fillText(t,x*100,y*100);c.restore();};
 function shapeById(id){
+  if(id==='prof')return profileShape({id:'beard',fixed:1,name:'教授',cutP:GLASSES_CUT});
+  if(id==='gradeF')return {name:'不及格的成績單',kind:'o',rot:0,core:[-.33,.3],box:[.85,1],draw(c){fillP(c,[[-.34,-.44],[.34,-.44],[.34,.44],[-.34,.44]]);},
+    cut(c){TXT(c,'倫理學',0,-.3,14);c.lineWidth=.012;c.beginPath();for(const y of [-.2,-.14]){c.moveTo(-.24,y);c.lineTo(.24,y);}c.stroke();
+      TXT(c,'F',0,.12,52);c.lineWidth=.03;c.beginPath();c.arc(0,.12,.25,0,7);c.stroke();}};
+  if(id==='bribe')return {name:'推過桌面的鈔票',kind:'o',rot:0,core:[-.45,.3],box:[1,.9],draw(c){
+    fillP(c,[[-.48,.24],[.48,.24],[.48,.3],[-.48,.3]]);c.lineWidth=.04;c.beginPath();c.moveTo(-.4,.3);c.lineTo(-.4,.46);c.moveTo(.4,.3);c.lineTo(.4,.46);c.stroke();
+    c.save();c.translate(.08,.08);c.rotate(-.08);fillP(c,[[-.24,-.11],[.24,-.11],[.24,.11],[-.24,.11]]);c.restore();
+    c.lineWidth=.03;c.beginPath();for(const [y,l] of [[.0,.16],[.08,.24],[.16,.14]]){c.moveTo(-.22-l,y);c.lineTo(-.22,y);}c.stroke();},
+    cut(c){c.save();c.translate(.08,.08);c.rotate(-.08);c.lineWidth=.016;c.strokeRect(-.2,-.08,.4,.16);TXT(c,'$20',0,0,11);c.restore();}};
+  if(id==='meNow')return profileShape({id:'flat',fixed:1,name:'推錢的我',extra:QMARK,box:[1.4,1.15]});
   if(id==='bigQ')return {name:'問號',kind:'o',rot:0,core:[0,.38],box:[.8,1],draw(c){c.save();c.scale(.01,.01);c.font='900 92px '+SERIF;c.textAlign='center';c.textBaseline='middle';c.fillText('？',0,0);c.restore();}};
   if(id==='liarAwake')return profileShape({id:'plain',fixed:1,name:'睜眼說瞎話的人',extra:BUBBLE,cutP:c=>{EYE_OPEN(c);BUBBLE_DOTS(c);},scale:.75,shift:-.22,box:[1.4,1.1],core:[-.22,0]});
   if(id==='liarDead')return profileShape({id:'plain',fixed:1,name:'躺著的人',extra:BED,cutP:EYE_SHUT,box:[1.12,1.5],core:[0,.15]});
@@ -656,6 +667,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'倫理學',panels:[['prof','教授：「你的倫理學不及格。」'],['gradeF','倫理學：F。'],['bribe','我把二十塊美金推過桌面……'],['meNow','「……那現在呢？」',1,3.5]]},
   {title:'閉眼說瞎話',panels:[['bigQ','說謊的人死後會做什麼？'],['liarAwake','活著的時候，他睜眼說瞎話。'],['liarDead','死了以後，他躺著……',0,0,-1.5708],['liarDeadTalk','……改成閉眼說瞎話。',0,3.5,-1.5708]]},
   {title:'很會說謊',panels:[['phoneRing','學校打電話來。'],['teacherCall','老師：「您兒子一直在說謊。」',1],['meCall','我：「告訴他，他很會說謊。」'],['familyPhoto','「我沒有兒子。」',0,3.5]]},
   {title:'三件行李',panels:[['bags3','我要托運三件行李。'],['bags3go','「這件寄新奧爾良，這件西雅圖，這件芝加哥。」'],['agentRoll','地勤翻白眼：「這不可能！」',1],['planeScatter','「為什麼？你們上週就這麼做了啊。」',0,3.5]]},
