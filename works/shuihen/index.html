@@ -618,6 +618,12 @@ const EARTH=(c,x,y,r)=>{fillE(c,x,y,r,r);};
 const EARTH_CUT=(c,x,y,r)=>{c.save();c.translate(x,y);c.scale(r,r);c.beginPath();c.moveTo(-.6,-.5);c.quadraticCurveTo(-.2,-.7,0,-.3);c.quadraticCurveTo(-.1,0,-.5,.1);c.closePath();c.fill();
   c.beginPath();c.moveTo(.2,.1);c.quadraticCurveTo(.6,-.1,.7,.3);c.quadraticCurveTo(.4,.7,.1,.5);c.closePath();c.fill();c.restore();};
 function shapeById(id){
+  if(id==='kidSilent')return profileShape({id:'kid',fixed:1,name:'不說話的孩子',extra:c=>{RRECT(c,.95,.0,1.3,.3,.04);},cutP:c=>{ZIP(c);TXT(c,'4',1.12,.15,22);},scale:.8,shift:-.16,box:[1.3,1.0],core:[-.16,0]});
+  if(id==='soup')return {name:'一碗湯',kind:'o',rot:0,core:[-.4,.1],box:[1,.8],draw(c){c.beginPath();c.moveTo(-.4,-.04);c.lineTo(.4,-.04);c.quadraticCurveTo(.36,.3,0,.32);c.quadraticCurveTo(-.36,.3,-.4,-.04);c.closePath();c.fill();
+    fillE(c,0,.34,.16,.04);c.lineWidth=.05;c.lineCap='round';c.beginPath();c.moveTo(.18,-.06);c.lineTo(.4,-.34);c.stroke();fillE(c,.42,-.37,.06,.04,-.9);},
+    cut(c){c.lineWidth=.016;c.beginPath();c.moveTo(-.34,.04);c.lineTo(.34,.04);c.stroke();}};
+  if(id==='kidSpeak')return profileShape({id:'kid',fixed:1,name:'開口的孩子',extra:BUBBLE,cutP:c=>{MOUTH(c);c.save();c.translate(1.25,-.02);TXT(c,'冷',0,0,20);c.restore();},scale:.75,shift:-.22,box:[1.4,1.1],core:[-.22,0]});
+  if(id==='kidCalm')return profileShape({id:'kid',fixed:1,name:'理所當然的孩子',cutP:c=>{EYE_SHUT(c);SMILE(c);}});
   if(id==='blankPaper')return {name:'空白考卷',kind:'o',rot:0,core:[-.33,.3],box:[.85,1],draw(c){fillP(c,[[-.34,-.44],[.34,-.44],[.34,.44],[-.34,.44]]);},
     cut(c){TXT(c,'考卷',0,-.32,15);c.lineWidth=.012;c.beginPath();c.moveTo(-.26,-.22);c.lineTo(.26,-.22);c.stroke();
       for(let k=0;k<4;k++){TXT(c,(k+1)+'.',-.22,-.1+k*.14,11);}}};
@@ -960,6 +966,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'一切都很好',panels:[['kidSilent','孩子四歲了，從沒說過一句話。'],['soup','有一天，媽媽端湯給他。'],['kidSpeak','「湯冷了。」爸媽：「你會說話？！」'],['kidCalm','「之前一切都很好啊。」',0,3.5]]},
   {title:'沉默',panels:[['blankPaper','考卷發回來，一片空白。'],['teacherBlank','老師：「為什麼什麼都沒寫？」'],['studentCalm','學生：「老師……」',1],['silence','「有時候，沉默就是最好的答案。」',0,3.5]]},
   {title:'沒安全感',panels:[['meAnx','我老婆離開我了……'],['momMad','因為她說我太沒安全感。',1],['doorEmpty','等等，她回來了。'],['teaCup','她只是去泡杯茶。',0,3.5]]},
   {title:'看辦公室',panels:[['bossOrder','老闆：「你是保全，工作就是看辦公室。」'],['guardOk','我：「沒問題。」',1],['tvOffice','我已經看到第六季了。'],['guardWatch','還是不懂這跟保全有什麼關係。',0,3.5]]},
