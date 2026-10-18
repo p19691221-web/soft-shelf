@@ -561,7 +561,17 @@ const FLATCAP=c=>{fillE(c,.38,.16,.36,.15);fillP(c,[[.5,.18],[.92,.22],[.9,.28],
 const FLAG=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.lineWidth=.04;c.beginPath();c.moveTo(0,.4);c.lineTo(0,-.4);c.stroke();
   c.beginPath();c.moveTo(0,-.4);c.quadraticCurveTo(.12,-.46,.26,-.38);c.quadraticCurveTo(.38,-.3,.48,-.36);c.lineTo(.48,-.12);c.quadraticCurveTo(.38,-.06,.26,-.14);c.quadraticCurveTo(.12,-.22,0,-.16);c.closePath();c.fill();c.restore();};
 const PISTOL=c=>{fillP(c,[[.86,.76],[1.24,.76],[1.24,.86],[.98,.86],[.96,1.0],[.86,1.0]]);c.lineWidth=.03;c.beginPath();c.moveTo(.98,.86);c.quadraticCurveTo(1.02,.94,.96,.94);c.stroke();};
+function couple(point){const H=profileShape({id:'flat',fixed:1,name:''}),W=profileShape({id:'plain',bun:1,fixed:1,name:''});
+  return {name:point?'指向太太的丈夫':'一對人質',kind:'o',rot:0,core:[-.2,.42],box:[1,.95],draw(c){
+    c.save();c.translate(-.2,.0);c.scale(-.5,.5);H.draw(c);c.restore();
+    c.save();c.translate(.24,.06);c.scale(-.44,.44);W.draw(c);c.restore();
+    if(point){c.lineWidth=.06;c.lineCap='round';c.beginPath();c.moveTo(-.12,.3);c.quadraticCurveTo(-.02,.36,.02,.2);c.stroke();fillE(c,.03,.17,.03,.03);}
+    else{for(const [x,y] of [[-.42,-.28],[.04,-.22]]){c.beginPath();c.moveTo(x,y-.06);c.quadraticCurveTo(x+.04,y,x,y+.03);c.quadraticCurveTo(x-.04,y,x,y-.06);c.fill();}}}};}
 function shapeById(id){
+  if(id==='maskDrop')return profileShape({id:'plain',fixed:1,name:'面具掉了的劫匪',extra:c=>{BEANIE(c);c.save();c.translate(.25,.75);c.rotate(.5);MASK(c);c.restore();},
+    cutP:c=>{c.save();c.translate(.25,.75);c.rotate(.5);MASK_CUT(c);c.restore();EYE_OPEN(c);},box:[1.35,1.3],core:[0,.1]});
+  if(id==='couple')return couple(false);
+  if(id==='couplePoint')return couple(true);
   if(id==='alley')return {name:'暗巷',kind:'o',rot:0,core:[-.12,.42],box:[1,1],draw(c){
     c.lineWidth=.045;c.beginPath();c.moveTo(-.12,.44);c.lineTo(-.12,-.3);c.quadraticCurveTo(-.12,-.4,.0,-.4);c.lineTo(.08,-.4);c.stroke();
     fillP(c,[[.02,-.4],[.16,-.4],[.12,-.32],[.06,-.32]]);
@@ -812,6 +822,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'可能看到了',panels:[['maskDrop','搶銀行時，劫匪的面具掉了。'],['robberMad','他戴回面具大吼：「看到我臉的都別想活！」'],['couple','「你們兩個，誰看到了？！」'],['couplePoint','丈夫：「我沒看到……但我太太可能看到了。」',0,3.5]]},
   {title:'換科目',panels:[['alley','一個男人走進暗巷。'],['robberGun','劫匪：「錢交出來，不然你就變成科學！」'],['victimQ','「你是說『變成歷史』吧？」',1],['robberMad','「少跟我換科目！」',0,3.5]]},
   {title:'業內人士',panels:[['bank','成功的搶匪和被關的搶匪，差在哪？'],['moneyRun','一個帶著錢跑了。'],['cell','一個被關進去了。'],['yeYu','一個是業內人士，一個是獄內人士。',0,3.5]]},
   {title:'我們的願望',panels:[['lamp','一個共產主義者撿到神燈。'],['genie','精靈：「你有什麼願望？」'],['comrade','「我希望一切都屬於我們。」',1],['genieOurs','精靈：「那我們的下一個願望是什麼？」',0,3.5]]},
