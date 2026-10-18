@@ -551,7 +551,17 @@ const WALK_BAG=c=>{fillE(c,.08,-.36,.09,.09);fillE(c,.15,-.42,.07,.06);c.lineWid
   SUITCASE(c,-.24,.18,.3);};
 const TV=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);RRECT(c,-.32,-.22,.32,.2,.04);c.lineWidth=.025;c.beginPath();c.moveTo(-.1,-.22);c.lineTo(-.2,-.38);c.moveTo(.06,-.22);c.lineTo(.18,-.4);c.stroke();c.restore();};
 const TV_CUT=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);RRECT(c,-.26,-.16,.2,.14,.03);c.restore();};
+const BACKPACK=(c,x,y,k,a)=>{c.save();c.translate(x,y);c.rotate(a||0);c.scale(k,k);RRECT(c,-.16,-.2,.16,.22,.08);c.lineWidth=.04;c.beginPath();c.arc(0,-.2,.07,Math.PI,0);c.stroke();c.restore();};
+const BACKPACK_CUT=(c,x,y,k,a)=>{c.save();c.translate(x,y);c.rotate(a||0);c.scale(k,k);c.lineWidth=.025;c.beginPath();c.moveTo(-.1,.04);c.lineTo(.1,.04);c.stroke();c.restore();};
+const HAND_UP=c=>{c.lineWidth=.1;c.lineCap='round';c.beginPath();c.moveTo(.3,1.05);c.quadraticCurveTo(.95,.9,.98,.1);c.stroke();fillE(c,.98,.02,.07,.09);};
 function shapeById(id){
+  if(id==='teacherQ')return profileShape({id:'plain',bun:1,fixed:1,name:'出題的老師',cutP:GLASSES_CUT});
+  if(id==='bagOut')return {name:'飛出窗外的書包',kind:'o',rot:0,core:[-.4,.3],box:[1,1],draw(c){
+    c.lineWidth=.05;c.strokeRect(-.42,-.3,.5,.7);c.beginPath();c.moveTo(-.17,-.3);c.lineTo(-.17,.4);c.moveTo(-.42,.05);c.lineTo(.08,.05);c.stroke();
+    BACKPACK(c,.3,-.2,.8,.5);c.lineWidth=.03;c.beginPath();for(const [x,y] of [[.0,-.0],[.06,.08],[-.04,-.1]]){c.moveTo(x,y);c.lineTo(x+.12,y-.1);}c.stroke();},
+    cut(c){BACKPACK_CUT(c,.3,-.2,.8,.5);}};
+  if(id==='teacherMad')return profileShape({id:'plain',bun:1,fixed:1,name:'生氣的老師',extra:c=>{ANGER(c);QMARK(c);},cutP:GLASSES_CUT,box:[1.4,1.15]});
+  if(id==='jimmy')return profileShape({id:'kid',fixed:1,name:'舉手的吉米',extra:HAND_UP,scale:.75,shift:-.05,box:[1.0,1.05],core:[-.05,.08]});
   if(id==='tvGrab')return {name:'被搬走的電視',kind:'o',rot:0,core:[0,.4],box:[.9,1],draw(c){TV(c,.02,-.14,1);
     c.lineWidth=.07;c.lineCap='round';c.beginPath();c.moveTo(-.06,.06);c.lineTo(-.14,.26);c.lineTo(-.06,.44);c.moveTo(.08,.06);c.lineTo(.18,.24);c.lineTo(.3,.3);c.stroke();
     c.beginPath();c.moveTo(-.3,-.1);c.lineTo(-.42,.02);c.moveTo(.34,-.1);c.lineTo(.42,.02);c.stroke();},cut(c){TV_CUT(c,.02,-.14,1);}};
@@ -766,6 +776,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'可以回家',panels:[['teacherQ','老師：「誰答得出下一題，就可以回家。」'],['bagOut','吉米把書包丟出窗外。'],['teacherMad','老師：「誰丟的？」'],['jimmy','吉米：「我丟的！」',1,3.5]]},
   {title:'遙控器',panels:[['tvGrab','劫匪衝進店裡，搬走一台電視。'],['tvRun','頭也不回地跑了。'],['clerkShout','店員追出去大喊：「等一下！」'],['remote','「你忘了拿遙控器！」',0,3.5]]},
   {title:'緩解疼痛',panels:[['meLeaf','我跟老婆說，我要開始抽大麻。'],['wifeWarn','她說：「你敢抽，我就離開你。」',1],['wifeLeave','我抽了。她走了。'],['meRelief','證明大麻真的能緩解痛苦！',0,3.5]]},
   {title:'找誰接',panels:[['headOff','頭斷掉了，要找誰接？'],['briefcase','提示：一種職業。'],['busker','答案是——'],['headOn','街頭藝人（接頭藝人）。',0,3.5]]},
