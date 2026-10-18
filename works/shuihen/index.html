@@ -594,7 +594,22 @@ const TIE=c=>{fillP(c,[[.42,1.0],[.5,1.0],[.52,1.18],[.46,1.24],[.4,1.18]]);};
 const BRAINL=(c)=>{fillE(c,-.16,0,.26,.22);};
 const BRAINR=(c)=>{fillE(c,.16,0,.26,.22);};
 const WRINK=(c,side)=>{c.lineWidth=.022;c.lineCap='round';c.beginPath();for(const [x,y] of side<0?[[-.26,-.08],[-.12,.08],[-.2,.12]]:[[.12,-.1],[.26,.06],[.18,-.02]]){c.moveTo(x-.05,y);c.quadraticCurveTo(x-.02,y-.05,x+.01,y);c.quadraticCurveTo(x+.04,y+.05,x+.07,y);}c.stroke();};
+const CHEFHAT=c=>{fillE(c,.3,-.06,.16,.14);fillE(c,.5,-.12,.17,.15);fillE(c,.68,-.04,.15,.13);fillP(c,[[.14,0],[.78,0],[.76,.24],[.16,.24]]);};
+const CHEFHAT_CUT=c=>{c.lineWidth=.02;c.beginPath();c.moveTo(.16,.18);c.lineTo(.76,.18);c.stroke();};
+const RAGE=c=>{ANGER(c);TXT(c,'！',1.02,.5,44);};
+const OVEN=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);RRECT(c,-.38,-.36,.38,.4,.04);c.restore();};
+const OVEN_CUT=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);RRECT(c,-.3,-.16,.3,.32,.03);c.lineWidth=.03;c.beginPath();c.moveTo(-.2,-.24);c.lineTo(.2,-.24);c.stroke();
+  for(const x of [-.24,-.12,0,.12,.24])fillE(c,x,-.3,.025,.025);c.restore();};
+const MITT=(c,x,y,k,a)=>{c.save();c.translate(x,y);c.rotate(a||0);c.scale(k,k);c.beginPath();c.moveTo(-.12,.3);c.lineTo(-.14,-.1);c.quadraticCurveTo(-.14,-.3,.02,-.3);c.quadraticCurveTo(.16,-.3,.16,-.1);
+  c.lineTo(.16,.3);c.closePath();c.fill();c.beginPath();c.ellipse(-.2,-.02,.06,.13,-.5,0,7);c.fill();c.restore();};
+const MITT_CUT=(c,x,y,k,a)=>{c.save();c.translate(x,y);c.rotate(a||0);c.scale(k,k);c.lineWidth=.03;c.beginPath();c.moveTo(-.12,.2);c.lineTo(.16,.2);c.stroke();
+  for(const [xx,yy] of [[-.02,-.12],[.06,0],[-.04,.08]])fillE(c,xx,yy,.02,.02);c.restore();};
 function shapeById(id){
+  if(id==='chefRage')return profileShape({id:'flat',fixed:1,name:'暴躁廚師',extra:c=>{CHEFHAT(c);RAGE(c);},cutP:c=>{CHEFHAT_CUT(c);MOUTH(c);},scale:.82,shift:-.14,box:[1.3,1.2],core:[-.14,.05]});
+  if(id==='ovenHot')return {name:'燙手的烤盤',kind:'o',rot:0,core:[-.36,.3],box:[1,1],draw(c){OVEN(c,0,.06,1);
+    c.lineWidth=.03;c.beginPath();for(const x of [-.14,0,.14]){c.moveTo(x,-.4);c.quadraticCurveTo(x+.06,-.46,x,-.52);}c.stroke();},cut(c){OVEN_CUT(c,0,.06,1);}};
+  if(id==='mitt')return {name:'烤箱手套',kind:'o',rot:0,core:[0,.4],box:[.7,1],draw(c){MITT(c,0,0,1.4,0);STAR(c,.32,-.36,.07);STAR(c,-.34,-.3,.05);},cut(c){MITT_CUT(c,0,0,1.4,0);}};
+  if(id==='chefCalm')return profileShape({id:'flat',fixed:1,name:'平靜的廚師',extra:c=>{CHEFHAT(c);MITT(c,1.05,.8,.75,-.3);},cutP:c=>{CHEFHAT_CUT(c);SMILE(c);EYE_SHUT(c);MITT_CUT(c,1.05,.8,.75,-.3);},box:[1.3,1.2],core:[0,.05]});
   if(id==='meBrainQ')return profileShape({id:'flat',fixed:1,name:'想通了的我',extra:c=>{STAR(c,1.0,.12,.12);},cutP:c=>{EYE_OPEN(c);},box:[1.2,1.12]});
   if(id==='brainLR')return {name:'左右腦',kind:'o',rot:0,core:[0,.32],box:[.95,.8],draw(c){BRAINL(c);BRAINR(c);},
     cut(c){c.lineWidth=.025;c.beginPath();c.moveTo(0,-.22);c.lineTo(0,.22);c.stroke();TXT(c,'左',-.16,0,22);TXT(c,'右',.16,0,22);}};
@@ -898,6 +913,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'烤箱手套',panels:[['chefRage','我以前是那種愛吼又愛罵髒話的廚師。'],['ovenHot','每天都從烤箱拿東西。'],['mitt','後來我發現了烤箱手套。'],['chefCalm','從此脾氣好多了。',0,3.5]]},
   {title:'左右腦',panels:[['meBrainQ','我終於知道我的腦子哪裡有問題了。'],['brainLR','腦子分左右兩邊。'],['brainLeftX','左邊：nothing right（沒一個對的）。'],['brainRightEmpty','右邊：nothing left（一點不剩）。',0,3.5]]},
   {title:'有用',panels:[['politician','政治人物的腦子和糞便，差在哪？'],['brain','一個是腦子。'],['poop','一個是糞便。'],['poopSprout','糞便至少有用。',0,3.5]]},
   {title:'重燃希望',panels:[['jelly','水母沒有大腦。'],['jellyOld','卻已經活了六億五千萬年。'],['humanThink','這讓我想到人類……'],['humanHope','……突然又有希望了。',0,3.5]]},
