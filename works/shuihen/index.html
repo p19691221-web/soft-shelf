@@ -458,7 +458,20 @@ const TAIL=c=>{c.beginPath();c.moveTo(.22,.98);c.lineTo(.7,.98);c.quadraticCurve
   c.quadraticCurveTo(.42,1.3,.36,1.4);c.quadraticCurveTo(.3,1.3,.24,1.36);c.quadraticCurveTo(.18,1.18,.22,.98);c.closePath();c.fill();};
 const ONION=(c,x,y,w,h)=>{c.beginPath();c.moveTo(x-w,y);c.bezierCurveTo(x-w*1.7,y-h*.45,x-w*.15,y-h*.7,x,y-h);c.bezierCurveTo(x+w*.15,y-h*.7,x+w*1.7,y-h*.45,x+w,y);c.closePath();c.fill();
   c.lineWidth=.025;c.beginPath();c.moveTo(x,y-h);c.lineTo(x,y-h-.08);c.stroke();};
+const CLOUD=(c,x,y,k)=>{fillE(c,x,y,.2*k,.11*k);fillE(c,x-.17*k,y+.03*k,.13*k,.09*k);fillE(c,x+.18*k,y+.03*k,.14*k,.09*k);fillE(c,x-.04*k,y-.08*k,.13*k,.1*k);fillE(c,x+.1*k,y-.06*k,.1*k,.08*k);};
+const DROPS=(c,pts,w)=>{c.lineWidth=w;c.lineCap='round';c.beginPath();for(const [x,y] of pts){c.moveTo(x,y);c.lineTo(x-.03,y+.1);}c.stroke();};
+const WINDOW_CUT=c=>{c.lineWidth=.035;c.strokeRect(-.04,-.02,1.0,1.16);c.beginPath();c.moveTo(.46,-.02);c.lineTo(.46,1.14);c.moveTo(-.04,.56);c.lineTo(.96,.56);c.stroke();};
+const GLASS_RAIN=c=>{c.lineWidth=.018;c.beginPath();for(const [x,y] of [[.2,.15],[.62,.3],[.3,.8],[.7,.9],[.12,.45],[.58,.7]]){c.moveTo(x,y);c.lineTo(x-.02,y+.12);}c.stroke();};
 function shapeById(id){
+  if(id==='rain')return {name:'下雨',kind:'o',rot:0,core:[0,-.1],box:[1,1],draw(c){CLOUD(c,0,-.18,1.4);
+    DROPS(c,[[-.28,.12],[-.12,.2],[.04,.12],[.2,.22],[.32,.12],[-.2,.36],[-.02,.38],[.16,.4]],.035);}};
+  if(id==='storm')return {name:'暴風雨',kind:'o',rot:0,core:[0,-.1],box:[1,1],draw(c){CLOUD(c,0,-.24,1.6);
+    fillP(c,[[.02,-.06],[-.12,.16],[-.02,.16],[-.1,.42],[.1,.1],[0,.1],[.1,-.06]]);
+    DROPS(c,[[-.38,.02],[-.3,.24],[-.4,.38],[.22,.04],[.3,.2],[.38,.02],[.24,.36],[.4,.32],[-.22,.06]],.045);}};
+  if(id==='wifeWin')return profileShape({id:'plain',bun:1,fixed:1,name:'盯著窗外的太太',cutP:WINDOW_CUT,box:[1.1,1.25]});
+  if(id==='wifeOut')return profileShape({id:'plain',bun:1,fixed:1,name:'在窗外淋雨的太太',
+    extra:c=>{CLOUD(c,.45,-.3,1.15);DROPS(c,[[.2,-.12],[.4,-.1],[.62,-.12],[.82,-.1],[.95,.1],[.96,.35]],.03);},
+    cutP:c=>{WINDOW_CUT(c);GLASS_RAIN(c);},box:[1.25,1.55],core:[0,.15]});
   if(id==='ghost')return profileShape({id:'flat',fixed:1,name:'老獨裁者的幽靈',extra:c=>{PEAKCAP(c);MUST(c);TAIL(c);},box:[1.12,1.5],core:[0,.15]});
   if(id==='leader')return profileShape({id:'plain',fixed:1,name:'新領袖'});
   if(id==='leaderQ')return profileShape({id:'plain',fixed:1,name:'發問的新領袖',extra:QMARK,box:[1.4,1.15]});
@@ -518,6 +531,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'露台',panels:[['rain','這陣子天氣很糟。'],['wifeWin','我太太一直盯著露台的窗戶看。',1],['storm','天氣越來越壞。'],['wifeOut','再壞下去，可能得讓她進來了。',1,3.5]]},
   {title:'塗成藍色',panels:[['ghost','老獨裁者的幽靈，出現在新領袖夢裡。'],['leader','新領袖：怎樣讓國家再次偉大？',1],['palace','幽靈：處決一半人口，把宮殿塗成藍色。'],['leaderQ','「為何是藍色？」「就知道你不問前半句。」',1]]},
   {title:'四個孩子的爸',panels:[['dad6','他有六個孩子，老愛叫老婆「六個孩子的媽」。'],['momMad','她很不高興。',1],['dadShout','聚會上他大喊：「六個孩子的媽，走了！」'],['mom4','她：「馬上來，四個孩子的爸。」',1,3.5]]},
   {title:'撞到告訴我',panels:[['carWall','我倒車，叫兒子：撞到牆告訴我。'],['kidWatch','兒子盯著看。',1],['carCrash','砰！'],['kidClock','兒子：「下午 3 點 45 分。」']]},
