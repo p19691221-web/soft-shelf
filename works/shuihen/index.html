@@ -554,7 +554,20 @@ const TV_CUT=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);RRECT(c,-.26,-.1
 const BACKPACK=(c,x,y,k,a)=>{c.save();c.translate(x,y);c.rotate(a||0);c.scale(k,k);RRECT(c,-.16,-.2,.16,.22,.08);c.lineWidth=.04;c.beginPath();c.arc(0,-.2,.07,Math.PI,0);c.stroke();c.restore();};
 const BACKPACK_CUT=(c,x,y,k,a)=>{c.save();c.translate(x,y);c.rotate(a||0);c.scale(k,k);c.lineWidth=.025;c.beginPath();c.moveTo(-.1,.04);c.lineTo(.1,.04);c.stroke();c.restore();};
 const HAND_UP=c=>{c.lineWidth=.1;c.lineCap='round';c.beginPath();c.moveTo(.3,1.05);c.quadraticCurveTo(.95,.9,.98,.1);c.stroke();fillE(c,.98,.02,.07,.09);};
+const LAMP=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);fillE(c,0,0,.26,.1);fillP(c,[[-.06,.06],[.06,.06],[.1,.16],[-.1,.16]]);
+  c.beginPath();c.moveTo(.2,-.04);c.quadraticCurveTo(.36,-.06,.46,-.16);c.lineTo(.44,-.1);c.quadraticCurveTo(.36,.02,.22,.04);c.closePath();c.fill();
+  c.lineWidth=.04;c.beginPath();c.arc(-.3,0,.07,Math.PI*.5,Math.PI*1.5);c.stroke();fillE(c,0,-.11,.08,.04);fillE(c,0,-.16,.025,.025);c.restore();};
 function shapeById(id){
+  if(id==='lamp')return {name:'神燈',kind:'o',rot:0,core:[-.27,.25],box:[1,.8],draw(c){LAMP(c,0,.1,1.1);STAR(c,.36,-.24,.09);STAR(c,.12,-.34,.06);STAR(c,-.3,-.22,.05);}};
+  if(id==='genie')return {name:'精靈',kind:'o',rot:0,core:[-.16,.42],box:[.9,1],draw(c){LAMP(c,-.12,.38,.62);
+    c.beginPath();c.moveTo(.12,.3);c.bezierCurveTo(.3,.2,-.1,.1,.05,-.02);c.bezierCurveTo(.2,-.1,-.12,-.12,0,-.2);c.lineTo(.16,-.2);c.bezierCurveTo(.24,-.08,.0,-.04,.16,.06);c.bezierCurveTo(.3,.16,.2,.26,.14,.3);c.closePath();c.fill();
+    fillE(c,.08,-.22,.16,.08);fillE(c,.08,-.36,.09,.1);fillE(c,.08,-.48,.03,.04);},
+    cut(c){c.lineWidth=.016;c.beginPath();c.moveTo(-.04,-.22);c.lineTo(.2,-.22);c.stroke();}};
+  if(id==='wishFame')return profileShape({id:'plain',fixed:1,name:'許願的人',extra:WOW,box:[1.25,1.2]});
+  if(id==='exitSign')return {name:'EXIT',kind:'o',rot:0,core:[-.43,.2],box:[1,.65],draw(c){fillP(c,[[-.46,-.24],[.46,-.24],[.46,.24],[-.46,.24]]);},
+    cut(c){c.lineWidth=.02;c.strokeRect(-.42,-.2,.84,.4);TXT(c,'EXIT',.13,.02,23);
+      fillE(c,-.28,-.1,.03,.03);c.lineWidth=.035;c.beginPath();c.moveTo(-.29,-.06);c.lineTo(-.31,.04);c.lineTo(-.25,.13);c.moveTo(-.31,.04);c.lineTo(-.37,.12);
+      c.moveTo(-.29,-.04);c.lineTo(-.22,-.02);c.moveTo(-.29,-.04);c.lineTo(-.36,.0);c.stroke();}};
   if(id==='teacherQ')return profileShape({id:'plain',bun:1,fixed:1,name:'出題的老師',cutP:GLASSES_CUT});
   if(id==='bagOut')return {name:'飛出窗外的書包',kind:'o',rot:0,core:[-.4,.3],box:[1,1],draw(c){
     c.lineWidth=.05;c.strokeRect(-.42,-.3,.5,.7);c.beginPath();c.moveTo(-.17,-.3);c.lineTo(-.17,.4);c.moveTo(-.42,.05);c.lineTo(.08,.05);c.stroke();
@@ -776,6 +789,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'EXIT',panels:[['lamp','他在沙灘撿到一盞神燈，擦了擦——'],['genie','精靈跳出來：「我可以實現你一個願望。」'],['wishFame','「我要舉世聞名，名字亮在全世界的劇院裡！」'],['exitSign','「沒問題。你的名字現在叫 EXIT。」',0,3.5]]},
   {title:'可以回家',panels:[['teacherQ','老師：「誰答得出下一題，就可以回家。」'],['bagOut','吉米把書包丟出窗外。'],['teacherMad','老師：「誰丟的？」'],['jimmy','吉米：「我丟的！」',1,3.5]]},
   {title:'遙控器',panels:[['tvGrab','劫匪衝進店裡，搬走一台電視。'],['tvRun','頭也不回地跑了。'],['clerkShout','店員追出去大喊：「等一下！」'],['remote','「你忘了拿遙控器！」',0,3.5]]},
   {title:'緩解疼痛',panels:[['meLeaf','我跟老婆說，我要開始抽大麻。'],['wifeWarn','她說：「你敢抽，我就離開你。」',1],['wifeLeave','我抽了。她走了。'],['meRelief','證明大麻真的能緩解痛苦！',0,3.5]]},
