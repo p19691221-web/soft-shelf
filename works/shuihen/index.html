@@ -604,7 +604,18 @@ const MITT=(c,x,y,k,a)=>{c.save();c.translate(x,y);c.rotate(a||0);c.scale(k,k);c
   c.lineTo(.16,.3);c.closePath();c.fill();c.beginPath();c.ellipse(-.2,-.02,.06,.13,-.5,0,7);c.fill();c.restore();};
 const MITT_CUT=(c,x,y,k,a)=>{c.save();c.translate(x,y);c.rotate(a||0);c.scale(k,k);c.lineWidth=.03;c.beginPath();c.moveTo(-.12,.2);c.lineTo(.16,.2);c.stroke();
   for(const [xx,yy] of [[-.02,-.12],[.06,0],[-.04,.08]])fillE(c,xx,yy,.02,.02);c.restore();};
+const GHOST=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.beginPath();c.moveTo(-.28,.36);c.lineTo(-.28,-.1);c.bezierCurveTo(-.28,-.5,.28,-.5,.28,-.1);c.lineTo(.28,.36);
+  for(let i=0;i<4;i++){const x1=.28-(i+1)*.14;c.quadraticCurveTo(x1+.07,.24,x1,.36);}c.closePath();c.fill();c.restore();};
+const GHOST_EYES=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);fillE(c,-.1,-.14,.045,.065);fillE(c,.1,-.14,.045,.065);fillE(c,0,.0,.05,.04);c.restore();};
+const COOKIE_CUT=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.lineWidth=.03;c.beginPath();c.arc(0,0,.12,.6,Math.PI*2+.1);c.arc(.1,.06,.05,-.4,Math.PI*1.2,true);c.stroke();
+  for(const [xx,yy] of [[-.05,-.03],[.03,-.06],[-.02,.05]])fillE(c,xx,yy,.018,.018);c.restore();};
 function shapeById(id){
+  if(id==='ghost')return {name:'鬼',kind:'o',rot:0,core:[0,.38],box:[.7,1],draw(c){GHOST(c,0,0,1.2);},cut(c){GHOST_EYES(c,0,0,1.2);}};
+  if(id==='ghostLie')return {name:'說謊的鬼',kind:'o',rot:0,core:[-.18,.38],box:[1,1],draw(c){GHOST(c,-.18,.06,.95);fillE(c,.28,-.32,.2,.13);fillP(c,[[.12,-.24],[.06,-.12],[.2,-.22]]);},
+    cut(c){GHOST_EYES(c,-.18,.06,.95);for(const x of [.2,.28,.36])fillE(c,x,-.32,.025,.025);}};
+  if(id==='bigEye')return {name:'看穿的眼睛',kind:'o',rot:0,core:[-.4,0],box:[1,.6],draw(c){c.beginPath();c.moveTo(-.42,0);c.quadraticCurveTo(0,-.36,.42,0);c.quadraticCurveTo(0,.36,-.42,0);c.closePath();c.fill();},
+    cut(c){c.lineWidth=.03;c.beginPath();c.arc(0,0,.14,0,7);c.stroke();fillE(c,.04,-.04,.04,.04);}};
+  if(id==='ghostSee')return {name:'被看穿的鬼',kind:'o',rot:0,core:[0,.42],box:[.7,1],draw(c){GHOST(c,0,0,1.2);},cut(c){GHOST_EYES(c,0,0,1.2);COOKIE_CUT(c,0,.22,1.1);}};
   if(id==='chefRage')return profileShape({id:'flat',fixed:1,name:'暴躁廚師',extra:c=>{CHEFHAT(c);RAGE(c);},cutP:c=>{CHEFHAT_CUT(c);MOUTH(c);},scale:.82,shift:-.14,box:[1.3,1.2],core:[-.14,.05]});
   if(id==='ovenHot')return {name:'燙手的烤盤',kind:'o',rot:0,core:[-.36,.3],box:[1,1],draw(c){OVEN(c,0,.06,1);
     c.lineWidth=.03;c.beginPath();for(const x of [-.14,0,.14]){c.moveTo(x,-.4);c.quadraticCurveTo(x+.06,-.46,x,-.52);}c.stroke();},cut(c){OVEN_CUT(c,0,.06,1);}};
@@ -913,6 +924,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'看穿',panels:[['ghost','為什麼鬼不擅長說謊？'],['ghostLie','鬼：「我才沒偷吃餅乾。」'],['bigEye','因為……'],['ghostSee','……你一眼就能看穿它們。',0,3.5]]},
   {title:'烤箱手套',panels:[['chefRage','我以前是那種愛吼又愛罵髒話的廚師。'],['ovenHot','每天都從烤箱拿東西。'],['mitt','後來我發現了烤箱手套。'],['chefCalm','從此脾氣好多了。',0,3.5]]},
   {title:'左右腦',panels:[['meBrainQ','我終於知道我的腦子哪裡有問題了。'],['brainLR','腦子分左右兩邊。'],['brainLeftX','左邊：nothing right（沒一個對的）。'],['brainRightEmpty','右邊：nothing left（一點不剩）。',0,3.5]]},
   {title:'有用',panels:[['politician','政治人物的腦子和糞便，差在哪？'],['brain','一個是腦子。'],['poop','一個是糞便。'],['poopSprout','糞便至少有用。',0,3.5]]},
