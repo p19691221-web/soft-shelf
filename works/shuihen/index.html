@@ -527,7 +527,22 @@ const PODIUM=(c,y0)=>{fillP(c,[[-.12,y0-.22],[.12,y0-.22],[.12,y0+.2],[-.12,y0+.
 const PODIUM_CUT=(c,y0)=>{TXT(c,'1',0,y0-.04,16);TXT(c,'2',-.255,y0+.06,14);TXT(c,'3',.255,y0+.1,14);};
 const STAND=(c,x,yb)=>{fillE(c,x,yb-.3,.05,.05);c.lineWidth=.06;c.beginPath();c.moveTo(x,yb-.24);c.lineTo(x,yb-.1);c.stroke();
   c.lineWidth=.04;c.beginPath();c.moveTo(x,yb-.1);c.lineTo(x-.04,yb);c.moveTo(x,yb-.1);c.lineTo(x+.04,yb);c.moveTo(x,yb-.2);c.lineTo(x-.07,yb-.3);c.moveTo(x,yb-.2);c.lineTo(x+.07,yb-.3);c.stroke();};
+const BEANIE=c=>{fillE(c,.4,.18,.36,.2);fillP(c,[[.04,.2],[.76,.2],[.78,.3],[.02,.3]]);};
+const MASK=c=>{fillP(c,[[.3,.36],[.82,.36],[.82,.48],[.3,.48]]);};
+const MASK_CUT=c=>{fillE(c,.66,.42,.045,.03);};
+const TORCH=c=>{fillP(c,[[.86,.86],[1.02,.8],[1.06,.9],[.9,.96]]);c.beginPath();c.moveTo(1.04,.84);c.lineTo(1.5,.62);c.lineTo(1.5,1.16);c.lineTo(1.06,.9);c.closePath();c.globalAlpha=.55;c.fill();c.globalAlpha=1;};
+const BANG=c=>{TXT(c,'！',1.02,.15,50);};
 function shapeById(id){
+  if(id==='sleepy')return profileShape({id:'flat',fixed:1,name:'正要睡的我',extra:BED,cutP:EYE_SHUT,box:[1.12,1.5],core:[0,.15]});
+  if(id==='thief')return profileShape({id:'plain',fixed:1,name:'翻錢的小偷',extra:c=>{BEANIE(c);MASK(c);TORCH(c);},cutP:MASK_CUT,scale:.78,shift:-.2,box:[1.3,1.05],core:[-.2,0]});
+  if(id==='wakeUp')return profileShape({id:'flat',fixed:1,name:'跳起來的我',extra:BANG,cutP:EYE_OPEN,box:[1.3,1.15]});
+  if(id==='searchTogether'){const T=profileShape({id:'plain',fixed:1,name:'',extra:c=>{BEANIE(c);MASK(c);}}),M=profileShape({id:'flat',fixed:1,name:''});
+    return {name:'一起翻錢',kind:'o',rot:0,core:[0,.38],box:[1,.95],draw(c){
+      c.save();c.translate(-.22,-.12);c.rotate(.35);c.scale(.42,.42);T.draw(c);c.restore();
+      c.save();c.translate(.22,-.12);c.rotate(-.35);c.scale(-.42,.42);M.draw(c);c.restore();
+      fillP(c,[[-.4,.16],[.4,.16],[.4,.44],[-.4,.44]]);},
+      cut(c){fillP(c,[[-.34,.2],[.34,.2],[.34,.3],[-.34,.3]]);fillE(c,0,.37,.06,.025);
+        c.save();c.translate(-.22,-.12);c.rotate(.35);c.scale(.42,.42);c.translate(-.45,-.57);MASK_CUT(c);c.restore();}};}
   if(id==='shouter')return profileShape({id:'plain',fixed:1,name:'大喊的人',extra:SHOUT,cutP:MOUTH,scale:.82,shift:-.12,box:[1.3,1.0],core:[-.12,0]});
   if(id==='cuffs')return {name:'手銬',kind:'o',rot:0,core:[-.27,.18],box:[1,.8],draw(c){
     c.lineWidth=.07;for(const x of [-.27,.27]){c.beginPath();c.arc(x,.08,.17,0,7);c.stroke();}
@@ -700,6 +715,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'一起找',panels:[['sleepy','昨晚正要睡覺……',0,0,-1.5708],['thief','看到小偷在我家翻錢。'],['wakeUp','我立刻跳起來——',1],['searchTogether','……跟他一起找。',0,3.5]]},
   {title:'誰是白痴',panels:[['shouter','一個男人在廣場大喊：「總統是白痴！」'],['cuffs','警察把他銬起來：「侮辱我們的總統違法！」'],['shouterExplain','「誤會了，我說的是鄰國的總統。」'],['chief','警長：「騙不了我們，大家都知道誰是白痴。」',1,3.5]]},
   {title:'第四名',panels:[['medal','如果懶惰是奧運項目……'],['podium','前三名都要走上頒獎台。'],['four','我寧願拿第四名……'],['podiumLazy','……這樣就不用走上去了。',0,3.5]]},
   {title:'懶得回',panels:[['msgLazy','今天有人說我懶。'],['meMad','我很不爽，決定回他。'],['msgTyping','打了幾個字……'],['meLazy','……算了，懶得回。',0,3.5,-1.5708]]},
