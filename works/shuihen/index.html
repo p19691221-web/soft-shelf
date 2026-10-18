@@ -618,6 +618,13 @@ const EARTH=(c,x,y,r)=>{fillE(c,x,y,r,r);};
 const EARTH_CUT=(c,x,y,r)=>{c.save();c.translate(x,y);c.scale(r,r);c.beginPath();c.moveTo(-.6,-.5);c.quadraticCurveTo(-.2,-.7,0,-.3);c.quadraticCurveTo(-.1,0,-.5,.1);c.closePath();c.fill();
   c.beginPath();c.moveTo(.2,.1);c.quadraticCurveTo(.6,-.1,.7,.3);c.quadraticCurveTo(.4,.7,.1,.5);c.closePath();c.fill();c.restore();};
 function shapeById(id){
+  if(id==='blankPaper')return {name:'空白考卷',kind:'o',rot:0,core:[-.33,.3],box:[.85,1],draw(c){fillP(c,[[-.34,-.44],[.34,-.44],[.34,.44],[-.34,.44]]);},
+    cut(c){TXT(c,'考卷',0,-.32,15);c.lineWidth=.012;c.beginPath();c.moveTo(-.26,-.22);c.lineTo(.26,-.22);c.stroke();
+      for(let k=0;k<4;k++){TXT(c,(k+1)+'.',-.22,-.1+k*.14,11);}}};
+  if(id==='teacherBlank')return profileShape({id:'plain',bun:1,fixed:1,name:'拿著空白考卷的老師',extra:c=>{ANGER(c);QMARK(c);},cutP:GLASSES_CUT,box:[1.4,1.15]});
+  if(id==='studentCalm')return profileShape({id:'kid',fixed:1,name:'淡定的學生',cutP:c=>{EYE_SHUT(c);SMILE(c);}});
+  if(id==='silence')return {name:'沉默',kind:'o',rot:0,core:[-.36,.0],box:[1,.8],draw(c){fillE(c,0,-.04,.4,.26);fillP(c,[[-.2,.16],[-.3,.36],[-.04,.2]]);},
+    cut(c){for(const x of [-.14,0,.14])fillE(c,x,-.04,.04,.04);}};
   if(id==='meAnx')return profileShape({id:'flat',fixed:1,name:'焦慮的我',extra:SWEAT,cutP:c=>{MOUTH(c);EYE_OPEN(c);},scale:.85,shift:-.06,box:[1.2,1.0],core:[-.06,0]});
   if(id==='doorEmpty')return {name:'空門口',kind:'o',rot:0,core:[-.3,.3],box:[.9,1.05],draw(c){
     c.lineWidth=.06;c.strokeRect(-.32,-.46,.5,.92);c.beginPath();c.moveTo(-.29,-.43);c.lineTo(-.05,-.36);c.lineTo(-.05,.39);c.lineTo(-.29,.43);c.closePath();c.fill();
@@ -953,6 +960,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'沉默',panels:[['blankPaper','考卷發回來，一片空白。'],['teacherBlank','老師：「為什麼什麼都沒寫？」'],['studentCalm','學生：「老師……」',1],['silence','「有時候，沉默就是最好的答案。」',0,3.5]]},
   {title:'沒安全感',panels:[['meAnx','我老婆離開我了……'],['momMad','因為她說我太沒安全感。',1],['doorEmpty','等等，她回來了。'],['teaCup','她只是去泡杯茶。',0,3.5]]},
   {title:'看辦公室',panels:[['bossOrder','老闆：「你是保全，工作就是看辦公室。」'],['guardOk','我：「沒問題。」',1],['tvOffice','我已經看到第六季了。'],['guardWatch','還是不懂這跟保全有什麼關係。',0,3.5]]},
   {title:'太晚了',panels:[['ufo','外星人降落地球。'],['alienTalk','「我們是來毀滅地球的。」'],['earthHot','地球：已經在發燒了。'],['activist','環保人士：「你們來得有點晚了吧？」',1,3.5]]},
