@@ -505,7 +505,23 @@ const BRA_HOLLOW=c=>{for(const sx of [-1,1]){c.beginPath();c.moveTo(sx*.06,.15);
 const BAG=(c)=>CHIPS(c,0,0,.3,.42);
 const BAG_HALF=c=>{c.beginPath();c.moveTo(-.25,-.36);c.lineTo(.25,-.36);c.quadraticCurveTo(.31,-.1,.27,.02);c.lineTo(-.27,.02);c.quadraticCurveTo(-.31,-.1,-.25,-.36);c.closePath();c.fill();
   c.lineWidth=.02;c.beginPath();for(const [x,y] of [[-.18,.06],[-.04,.04],[.1,.07],[.2,.05]]){c.moveTo(x-.06,y+.03);c.quadraticCurveTo(x,y-.03,x+.06,y+.03);}c.stroke();};
+const ARROW=(c,x0,y0,x1,y1)=>{c.lineWidth=.035;c.beginPath();c.moveTo(x0,y0);c.lineTo(x1,y1);c.stroke();const a=Math.atan2(y1-y0,x1-x0);
+  fillP(c,[[x1+Math.cos(a)*.07,y1+Math.sin(a)*.07],[x1+Math.cos(a+2.4)*.07,y1+Math.sin(a+2.4)*.07],[x1+Math.cos(a-2.4)*.07,y1+Math.sin(a-2.4)*.07]]);};
+const PLANE=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);fillE(c,0,0,.45,.07);fillP(c,[[-.42,-.02],[-.34,-.02],[-.26,-.2],[-.36,-.2]]);
+  fillP(c,[[-.06,.02],[.12,.02],[-.12,.24],[-.2,.24]]);fillP(c,[[-.06,-.02],[.08,-.02],[-.08,-.14],[-.14,-.14]]);c.restore();};
+const ROLLEYES=c=>{fillE(c,.64,.42,.05,.035);};
+const ROLLEYES_CUT=c=>{fillE(c,.65,.395,.022,.014);};
 function shapeById(id){
+  if(id==='bags3')return {name:'三件行李',kind:'o',rot:0,core:[-.27,.25],box:[1,.8],draw(c){SUITCASE(c,-.32,.1,.32);SUITCASE(c,.02,.04,.4);SUITCASE(c,.33,.14,.26);},
+    cut(c){SUITCASE_CUT(c,-.32,.1,.32);SUITCASE_CUT(c,.02,.04,.4);SUITCASE_CUT(c,.33,.14,.26);}};
+  if(id==='bags3go')return {name:'各寄一地',kind:'o',rot:0,core:[-.27,.28],box:[1,.95],draw(c){SUITCASE(c,-.3,.28,.24);SUITCASE(c,.0,.28,.24);SUITCASE(c,.3,.28,.24);
+    ARROW(c,-.3,.16,-.42,-.3);ARROW(c,0,.16,0,-.36);ARROW(c,.3,.16,.42,-.3);},
+    cut(c){SUITCASE_CUT(c,-.3,.28,.24);SUITCASE_CUT(c,0,.28,.24);SUITCASE_CUT(c,.3,.28,.24);}};
+  if(id==='agentRoll')return profileShape({id:'plain',fixed:1,name:'翻白眼的地勤',extra:c=>{ROLLEYES(c);ANGER(c);},cutP:ROLLEYES_CUT,box:[1.12,1.12]});
+  if(id==='planeScatter')return {name:'散落的行李',kind:'o',rot:0,core:[-.1,.12],box:[1.05,1],draw(c){PLANE(c,-.02,-.28,1);
+    ARROW(c,-.1,-.16,-.32,.08);ARROW(c,0,-.16,.02,.12);ARROW(c,.1,-.16,.32,.08);
+    SUITCASE(c,-.36,.24,.2);SUITCASE(c,.03,.3,.2);SUITCASE(c,.37,.22,.2);},
+    cut(c){c.save();c.translate(-.02,-.28);for(let k=0;k<6;k++)fillE(c,-.12+k*.07,-.01,.016,.016);c.restore();}};
   if(id==='bra')return {name:'衣架上的胸罩',kind:'o',rot:0,core:[-.44,.25],box:[1,.9],draw:BRA};
   if(id==='bag')return {name:'一包洋芋片',kind:'o',rot:0,core:[-.29,.3],box:[.8,1],draw:BAG,cut(c){c.lineWidth=.016;c.beginPath();c.moveTo(-.16,-.1);c.lineTo(.16,-.1);c.moveTo(-.12,-.02);c.lineTo(.12,-.02);c.stroke();}};
   if(id==='bagOpen')return {name:'打開的洋芋片',kind:'o',rot:0,core:[-.29,.3],box:[.8,1],draw:BAG,cut:BAG_HALF};
@@ -619,6 +635,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'三件行李',panels:[['bags3','我要托運三件行李。'],['bags3go','「這件寄新奧爾良，這件西雅圖，這件芝加哥。」'],['agentRoll','地勤翻白眼：「這不可能！」',1],['planeScatter','「為什麼？你們上週就這麼做了啊。」',0,3.5]]},
   {title:'一半是空的',panels:[['bra','問：聚攏型胸罩和一包洋芋片，有什麼共同點？'],['bag','答：看起來都很飽滿。'],['bagOpen','打開才發現……'],['braOpen','……一半是空的。',0,3.5]]},
   {title:'一塊錢',panels:[['kidStore','小時候，一塊錢就能在商店買一大堆。'],['goods','兩包洋芋片、一大瓶汽水、六包糖果、六根牛肉乾。'],['adultNow','現在不行了。'],['cctv','店裡到處都裝了監視器。',0,3.5]]},
   {title:'所以要我留下',panels:[['suitcase','老婆幫我收好行李，叫我走。'],['door','我提著行李走到門口。'],['wifeCurse','她：「祝你死得漫長、緩慢、痛苦。」',1],['manStay','我：「所以……你要我留下來？」',0,3.5]]},
