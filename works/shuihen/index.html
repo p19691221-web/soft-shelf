@@ -485,7 +485,16 @@ const BARS_WIN=(c,smoke)=>{fillP(c,[[-.32,-.2],[.32,-.2],[.32,.36],[-.32,.36]]);
   if(smoke){for(const [x,y,r] of [[.04,-.3,.04],[-.02,-.4,.05],[.04,-.5,.06]])fillE(c,x,y,r,r);}};
 const BARS_CUT=c=>{c.lineWidth=.035;c.beginPath();for(const x of [-.16,0,.16]){c.moveTo(x,-.2);c.lineTo(x,.36);}c.stroke();
   c.lineWidth=.025;c.strokeRect(-.27,-.15,.54,.46);};
+const EYE_CUT=c=>{fillE(c,.64,.44,.04,.028);};
+const EYE_RED=c=>{fillE(c,.64,.44,.045,.032);c.lineWidth=.012;c.beginPath();c.moveTo(.6,.47);c.lineTo(.56,.5);c.moveTo(.62,.4);c.lineTo.call(c,.58,.36);c.stroke();};
+const EYE_DULL=c=>{c.lineWidth=.022;c.beginPath();c.moveTo(.59,.44);c.lineTo(.69,.44);c.stroke();};
 function shapeById(id){
+  if(id==='copEye')return profileShape({id:'flat',fixed:1,name:'起疑的警察',extra:PEAKCAP,cutP:EYE_DULL,box:[1.12,1.12]});
+  if(id==='meRed')return profileShape({id:'plain',fixed:1,name:'眼睛紅紅的我',cutP:EYE_RED});
+  if(id==='donut')return {name:'甜甜圈',kind:'o',rot:0,core:[-.33,0],box:[1,.9],draw(c){fillE(c,0,0,.42,.32);},
+    cut(c){fillE(c,0,0,.12,.09);c.lineWidth=.03;c.lineCap='round';c.beginPath();
+      for(const [x,y,a] of [[-.26,-.08,.6],[-.18,.14,-.4],[.02,-.2,.2],[.22,-.12,-.7],[.28,.08,.5],[.06,.2,-.2],[-.1,-.16,1.2],[.16,.14,1],[-.3,.06,-1]]){
+        c.moveTo(x-Math.cos(a)*.035,y-Math.sin(a)*.035);c.lineTo(x+Math.cos(a)*.035,y+Math.sin(a)*.035);}c.stroke();}};
   if(id==='smoke2')return profileShape({id:'plain',fixed:1,name:'一次抽兩根菸的人',extra:CIG2,box:[1.3,1.15]});
   if(id==='smoke1')return profileShape({id:'plain',fixed:1,name:'只抽一根菸的人',extra:CIG,box:[1.25,1.15]});
   if(id==='cell')return {name:'牢房的鐵窗',kind:'o',rot:0,core:[0,.1],box:[1,1],draw(c){BARS_WIN(c,0);},cut:BARS_CUT};
@@ -569,6 +578,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'甜甜圈',panels:[['car','我被警察攔下來。'],['copEye','警察：「你眼睛紅紅的，吸了大麻？」'],['meRed','我：「你眼神呆滯……」',1],['donut','「……吃了甜甜圈？」',0,3.5]]},
   {title:'兩根菸',panels:[['smoke2','他總是一次抽兩根菸。'],['cell','「一根給我，一根給坐牢的哥哥。」'],['smoke1','後來只抽一根。「你哥出獄了？」'],['cellSmoke','「沒有，是我戒菸了。」',0,3.5]]},
   {title:'深夜講座',panels:[['cop','凌晨兩點，警察攔下老人：「這麼晚去哪？」'],['oldman','「去聽講座，講喝酒、抽菸、熬夜的危害。」',1],['copQ','「這種時間，誰在講？」'],['wifePin','「我老婆。」',1,3.5]]},
   {title:'坐下',panels:[['parkWalk','一個男人在公園散步。'],['bench2','長椅上兩個人垂頭喪氣。他問：「怎麼了？」'],['bench2up','其中一人抬頭：「坐下，我告訴你。」'],['bench3','他坐下。「油漆還沒乾。」']]},
