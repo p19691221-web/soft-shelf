@@ -591,7 +591,17 @@ const POOP=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);fillE(c,0,.2,.3,.1
   c.beginPath();c.moveTo(-.06,-.1);c.quadraticCurveTo(0,-.24,.08,-.2);c.quadraticCurveTo(.04,-.12,.06,-.08);c.closePath();c.fill();c.restore();};
 const PODIUM_MIC=c=>{fillP(c,[[.75,.95],[1.3,.95],[1.24,1.5],[.81,1.5]]);c.lineWidth=.03;c.beginPath();c.moveTo(.95,.95);c.quadraticCurveTo(.92,.82,.86,.76);c.stroke();fillE(c,.85,.74,.035,.05,-.5);};
 const TIE=c=>{fillP(c,[[.42,1.0],[.5,1.0],[.52,1.18],[.46,1.24],[.4,1.18]]);};
+const BRAINL=(c)=>{fillE(c,-.16,0,.26,.22);};
+const BRAINR=(c)=>{fillE(c,.16,0,.26,.22);};
+const WRINK=(c,side)=>{c.lineWidth=.022;c.lineCap='round';c.beginPath();for(const [x,y] of side<0?[[-.26,-.08],[-.12,.08],[-.2,.12]]:[[.12,-.1],[.26,.06],[.18,-.02]]){c.moveTo(x-.05,y);c.quadraticCurveTo(x-.02,y-.05,x+.01,y);c.quadraticCurveTo(x+.04,y+.05,x+.07,y);}c.stroke();};
 function shapeById(id){
+  if(id==='meBrainQ')return profileShape({id:'flat',fixed:1,name:'想通了的我',extra:c=>{STAR(c,1.0,.12,.12);},cutP:c=>{EYE_OPEN(c);},box:[1.2,1.12]});
+  if(id==='brainLR')return {name:'左右腦',kind:'o',rot:0,core:[0,.32],box:[.95,.8],draw(c){BRAINL(c);BRAINR(c);},
+    cut(c){c.lineWidth=.025;c.beginPath();c.moveTo(0,-.22);c.lineTo(0,.22);c.stroke();TXT(c,'左',-.16,0,22);TXT(c,'右',.16,0,22);}};
+  if(id==='brainLeftX')return {name:'左腦沒一個對的',kind:'o',rot:0,core:[0,.32],box:[.95,.8],draw(c){BRAINL(c);BRAINR(c);},
+    cut(c){c.lineWidth=.04;c.lineCap='round';c.beginPath();c.moveTo(-.25,-.09);c.lineTo(-.07,.09);c.moveTo(-.07,-.09);c.lineTo(-.25,.09);c.stroke();c.lineWidth=.025;c.beginPath();c.moveTo(0,-.22);c.lineTo(0,.22);c.stroke();}};
+  if(id==='brainRightEmpty')return {name:'右腦一點不剩',kind:'o',rot:0,core:[0,.32],box:[.95,.8],draw(c){BRAINL(c);c.lineWidth=.035;c.beginPath();c.ellipse(.16,0,.24,.2,0,0,7);c.stroke();},
+    cut(c){c.lineWidth=.04;c.lineCap='round';c.beginPath();c.moveTo(-.25,-.09);c.lineTo(-.07,.09);c.moveTo(-.07,-.09);c.lineTo(-.25,.09);c.stroke();}};
   if(id==='politician')return profileShape({id:'flat',fixed:1,name:'發言的政治人物',extra:c=>{PODIUM_MIC(c);},cutP:c=>{MOUTH(c);},box:[1.35,1.5],core:[0,.15]});
   if(id==='brain')return {name:'腦子',kind:'o',rot:0,core:[0,.3],box:[.9,.8],draw(c){fillE(c,-.14,0,.24,.2);fillE(c,.14,-.02,.24,.21);fillE(c,.2,.16,.12,.08);},
     cut(c){c.lineWidth=.022;c.lineCap='round';c.beginPath();c.moveTo(0,-.2);c.quadraticCurveTo(.04,0,0,.18);
@@ -888,6 +898,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'左右腦',panels:[['meBrainQ','我終於知道我的腦子哪裡有問題了。'],['brainLR','腦子分左右兩邊。'],['brainLeftX','左邊：nothing right（沒一個對的）。'],['brainRightEmpty','右邊：nothing left（一點不剩）。',0,3.5]]},
   {title:'有用',panels:[['politician','政治人物的腦子和糞便，差在哪？'],['brain','一個是腦子。'],['poop','一個是糞便。'],['poopSprout','糞便至少有用。',0,3.5]]},
   {title:'重燃希望',panels:[['jelly','水母沒有大腦。'],['jellyOld','卻已經活了六億五千萬年。'],['humanThink','這讓我想到人類……'],['humanHope','……突然又有希望了。',0,3.5]]},
   {title:'螺旋槳',panels:[['planeSpin','小飛機的螺旋槳，其實是給駕駛吹涼的。'],['pilotCool','轉得越快，他越涼快。'],['planeStop','直到它停下來……'],['pilotSweat','……駕駛就開始冒汗了。',0,3.5]]},
