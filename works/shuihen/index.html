@@ -570,7 +570,16 @@ function couple(point){const H=profileShape({id:'flat',fixed:1,name:''}),W=profi
 const NAMETAG=c=>{RRECT(c,.5,.98,1.2,1.36,.04);};
 const NAMETAG_CUT=c=>{TXT(c,'金口',.85,1.17,24);};
 const ZIP=c=>{c.lineWidth=.02;c.beginPath();c.moveTo(.68,.72);c.lineTo(.84,.72);for(const x of [.71,.75,.79]){c.moveTo(x,.69);c.lineTo(x,.75);}c.stroke();};
+const POINT=c=>{c.lineWidth=.09;c.lineCap='round';c.beginPath();c.moveTo(.4,1.05);c.quadraticCurveTo(.9,.9,1.1,.55);c.stroke();fillE(c,1.14,.5,.05,.04,-.9);};
 function shapeById(id){
+  if(id==='custQ')return profileShape({id:'flat',fixed:1,name:'問口味的顧客',extra:QMARK,box:[1.4,1.15]});
+  if(id==='clerkPoint')return profileShape({id:'pony',fixed:1,name:'指著牌子的店員',extra:POINT,box:[1.25,1.15]});
+  if(id==='flavorSign')return {name:'口味牌',kind:'o',rot:0,core:[-.37,.3],box:[.85,1],draw(c){RRECT(c,-.38,-.44,.38,.38,.04);c.lineWidth=.03;c.beginPath();c.moveTo(-.2,-.44);c.lineTo(-.26,-.52);c.moveTo(.2,-.44);c.lineTo(.26,-.52);c.stroke();},
+    cut(c){TXT(c,'香草',0,-.3,16);TXT(c,'巧克力',0,-.12,16);TXT(c,'草莓',0,.06,16);c.lineWidth=.012;c.beginPath();c.moveTo(-.28,.15);c.lineTo(.28,.15);c.stroke();TXT(c,'週一休息',0,.26,15);}};
+  if(id==='cone')return {name:'兩球週一休息',kind:'o',rot:0,core:[0,.42],box:[.75,1],draw(c){
+    c.beginPath();c.moveTo(-.16,.0);c.lineTo(.16,.0);c.lineTo(0,.46);c.closePath();c.fill();fillE(c,0,-.08,.2,.15);fillE(c,0,-.33,.2,.15);},
+    cut(c){c.lineWidth=.012;c.beginPath();for(const k of [-.08,.0,.08]){c.moveTo(k-.06,.04);c.lineTo(k+.06,.22);c.moveTo(k+.06,.04);c.lineTo(k-.06,.22);}c.stroke();
+      TXT(c,'週一',0,-.33,15);TXT(c,'休息',0,-.08,15);}};
   if(id==='tellerMum')return profileShape({id:'flat',fixed:1,name:'不說話的櫃員',extra:NAMETAG,cutP:c=>{NAMETAG_CUT(c);ZIP(c);},scale:.85,shift:-.06,box:[1.05,1.15],core:[-.06,.12]});
   if(id==='coworker')return profileShape({id:'pony',fixed:1,name:'見怪不怪的同事',extra:c=>{c.beginPath();c.moveTo(.92,.06);c.quadraticCurveTo(.98,.16,.92,.2);c.quadraticCurveTo(.86,.16,.92,.06);c.fill();},box:[1.12,1.12]});
   if(id==='richCouple'){const H=profileShape({id:'beard',fixed:1,name:''}),W=profileShape({id:'pony',fixed:1,name:''});
@@ -837,6 +846,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'週一休息',panels:[['custQ','顧客：「你們有哪些口味？」'],['clerkPoint','店員：「牆上的牌子都有寫。」',1],['flavorSign','他看了看牌子……'],['cone','「那給我兩球『週一休息』。」',0,3.5]]},
   {title:'金口難開',panels:[['robberGun','劫匪：「保險庫在哪？」'],['tellerMum','櫃員：「……」'],['robberMad','劫匪：「搞什麼？保險庫在哪？！」'],['coworker','同事：「他一向金口難開。」',1,3.5]]},
   {title:'九十歲',panels:[['richCouple','六十歲的富翁，帶著二十五歲的嬌妻走進酒吧。'],['friendQ','朋友：「她怎麼會嫁給你？」'],['richLie','「我謊報了年齡。」「說自己四十五？」',1],['age90','「不，我說九十！」',0,3.5]]},
   {title:'負數',panels:[['robberGun','劫匪：「錢全部交出來！」'],['meLaugh','我忍不住大笑。',1],['robberQ','劫匪：「你笑什麼？」'],['balance','「我的帳戶是負的。」',0,3.5]]},
@@ -975,7 +985,7 @@ function buildChalk(){chalk=document.createElement('canvas');chalk.width=Math.ro
   speck=chx.createPattern(t,'repeat');}
 function chalkLine(x1,y1,x2,y2,j){chx.beginPath();chx.moveTo(x1+j[0],y1+j[1]);chx.quadraticCurveTo((x1+x2)/2+j[2],(y1+y2)/2+j[3],x2+j[4],y2+j[5]);chx.stroke();}
 function wrapChalk(t,x,y,maxW,lh){const lines=[];let cur='';
-  for(const ch of t){if(cur&&!'，。！？、）」：…'.includes(ch)&&chx.measureText(cur+ch).width>maxW){if(cur.endsWith('「')){lines.push(cur.slice(0,-1));cur='「'+ch;}else{lines.push(cur);cur=ch;}}else cur+=ch;}
+  for(const ch of t){if(cur&&!'，。！？、）」』：…'.includes(ch)&&chx.measureText(cur+ch).width>maxW){if(cur.endsWith('「')){lines.push(cur.slice(0,-1));cur='「'+ch;}else{lines.push(cur);cur=ch;}}else cur+=ch;}
   if(cur)lines.push(cur);
   if(lines.length>2){lines[1]=lines.slice(1).join('');}
   lines.slice(0,2).forEach((l,i)=>chx.fillText(l,x,y+i*lh,maxW));}
