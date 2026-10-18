@@ -539,8 +539,21 @@ const BODY=(c,arms)=>{c.lineWidth=.1;c.lineCap='round';c.beginPath();c.moveTo(0,
   else{c.moveTo(0,-.04);c.lineTo(-.14,.14);c.moveTo(0,-.04);c.lineTo(.14,.14);}c.stroke();};
 const GUITAR=c=>{c.save();c.translate(.02,.12);c.rotate(-.6);fillE(c,-.02,.06,.1,.08);fillE(c,-.02,-.04,.08,.065);c.lineWidth=.035;c.beginPath();c.moveTo(-.02,-.08);c.lineTo(-.02,-.36);c.stroke();c.restore();};
 const NOTES=c=>{for(const [x,y,k] of [[.3,-.36,1],[-.32,-.3,.8],[.36,-.08,.7]]){fillE(c,x,y,.04*k,.03*k,-.4);c.lineWidth=.02*k;c.beginPath();c.moveTo(x+.035*k,y);c.lineTo(x+.035*k,y-.14*k);c.lineTo(x+.09*k,y-.1*k);c.stroke();}};
+const NOTES_P=c=>{c.save();c.translate(1.05,.35);c.scale(.75,.75);NOTES(c);c.restore();};
 const HAT=c=>{fillE(c,.3,.43,.12,.025);fillE(c,.3,.4,.06,.045);};
+const LEAF7=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);
+  for(const [a,l] of [[0,.42],[-.45,.36],[.45,.36],[-.95,.28],[.95,.28],[-1.4,.18],[1.4,.18]]){c.save();c.rotate(a);c.beginPath();c.moveTo(0,0);
+    c.quadraticCurveTo(-.06,-l*.5,0,-l);c.quadraticCurveTo(.06,-l*.5,0,0);c.closePath();c.fill();c.restore();}
+  c.lineWidth=.04;c.beginPath();c.moveTo(0,0);c.lineTo(0,.2);c.stroke();c.restore();};
+const SMILE=c=>{c.lineWidth=.03;c.beginPath();c.moveTo(.68,.72);c.quadraticCurveTo(.73,.76,.79,.71);c.stroke();};
+const WALK_BAG=c=>{fillE(c,.08,-.36,.09,.09);fillE(c,.15,-.42,.07,.06);c.lineWidth=.12;c.beginPath();c.moveTo(.06,-.25);c.lineTo(.02,.06);c.stroke();
+  c.lineWidth=.06;c.beginPath();c.moveTo(.03,.06);c.quadraticCurveTo(.13,.22,.19,.44);c.moveTo(.0,.06);c.quadraticCurveTo(-.07,.24,-.19,.42);c.moveTo(.05,-.18);c.lineTo(-.18,.04);c.stroke();
+  SUITCASE(c,-.24,.18,.3);};
 function shapeById(id){
+  if(id==='meLeaf')return profileShape({id:'flat',fixed:1,name:'宣布要抽的我',extra:c=>LEAF7(c,1.2,.5,1.15),scale:.8,shift:-.18,box:[1.4,1.05],core:[-.18,0]});
+  if(id==='wifeWarn')return profileShape({id:'plain',bun:1,fixed:1,name:'放話的老婆',extra:ANGER});
+  if(id==='wifeLeave')return {name:'提著行李走掉',kind:'o',rot:0,core:[.02,.4],box:[.85,1],draw:WALK_BAG,cut(c){SUITCASE_CUT(c,-.24,.18,.3);}};
+  if(id==='meRelief')return profileShape({id:'flat',fixed:1,name:'鬆一口氣的我',extra:NOTES_P,cutP:c=>{SMILE(c);EYE_SHUT(c);},scale:.82,shift:-.14,box:[1.25,1.0],core:[-.14,0]});
   if(id==='headOff')return {name:'頭斷掉的人',kind:'o',rot:0,core:[0,.4],box:[.8,1],draw(c){BODY(c,'up');fillE(c,.06,-.38,.1,.1);
     c.lineWidth=.025;c.beginPath();for(const a of [-.6,0,.6]){c.moveTo(.06+Math.sin(a)*.14,-.24+Math.cos(a)*.0);c.lineTo(.06+Math.sin(a)*.2,-.2);}c.stroke();}};
   if(id==='briefcase')return {name:'一種職業',kind:'o',rot:0,core:[-.37,.2],box:[.9,.8],draw(c){SUITCASE(c,0,.04,.8);},cut(c){SUITCASE_CUT(c,0,.04,.8);TXT(c,'職業',0,.12,15);}};
@@ -741,6 +754,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'緩解疼痛',panels:[['meLeaf','我跟老婆說，我要開始抽大麻。'],['wifeWarn','她說：「你敢抽，我就離開你。」',1],['wifeLeave','我抽了。她走了。'],['meRelief','證明大麻真的能緩解痛苦！',0,3.5]]},
   {title:'找誰接',panels:[['headOff','頭斷掉了，要找誰接？'],['briefcase','提示：一種職業。'],['busker','答案是——'],['headOn','街頭藝人（接頭藝人）。',0,3.5]]},
   {title:'半手李',panels:[['mrLee','這是李先生。'],['sling','有一天，他摔斷了手臂。'],['bigQ','請問：他會變成什麼？'],['gift','半手李（伴手禮）。',0,3.5]]},
   {title:'一起找',panels:[['sleepy','昨晚正要睡覺……',0,0,-1.5708],['thief','看到小偷在我家翻錢。'],['wakeUp','我立刻跳起來——',1],['searchTogether','……跟他一起找。',0,3.5]]},
