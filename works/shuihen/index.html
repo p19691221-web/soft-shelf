@@ -652,6 +652,13 @@ const BED2=c=>{c.fillRect(-.46,.16,.92,.1);c.fillRect(-.46,-.12,.06,.44);c.fillR
 const ZZ=(c,x,y,k)=>{c.lineWidth=.03*k;c.lineJoin='round';c.beginPath();c.moveTo(x,y);c.lineTo(x+.1*k,y);c.lineTo(x,y+.1*k);c.lineTo(x+.1*k,y+.1*k);c.stroke();};
 const BINO_P=c=>{RRECT(c,.66,.33,1.1,.47,.04);RRECT(c,1.0,.3,1.14,.5,.03);};
 function shapeById(id){
+  if(id==='triEq')return {name:'三角形',kind:'o',rot:0,core:[0,.1],box:[.95,.95],draw(c){fillP(c,[[0,-.38],[.4,.32],[-.4,.32]]);},cut(c){fillE(c,-.07,.06,.03,.03);fillE(c,.07,.06,.03,.03);c.lineWidth=.02;c.beginPath();c.arc(0,.14,.05,.2,Math.PI-.2);c.stroke();}};
+  if(id==='temple')return {name:'廟',kind:'o',rot:0,core:[0,.1],box:[1.05,.95],draw(c){c.beginPath();c.moveTo(-.48,-.08);c.quadraticCurveTo(-.3,-.06,-.22,-.24);c.lineTo(.22,-.24);c.quadraticCurveTo(.3,-.06,.48,-.08);c.lineTo(.38,0);c.lineTo(-.38,0);c.closePath();c.fill();
+    c.fillRect(-.3,0,.6,.34);c.fillRect(-.36,.34,.72,.06);fillE(c,0,-.3,.05,.05);},cut(c){RRECT(c,-.09,.1,.09,.34,.02);for(const x of [-.22,.16])c.fillRect(x,.06,.06,.16);}};
+  if(id==='jiaobei')return {name:'筊杯',kind:'o',rot:0,core:[0,0],box:[1,.8],draw(c){for(const [x,a,f] of [[-.2,-.4,1],[.2,.5,-1]]){c.save();c.translate(x,0);c.rotate(a);c.beginPath();c.ellipse(0,0,.13,.25,0,f>0?-Math.PI/2:Math.PI/2,f>0?Math.PI/2:Math.PI*1.5);c.closePath();c.fill();c.restore();}
+    c.lineWidth=.025;c.lineCap='round';for(const [x,y] of [[-.38,-.3],[.38,-.32],[0,-.38]]){c.beginPath();c.moveTo(x,y);c.lineTo(x*1.15,y-.08);c.stroke();}}};
+  if(id==='triRight')return {name:'直角三角形',kind:'o',rot:0,core:[-.1,.1],box:[.95,.95],draw(c){fillP(c,[[-.34,-.38],[-.34,.32],[.38,.32]]);},cut(c){c.lineWidth=.022;c.strokeRect(-.34,.18,.14,.14);fillE(c,-.2,.0,.025,.025);fillE(c,-.08,.08,.025,.025);c.beginPath();c.arc(-.14,.12,.05,.3,Math.PI-.3);c.stroke();}};
+
   if(id==='herLook')return profileShape({id:'pony',fixed:1,name:'盯著看的她',cutP:MOUTH});
   if(id==='meHopeful')return profileShape({id:'flat',fixed:1,name:'開心的我',extra:c=>{HEART(c,1.02,.12,.1);},cutP:c=>{SMILE(c);},box:[1.25,1.12]});
   if(id==='hourglass')return {name:'沙漏',kind:'o',rot:0,core:[0,0],box:[.8,1.05],draw(c){c.fillRect(-.26,-.44,.52,.06);c.fillRect(-.26,.38,.52,.06);
@@ -1210,6 +1217,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'擲筊',panels:[['triEq','一個三角形走進廟裡。'],['temple','誠心誠意，拜了又拜。'],['jiaobei','拿起筊杯，一擲——'],['triRight','「直角（擲筊）三角形」',0,3.5]]},
   {title:'耐看',panels:[['herLook','她盯著我看了很久。'],['meHopeful','「你其實很耐看耶……」'],['hourglass','我正要開心——'],['herBored','「……只是我沒耐心。」',1,3.5]]},
   {title:'望遠鏡',panels:[['binoculars','同樣是拿望遠鏡——'],['generalBino','在戰場上，叫「將軍」。'],['dormWin','在宿舍……'],['peeperBino','叫「變態」。',0,3.5]]},
   {title:'興趣',panels:[['interviewer','面試官：「興趣是什麼？」'],['hobbyTalk','「分成靜態和動態兩種。」'],['bedSleep','靜態：睡覺。'],['bedTurn','動態：翻身。',1,3.5]]},
@@ -1299,7 +1307,7 @@ const STORIES=[
 ];
 const CATS=['諧音梗','夫妻家庭','搶匪小偷','職場校園','時事諷刺','日常冷笑話','故事小品'];
 const CATMAP={
-  '諧音梗':['一個人過','鳳梨酥','仙草蜜','一波三折','八天的','飢童','美紅敢','仰式','你哪位','哈囉 win','窗戶凍住了','左右腦','換科目','業內人士','找誰接','半手李','閉眼說瞎話','誰是京都人','金口難開','看辦公室','週一休息','看穿'],
+  '諧音梗':['擲筊','一個人過','鳳梨酥','仙草蜜','一波三折','八天的','飢童','美紅敢','仰式','你哪位','哈囉 win','窗戶凍住了','左右腦','換科目','業內人士','找誰接','半手李','閉眼說瞎話','誰是京都人','金口難開','看辦公室','週一休息','看穿'],
   '夫妻家庭':['貓與虎','送回娘家','七十才開始','一模一樣','買菸','需要談談','不敢問','窗戶凍住了','一切都很好','沒安全感','所以要我留下','露台','四個孩子的爸','深夜講座','睜一隻眼','緩解疼痛','九十歲','撞到告訴我','很會說謊','很甜','兩根菸'],
   '搶匪小偷':['金口難開','負數','可能看到了','換科目','業內人士','遙控器','一起找'],
   '職場校園':['一個人過','仙草蜜','飢童','不忍心','美紅敢','錯的先講','吸菸區','沉默','看辦公室','可以回家','倫理學','很會說謊','烤箱手套'],
