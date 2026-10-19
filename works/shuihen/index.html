@@ -652,6 +652,12 @@ const BED2=c=>{c.fillRect(-.46,.16,.92,.1);c.fillRect(-.46,-.12,.06,.44);c.fillR
 const ZZ=(c,x,y,k)=>{c.lineWidth=.03*k;c.lineJoin='round';c.beginPath();c.moveTo(x,y);c.lineTo(x+.1*k,y);c.lineTo(x,y+.1*k);c.lineTo(x+.1*k,y+.1*k);c.stroke();};
 const BINO_P=c=>{RRECT(c,.66,.33,1.1,.47,.04);RRECT(c,1.0,.3,1.14,.5,.03);};
 function shapeById(id){
+  if(id==='herLook')return profileShape({id:'pony',fixed:1,name:'盯著看的她',cutP:MOUTH});
+  if(id==='meHopeful')return profileShape({id:'flat',fixed:1,name:'開心的我',extra:c=>{HEART(c,1.02,.12,.1);},cutP:c=>{SMILE(c);},box:[1.25,1.12]});
+  if(id==='hourglass')return {name:'沙漏',kind:'o',rot:0,core:[0,0],box:[.8,1.05],draw(c){c.fillRect(-.26,-.44,.52,.06);c.fillRect(-.26,.38,.52,.06);
+    fillP(c,[[-.2,-.38],[.2,-.38],[.03,0],[.2,.38],[-.2,.38],[-.03,0]]);},cut(c){fillP(c,[[-.14,-.32],[.14,-.32],[.08,-.2],[-.08,-.2]]);c.lineWidth=.016;c.beginPath();c.moveTo(0,-.02);c.lineTo(0,.2);c.stroke();}};
+  if(id==='herBored')return profileShape({id:'pony',fixed:1,name:'沒耐心的她',extra:c=>{for(const [x,y] of [[.95,.3],[1.08,.2],[1.2,.1]])fillE(c,x,y,.03,.03);},cutP:c=>{EYE_SHUT(c);c.lineWidth=.025;c.beginPath();c.moveTo(.7,.73);c.lineTo(.8,.73);c.stroke();},box:[1.3,1.12]});
+
   if(id==='binoculars')return {name:'望遠鏡',kind:'o',rot:-.15,core:[0,0],box:[1,.8],draw(c){for(const x of [-.2,.2]){RRECT(c,x-.13,-.2,x+.13,.24,.05);RRECT(c,x-.15,.12,x+.15,.3,.04);}c.fillRect(-.08,-.08,.16,.12);},
     cut(c){for(const x of [-.2,.2]){fillE(c,x,.21,.09,.05);}}};
   if(id==='generalBino')return profileShape({id:'flat',fixed:1,name:'拿望遠鏡的將軍',extra:c=>{PEAKCAP(c);BINO_P(c);},cutP:MOUTH,scale:.85,shift:-.1,box:[1.3,1.1],core:[-.1,0]});
@@ -1204,6 +1210,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'耐看',panels:[['herLook','她盯著我看了很久。'],['meHopeful','「你其實很耐看耶……」'],['hourglass','我正要開心——'],['herBored','「……只是我沒耐心。」',1,3.5]]},
   {title:'望遠鏡',panels:[['binoculars','同樣是拿望遠鏡——'],['generalBino','在戰場上，叫「將軍」。'],['dormWin','在宿舍……'],['peeperBino','叫「變態」。',0,3.5]]},
   {title:'興趣',panels:[['interviewer','面試官：「興趣是什麼？」'],['hobbyTalk','「分成靜態和動態兩種。」'],['bedSleep','靜態：睡覺。'],['bedTurn','動態：翻身。',1,3.5]]},
   {title:'一個人過',panels:[['xmasTree','耶誕節，讓我一個人過。'],['heartAlone','情人節，也讓我一個人過。'],['examPaper','期末考來了……'],['studentYell','「有種，考試也讓我一個人過！」',0,3.5]]},
