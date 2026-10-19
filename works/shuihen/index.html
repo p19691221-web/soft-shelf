@@ -630,7 +630,18 @@ const VASE=(c,x,y,k)=>{fillE(c,x,y+.13*k,.13*k,.16*k);c.fillRect(x-.05*k,y-.06*k
 const GROUND=c=>{c.fillRect(-.48,.4,.96,.035);};
 const BIN=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);fillP(c,[[-.2,-.08],[.2,-.08],[.16,.4],[-.16,.4]]);c.fillRect(-.24,-.15,.48,.07);c.restore();};
 const BIN_CUT=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.lineWidth=.025;c.beginPath();for(const u of [-.08,0,.08]){c.moveTo(u*1.1,-.02);c.lineTo(u,.34);}c.stroke();c.restore();};
+const NOTE=(c,x,y,k)=>{fillE(c,x,y,.06*k,.045*k,-.4);c.lineWidth=.025*k;c.beginPath();c.moveTo(x+.055*k,y-.01*k);c.lineTo(x+.055*k,y-.22*k);c.quadraticCurveTo(x+.1*k,y-.15*k,x+.15*k,y-.14*k);c.stroke();};
+const WILDHAIR=c=>{for(const [x,y,rx,ry] of [[.1,.12,.13,.1],[.0,.3,.12,.12],[-.02,.52,.11,.12],[.28,-.02,.13,.09],[.5,-.02,.12,.08],[.05,.72,.1,.1]])fillE(c,x,y,rx,ry);};
 function shapeById(id){
+  if(id==='piano')return {name:'鋼琴',kind:'o',rot:0,core:[0,.05],box:[1.05,1],draw(c){c.beginPath();c.moveTo(-.42,-.02);c.lineTo(.12,-.02);c.quadraticCurveTo(.34,-.04,.42,.06);c.lineTo(.42,.14);c.lineTo(-.42,.14);c.closePath();c.fill();
+    fillP(c,[[-.36,-.03],[.36,-.03],[-.2,-.34]]);c.lineWidth=.04;c.beginPath();for(const x of [-.36,.0,.36]){c.moveTo(x,.14);c.lineTo(x,.4);}c.stroke();NOTE(c,.12,-.3,1);NOTE(c,.32,-.42,.8);},
+    cut(c){c.lineWidth=.014;c.beginPath();c.moveTo(-.42,.06);c.lineTo(-.1,.06);c.stroke();}};
+  if(id==='beethovenAsk')return profileShape({id:'plain',fixed:1,name:'問觀眾的貝多芬',extra:c=>{WILDHAIR(c);c.lineWidth=.035;c.lineCap='round';c.beginPath();c.moveTo(.86,.98);c.lineTo(1.22,.36);c.stroke();fillE(c,.84,1.0,.06,.06);},cutP:MOUTH,scale:.82,shift:-.12,box:[1.35,1.2],core:[-.12,.05]});
+  if(id==='crowdCheer')return {name:'歡呼的觀眾',kind:'o',rot:0,core:[0,.25],box:[1.05,1],draw(c){c.lineWidth=.05;c.lineCap='round';
+    for(const [x,y] of [[-.3,.12],[0,.06],[.3,.12]]){fillE(c,x,y,.09,.1);fillP(c,[[x-.13,y+.2],[x+.13,y+.2],[x+.15,y+.48],[x-.15,y+.48]]);c.beginPath();c.moveTo(x-.1,y+.23);c.lineTo(x-.17,y-.12);c.moveTo(x+.1,y+.23);c.lineTo(x+.17,y-.12);c.stroke();}
+    NOTE(c,-.16,-.26,1);NOTE(c,.2,-.34,1);}};
+  if(id==='beethovenDeaf')return profileShape({id:'plain',fixed:1,name:'聽不見的貝多芬',extra:c=>{WILDHAIR(c);QMARK(c);},cutP:MOUTH,box:[1.4,1.15]});
+
   if(id==='sweater')return {name:'我的毛衣',kind:'o',rot:0,core:[0,0],box:[1.05,1],draw(c){fillP(c,[[-.22,-.36],[-.07,-.36],[0,-.29],[.07,-.36],[.22,-.36],[.44,.2],[.33,.25],[.2,-.05],[.2,.38],[-.2,.38],[-.2,-.05],[-.33,.25],[-.44,.2]]);},
     cut(c){c.lineWidth=.016;c.beginPath();for(let y=.3;y<.37;y+=.03){c.moveTo(-.18,y);c.lineTo(.18,y);}c.moveTo(-.34,.19);c.lineTo(-.42,.16);c.moveTo(.34,.19);c.lineTo(.42,.16);c.stroke();}};
   if(id==='gfCozy')return profileShape({id:'pony',fixed:1,name:'穿我毛衣的女朋友',extra:c=>{fillP(c,[[.1,1.0],[.85,.95],[1.0,1.3],[-.05,1.3]]);},cutP:c=>{EYE_SHUT(c);SMILE(c);},scale:.85,shift:-.04,box:[1.15,1.25],core:[-.04,.1]});
@@ -1032,6 +1043,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'聽不見',panels:[['piano','今晚，貝多芬親自登台。'],['beethovenAsk','貝多芬：「今晚想不想聽交響樂？！」'],['crowdCheer','觀眾全體起立，熱烈歡呼！'],['beethovenDeaf','貝多芬：「我聽不見你們的聲音！」',0,3.5]]},
   {title:'需要談談',panels:[['sweater','女朋友老是偷穿我的襯衫和毛衣。'],['gfCozy','她說：「你的衣服穿起來比較舒服。」'],['skirt','某天，我拿了她一件裙子。'],['gfTalk','她：「……我們需要談談。」',0,3.5]]},
   {title:'收拾',panels:[['binSmoke','夜裡，廣場邊的垃圾桶還在冒煙。'],['shutter','天亮了，店家的鐵門只拉起一半。'],['binDoused','阿伯拉來水管，把火沖熄。'],['plazaBird','水乾了，鳥又回來。廣場還是廣場。',0,3.5]]},
   {title:'放下',panels:[['vases2','黑指捧兩瓶花供佛。佛說：「放下。」'],['vases1','他放下一瓶。佛又說：「放下。」'],['emptyHands','兩手已空，佛仍說放下。「還要放下什麼？」'],['enso','「放下的不是花，是心裡一直抓著的。」',0,3.5]]},
