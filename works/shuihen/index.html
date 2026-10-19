@@ -637,7 +637,16 @@ const PACK_CUT=(c,t)=>{c.lineWidth=.018;c.beginPath();c.moveTo(-.24,-.2);c.lineT
 const NURSECAP=c=>{fillP(c,[[.2,.12],[.26,-.12],[.62,-.14],[.68,.1]]);};
 const NURSECAP_CUT=c=>{c.lineWidth=.025;c.beginPath();c.moveTo(.2,.1);c.lineTo(.68,.08);c.stroke();};
 const WAVES=(c,y)=>{c.lineWidth=.04;c.lineCap='round';c.beginPath();c.moveTo(-.46,y);for(let i=0;i<6;i++){const x=-.46+i*.16;c.quadraticCurveTo(x+.04,y-.06,x+.08,y);c.quadraticCurveTo(x+.12,y+.06,x+.16,y);}c.stroke();};
+function pair(name,cutA,cutB,mid,away){const A=profileShape({id:'flat',fixed:1,name:'',cutP:cutA}),B=profileShape({id:'pony',fixed:1,name:'',cutP:cutB});
+  return {name,kind:'o',rot:0,core:[-.22,.42],box:[1.05,.95],draw(c){c.save();c.translate(away?-.26:-.24,.06);c.scale(away?-.5:.5,.5);A.draw(c);c.restore();
+    c.save();c.translate(away?.27:.25,.08);c.scale(away?.48:-.48,.48);B.draw(c);c.restore();if(mid)mid(c);},
+    cut(c){c.save();c.translate(away?-.26:-.24,.06);c.scale(away?-.5:.5,.5);A.cut&&A.cut(c);c.restore();c.save();c.translate(away?.27:.25,.08);c.scale(away?.48:-.48,.48);B.cut&&B.cut(c);c.restore();}};}
 function shapeById(id){
+  if(id==='coworkFight')return pair('吵架的同事',MOUTH,MOUTH,c=>{c.lineWidth=.035;c.lineCap='round';c.beginPath();c.moveTo(-.06,-.3);c.lineTo(.0,-.18);c.lineTo(-.04,-.14);c.lineTo(.04,-.02);c.stroke();});
+  if(id==='mgrAngry')return profileShape({id:'beard',fixed:1,name:'生氣的經理',extra:c=>{TIE(c);ANGER(c);},cutP:MOUTH,box:[1.3,1.3],core:[0,.1]});
+  if(id==='coworkMess')return pair('又吵成一團',MOUTH,MOUTH,c=>{c.lineWidth=.03;c.beginPath();for(let i=0;i<9;i++){const a=i*1.4,r=.06+i*.012;c.lineTo(Math.cos(a)*r,-.3+Math.sin(a)*r*.7);}c.stroke();});
+  if(id==='coworkQuiet')return pair('安靜的同事',ZIP,ZIP,null,true);
+
   if(id==='swimFree')return {name:'自由式',kind:'o',rot:0,core:[0,.1],box:[.97,.8],draw(c){WAVES(c,.14);fillE(c,-.02,.04,.11,.1);fillE(c,-.22,.12,.2,.05);
     c.lineWidth=.07;c.lineCap='round';c.beginPath();c.moveTo(.06,.06);c.quadraticCurveTo(.2,-.34,.42,-.02);c.stroke();for(const [x,y] of [[-.42,.0],[-.36,-.06],[-.3,.02]])fillE(c,x,y,.025,.025);},
     cut(c){c.lineWidth=.02;c.beginPath();c.arc(-.02,.0,.1,Math.PI*1.1,Math.PI*1.9);c.stroke();}};
@@ -1088,6 +1097,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'錯的先講',panels:[['coworkFight','辦公室裡，兩個同事吵了起來。'],['mgrAngry','經理：「吵什麼？給我說清楚！」'],['coworkMess','兩人搶著講，又吵成一團。'],['coworkQuiet','「夠了！錯的那個先講！」……全場安靜。',0,3.5]]},
   {title:'仰式',panels:[['swimFree','A：「妳很愛游泳？」B：「一週兩三次。」'],['chatPhone','B：「下次一起去游泳吧！」'],['typeA','A 打字：「那妳會『癢是』嗎？」'],['swimBack','B 刪了好友。A：「我是說仰式啦！」',0,3.5]]},
   {title:'你哪位',panels:[['weiCall','韋小明打電話：「喂～小明嗎？」'],['mingAns','小明：「是我，你哪位？」'],['weiName','「韋小明。」'],['mingHang','「我是小明啊，你哪位？」嘟嘟嘟……',1,3.5]]},
   {title:'一模一樣',panels:[['baby','護理師：「你們的寶寶好可愛。」'],['dadLaugh','爸爸笑：「妳對每對爸媽都這樣說吧？」'],['nurseNo','「不，只對寶寶好看的說。」'],['nurseSmile','「那其他人呢？」「我說：跟你長得一模一樣。」',1,3.5]]},
@@ -1163,7 +1173,7 @@ const CATMAP={
   '諧音梗':['仰式','你哪位','哈囉 win','窗戶凍住了','左右腦','換科目','業內人士','找誰接','半手李','閉眼說瞎話','誰是京都人','金口難開','看辦公室','週一休息','看穿'],
   '夫妻家庭':['一模一樣','買菸','需要談談','不敢問','窗戶凍住了','一切都很好','沒安全感','所以要我留下','露台','四個孩子的爸','深夜講座','睜一隻眼','緩解疼痛','九十歲','撞到告訴我','很會說謊','很甜','兩根菸'],
   '搶匪小偷':['金口難開','負數','可能看到了','換科目','業內人士','遙控器','一起找'],
-  '職場校園':['吸菸區','沉默','看辦公室','可以回家','倫理學','很會說謊','烤箱手套'],
+  '職場校園':['錯的先講','吸菸區','沉默','看辦公室','可以回家','倫理學','很會說謊','烤箱手套'],
   '時事諷刺':['太晚了','有用','重燃希望','誰是白痴','塗成藍色','我們的願望','白羊吃草','會飛的車'],
   '故事小品':['收拾','放下','恆河','平安','等','釣','慢','午後']};
 STORIES.forEach(S=>{S.cats=CATS.filter(c=>(CATMAP[c]||[]).includes(S.title));if(!S.cats.length)S.cats=['日常冷笑話'];});
