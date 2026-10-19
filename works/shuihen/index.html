@@ -618,7 +618,17 @@ const EARTH=(c,x,y,r)=>{fillE(c,x,y,r,r);};
 const EARTH_CUT=(c,x,y,r)=>{c.save();c.translate(x,y);c.scale(r,r);c.beginPath();c.moveTo(-.6,-.5);c.quadraticCurveTo(-.2,-.7,0,-.3);c.quadraticCurveTo(-.1,0,-.5,.1);c.closePath();c.fill();
   c.beginPath();c.moveTo(.2,.1);c.quadraticCurveTo(.6,-.1,.7,.3);c.quadraticCurveTo(.4,.7,.1,.5);c.closePath();c.fill();c.restore();};
 const EXCL=c=>{c.save();c.scale(.01,.01);c.font='900 60px '+SERIF;c.textAlign='center';c.textBaseline='middle';c.fillText('！',108,18);c.restore();};
+const VASE=(c,x,y,k)=>{fillE(c,x,y+.13*k,.13*k,.16*k);c.fillRect(x-.05*k,y-.06*k,.1*k,.1*k);fillE(c,x,y-.06*k,.085*k,.03*k);
+  c.lineWidth=.025*k;c.lineCap='round';c.beginPath();for(const [dx,dy] of [[-.14,-.3],[0,-.36],[.14,-.3]]){c.moveTo(x,y-.06*k);c.quadraticCurveTo(x+dx*.3*k,y-.2*k,x+dx*k,y+dy*k);}c.stroke();
+  for(const [dx,dy] of [[-.14,-.3],[0,-.36],[.14,-.3]])fillE(c,x+dx*k,y+dy*k,.06*k,.06*k);};
+const GROUND=c=>{c.fillRect(-.48,.4,.96,.035);};
 function shapeById(id){
+  if(id==='vases2')return {name:'兩瓶花',kind:'o',rot:0,core:[0,.1],box:[1.05,1.05],draw(c){VASE(c,-.24,-.02,1);VASE(c,.24,-.02,1);}};
+  if(id==='vases1')return {name:'放下一瓶',kind:'o',rot:0,core:[0,.1],box:[1.05,1.05],draw(c){GROUND(c);VASE(c,-.24,.22,.75);VASE(c,.24,-.1,1);}};
+  if(id==='emptyHands')return profileShape({id:'plain',fixed:1,name:'兩手空空的黑指',extra:QMARK,box:[1.4,1.15]});
+  if(id==='enso')return {name:'一個圓',kind:'o',rot:0,core:[0,-.36],box:[1,1],draw(c){c.lineCap='round';
+    for(let i=0;i<14;i++){const a0=-1.25+i*.4,a1=a0+.44,w=.13-i*.006;c.lineWidth=w;c.beginPath();c.arc(0,0,.34,a0,a1);c.stroke();}}};
+
   if(id==='oldCouple'){const H=profileShape({id:'beard',fixed:1,name:''}),W=profileShape({id:'plain',bun:1,fixed:1,name:''});
     return {name:'老夫老妻',kind:'o',rot:0,core:[-.22,.42],box:[1.05,.95],draw(c){c.save();c.translate(-.27,.06);c.scale(.56,.56);H.draw(c);c.restore();
       c.save();c.translate(.29,.08);c.scale(-.52,.52);W.draw(c);c.restore();HEART(c,.01,-.36,.11);}};}
@@ -996,6 +1006,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'放下',panels:[['vases2','黑指捧兩瓶花供佛。佛說：「放下。」'],['vases1','他放下一瓶。佛又說：「放下。」'],['emptyHands','兩手已空，佛仍說放下。「還要放下什麼？」'],['enso','「放下的不是花，是心裡一直抓著的。」',0,3.5]]},
   {title:'不敢問',panels:[['oldCouple','結婚六十五年，爺爺都叫奶奶「親愛的」、「寶貝」。'],['heart65','我問他：「感情長久的祕訣是什麼？」'],['grandpaWhisper','爺爺小聲說：「十年前我就忘了她叫什麼，」'],['grandpaSweat','「……一直不敢問。」',0,3.5]]},
   {title:'哈囉 win',panels:[['pumpkin','萬聖節，大家在玩猜謎。'],['ghostAsk','「講哪兩個字不會輸？」'],['kidHello','小孩舉手：「哈囉！」'],['trophyWin','因為——哈囉 win。',0,3.5]]},
   {title:'窗戶凍住了',panels:[['frozenWin','寒冬清晨，太太傳訊：「窗戶凍住了，打不開。」'],['husbandTip','先生回：「澆點溫水，再用錘子輕敲邊緣。」'],['brokenPC','十分鐘後，太太傳來：「電腦整個壞了。」'],['husbandShock','先生：「……妳說的窗戶，是電腦那個？」',0,3.5]]},
