@@ -634,7 +634,16 @@ const NOTE=(c,x,y,k)=>{fillE(c,x,y,.06*k,.045*k,-.4);c.lineWidth=.025*k;c.beginP
 const WILDHAIR=c=>{for(const [x,y,rx,ry] of [[.1,.12,.13,.1],[.0,.3,.12,.12],[-.02,.52,.11,.12],[.28,-.02,.13,.09],[.5,-.02,.12,.08],[.05,.72,.1,.1]])fillE(c,x,y,rx,ry);};
 const PACK=c=>{RRECT(c,-.24,-.36,.24,.4,.03);};
 const PACK_CUT=(c,t)=>{c.lineWidth=.018;c.beginPath();c.moveTo(-.24,-.2);c.lineTo(.24,-.2);c.stroke();c.strokeRect(-.17,-.08,.34,.38);TXT(c,t,0,.11,26);};
+const NURSECAP=c=>{fillP(c,[[.2,.12],[.26,-.12],[.62,-.14],[.68,.1]]);};
+const NURSECAP_CUT=c=>{c.lineWidth=.025;c.beginPath();c.moveTo(.2,.1);c.lineTo(.68,.08);c.stroke();};
 function shapeById(id){
+  if(id==='baby')return {name:'包著的寶寶',kind:'o',rot:0,core:[-.05,.05],box:[1.05,.9],draw(c){fillE(c,.22,-.04,.17,.16);c.beginPath();c.moveTo(.1,-.16);c.bezierCurveTo(-.2,-.2,-.48,.0,-.42,.16);c.bezierCurveTo(-.36,.3,.1,.3,.34,.1);c.closePath();c.fill();
+    HEART(c,.36,-.34,.07);},cut(c){c.lineWidth=.02;c.beginPath();c.arc(.27,-.06,.03,Math.PI*.1,Math.PI*.9);c.stroke();c.beginPath();c.arc(.16,-.06,.03,Math.PI*.1,Math.PI*.9);c.stroke();
+    c.lineWidth=.025;c.beginPath();c.arc(.22,-.04,.19,Math.PI*.55,Math.PI*1.6);c.stroke();c.beginPath();c.moveTo(-.02,.02);c.lineTo(-.22,.16);c.stroke();}};
+  if(id==='dadLaugh')return profileShape({id:'flat',fixed:1,name:'笑著的新手爸爸',cutP:c=>{EYE_SHUT(c);c.lineWidth=.03;c.beginPath();c.arc(.74,.71,.05,0,Math.PI);c.stroke();}});
+  if(id==='nurseNo')return profileShape({id:'plain',bun:1,fixed:1,name:'護理師',extra:NURSECAP,cutP:c=>{NURSECAP_CUT(c);MOUTH(c);}});
+  if(id==='nurseSmile')return profileShape({id:'plain',bun:1,fixed:1,name:'微笑的護理師',extra:NURSECAP,cutP:c=>{NURSECAP_CUT(c);EYE_SHUT(c);SMILE(c);}});
+
   if(id==='packWarn')return {name:'菸盒',kind:'o',rot:0,core:[0,0],box:[.9,1.15],draw(c){PACK(c);for(const x of [-.08,.0,.08])c.fillRect(x-.025,-.5,.05,.16);},cut(c){PACK_CUT(c,'警');}};
   if(id==='dadOut')return profileShape({id:'flat',fixed:1,name:'出門買菸的爸爸',extra:BUBBLE,cutP:c=>{MOUTH(c);BUBBLE_DOTS(c);},scale:.75,shift:-.22,box:[1.4,1.1],core:[-.22,0]});
   if(id==='openDoor')return {name:'開著的門',kind:'o',rot:0,core:[-.3,0],box:[1,1.05],draw(c){c.fillRect(-.3,-.44,.5,.06);c.fillRect(-.3,-.44,.06,.86);c.fillRect(.14,-.44,.06,.86);
@@ -1063,6 +1072,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'一模一樣',panels:[['baby','護理師：「你們的寶寶好可愛。」'],['dadLaugh','爸爸笑：「妳對每對爸媽都這樣說吧？」'],['nurseNo','「不，只對寶寶好看的說。」'],['nurseSmile','「那其他人呢？」「我說：跟你長得一模一樣。」',1,3.5]]},
   {title:'買菸',panels:[['packWarn','菸盒上的警語，寫了一堆危害。'],['dadOut','十九年前，爸爸說：「我去買包菸。」'],['openDoor','到現在，還沒回來。'],['packBuy','我覺得「買菸」本身，也該印上去。',0,3.5]]},
   {title:'吸菸區',panels:[['firedBox','我被開除了。'],['staffAsk','因為我總問客人：「吸菸區還是非吸菸區？」'],['flame','主管說，該問的是「火葬」……'],['grave','……和「土葬」。',0,3.5]]},
   {title:'聽不見',panels:[['piano','今晚，貝多芬親自登台。'],['beethovenAsk','貝多芬：「今晚想不想聽交響樂？！」'],['crowdCheer','觀眾全體起立，熱烈歡呼！'],['beethovenDeaf','貝多芬：「我聽不見你們的聲音！」',0,3.5]]},
@@ -1133,7 +1143,7 @@ const STORIES=[
 const CATS=['諧音梗','夫妻家庭','搶匪小偷','職場校園','時事諷刺','日常冷笑話','故事小品'];
 const CATMAP={
   '諧音梗':['哈囉 win','窗戶凍住了','左右腦','換科目','業內人士','找誰接','半手李','閉眼說瞎話','誰是京都人','金口難開','看辦公室','週一休息','看穿'],
-  '夫妻家庭':['買菸','需要談談','不敢問','窗戶凍住了','一切都很好','沒安全感','所以要我留下','露台','四個孩子的爸','深夜講座','睜一隻眼','緩解疼痛','九十歲','撞到告訴我','很會說謊','很甜','兩根菸'],
+  '夫妻家庭':['一模一樣','買菸','需要談談','不敢問','窗戶凍住了','一切都很好','沒安全感','所以要我留下','露台','四個孩子的爸','深夜講座','睜一隻眼','緩解疼痛','九十歲','撞到告訴我','很會說謊','很甜','兩根菸'],
   '搶匪小偷':['金口難開','負數','可能看到了','換科目','業內人士','遙控器','一起找'],
   '職場校園':['吸菸區','沉默','看辦公室','可以回家','倫理學','很會說謊','烤箱手套'],
   '時事諷刺':['太晚了','有用','重燃希望','誰是白痴','塗成藍色','我們的願望','白羊吃草','會飛的車'],
