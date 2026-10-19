@@ -652,6 +652,13 @@ const BED2=c=>{c.fillRect(-.46,.16,.92,.1);c.fillRect(-.46,-.12,.06,.44);c.fillR
 const ZZ=(c,x,y,k)=>{c.lineWidth=.03*k;c.lineJoin='round';c.beginPath();c.moveTo(x,y);c.lineTo(x+.1*k,y);c.lineTo(x,y+.1*k);c.lineTo(x+.1*k,y+.1*k);c.stroke();};
 const BINO_P=c=>{RRECT(c,.66,.33,1.1,.47,.04);RRECT(c,1.0,.3,1.14,.5,.03);};
 function shapeById(id){
+  if(id==='globe')return {name:'地球儀',kind:'o',rot:0,core:[0,0],box:[.95,1],draw(c){fillE(c,0,-.06,.3,.3);c.lineWidth=.04;c.beginPath();c.arc(0,-.06,.38,Math.PI*.25,Math.PI*.75);c.stroke();c.fillRect(-.03,.28,.06,.1);c.fillRect(-.16,.38,.32,.05);},
+    cut(c){c.lineWidth=.018;c.beginPath();c.ellipse(0,-.06,.13,.3,0,0,7);c.moveTo(-.3,-.06);c.lineTo(.3,-.06);c.moveTo(-.26,-.2);c.lineTo(.26,-.2);c.moveTo(-.26,.08);c.lineTo(.26,.08);c.stroke();}};
+  if(id==='leader')return profileShape({id:'flat',fixed:1,name:'元首',extra:c=>{TIE(c);QMARK(c);},cutP:MOUTH,box:[1.4,1.3],core:[0,.1]});
+  if(id==='whiteHouse')return {name:'白色官邸',kind:'o',rot:0,core:[0,.1],box:[1.05,.9],draw(c){fillP(c,[[-.2,-.12],[0,-.26],[.2,-.12]]);c.fillRect(-.46,-.02,.92,.06);c.fillRect(-.42,.04,.84,.3);c.fillRect(-.24,-.12,.48,.12);c.fillRect(-.48,.34,.96,.05);},
+    cut(c){for(const x of [-.18,-.06,.06,.18]){c.fillRect(x-.015,-.1,.03,.42);}for(const x of [-.36,-.28,.28,.36])c.fillRect(x-.025,.1,.05,.08);}};
+  if(id==='leaderTired')return profileShape({id:'flat',fixed:1,name:'做白工的元首',extra:c=>{TIE(c);SWEAT(c);},cutP:EYE_SHUT,scale:.85,shift:-.06,box:[1.2,1.25],core:[-.06,.1]});
+
   if(id==='triEq')return {name:'三角形',kind:'o',rot:0,core:[0,.1],box:[.95,.95],draw(c){fillP(c,[[0,-.38],[.4,.32],[-.4,.32]]);},cut(c){fillE(c,-.07,.06,.03,.03);fillE(c,.07,.06,.03,.03);c.lineWidth=.02;c.beginPath();c.arc(0,.14,.05,.2,Math.PI-.2);c.stroke();}};
   if(id==='temple')return {name:'廟',kind:'o',rot:0,core:[0,.1],box:[1.05,.95],draw(c){c.beginPath();c.moveTo(-.48,-.08);c.quadraticCurveTo(-.3,-.06,-.22,-.24);c.lineTo(.22,-.24);c.quadraticCurveTo(.3,-.06,.48,-.08);c.lineTo(.38,0);c.lineTo(-.38,0);c.closePath();c.fill();
     c.fillRect(-.3,0,.6,.34);c.fillRect(-.36,.34,.72,.06);fillE(c,0,-.3,.05,.05);},cut(c){RRECT(c,-.09,.1,.09,.34,.02);for(const x of [-.22,.16])c.fillRect(x,.06,.06,.16);}};
@@ -1217,6 +1224,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'坐白宮',panels:[['globe','哪國元首的 CP 值最低？'],['leader','答案：美國。'],['whiteHouse','因為歷任總統都——'],['leaderTired','「坐白宮」（做白工）。',0,3.5]]},
   {title:'擲筊',panels:[['triEq','一個三角形走進廟裡。'],['temple','誠心誠意，拜了又拜。'],['jiaobei','拿起筊杯，一擲——'],['triRight','「直角（擲筊）三角形」',0,3.5]]},
   {title:'耐看',panels:[['herLook','她盯著我看了很久。'],['meHopeful','「你其實很耐看耶……」'],['hourglass','我正要開心——'],['herBored','「……只是我沒耐心。」',1,3.5]]},
   {title:'望遠鏡',panels:[['binoculars','同樣是拿望遠鏡——'],['generalBino','在戰場上，叫「將軍」。'],['dormWin','在宿舍……'],['peeperBino','叫「變態」。',0,3.5]]},
@@ -1307,7 +1315,7 @@ const STORIES=[
 ];
 const CATS=['諧音梗','夫妻家庭','搶匪小偷','職場校園','時事諷刺','日常冷笑話','故事小品'];
 const CATMAP={
-  '諧音梗':['擲筊','一個人過','鳳梨酥','仙草蜜','一波三折','八天的','飢童','美紅敢','仰式','你哪位','哈囉 win','窗戶凍住了','左右腦','換科目','業內人士','找誰接','半手李','閉眼說瞎話','誰是京都人','金口難開','看辦公室','週一休息','看穿'],
+  '諧音梗':['坐白宮','擲筊','一個人過','鳳梨酥','仙草蜜','一波三折','八天的','飢童','美紅敢','仰式','你哪位','哈囉 win','窗戶凍住了','左右腦','換科目','業內人士','找誰接','半手李','閉眼說瞎話','誰是京都人','金口難開','看辦公室','週一休息','看穿'],
   '夫妻家庭':['貓與虎','送回娘家','七十才開始','一模一樣','買菸','需要談談','不敢問','窗戶凍住了','一切都很好','沒安全感','所以要我留下','露台','四個孩子的爸','深夜講座','睜一隻眼','緩解疼痛','九十歲','撞到告訴我','很會說謊','很甜','兩根菸'],
   '搶匪小偷':['金口難開','負數','可能看到了','換科目','業內人士','遙控器','一起找'],
   '職場校園':['一個人過','仙草蜜','飢童','不忍心','美紅敢','錯的先講','吸菸區','沉默','看辦公室','可以回家','倫理學','很會說謊','烤箱手套'],
