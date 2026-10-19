@@ -617,7 +617,19 @@ const ALIEN_CUT=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);fillE(c,-.09,
 const EARTH=(c,x,y,r)=>{fillE(c,x,y,r,r);};
 const EARTH_CUT=(c,x,y,r)=>{c.save();c.translate(x,y);c.scale(r,r);c.beginPath();c.moveTo(-.6,-.5);c.quadraticCurveTo(-.2,-.7,0,-.3);c.quadraticCurveTo(-.1,0,-.5,.1);c.closePath();c.fill();
   c.beginPath();c.moveTo(.2,.1);c.quadraticCurveTo(.6,-.1,.7,.3);c.quadraticCurveTo(.4,.7,.1,.5);c.closePath();c.fill();c.restore();};
+const EXCL=c=>{c.save();c.scale(.01,.01);c.font='900 60px '+SERIF;c.textAlign='center';c.textBaseline='middle';c.fillText('！',108,18);c.restore();};
 function shapeById(id){
+  if(id==='frozenWin')return {name:'結霜的窗戶',kind:'o',rot:0,core:[0,0],box:[.95,1.1],draw(c){RRECT(c,-.36,-.44,.36,.36,.03);
+    for(const [x,h] of [[-.27,.13],[-.15,.2],[-.02,.1],[.1,.17],[.24,.12]])fillP(c,[[x-.045,.35],[x+.045,.35],[x,.36+h]]);},
+    cut(c){c.lineWidth=.03;c.beginPath();c.moveTo(0,-.37);c.lineTo(0,.29);c.moveTo(-.29,-.04);c.lineTo(.29,-.04);c.stroke();
+      c.lineWidth=.022;for(const [x,y] of [[-.15,-.21],[.16,.13]]){for(let a=0;a<3;a++){const t=a*Math.PI/3;c.beginPath();c.moveTo(x-Math.cos(t)*.08,y-Math.sin(t)*.08);c.lineTo(x+Math.cos(t)*.08,y+Math.sin(t)*.08);c.stroke();}}}};
+  if(id==='husbandTip')return profileShape({id:'plain',fixed:1,name:'出主意的先生',extra:c=>{c.save();c.translate(1.2,.05);c.rotate(-.6);c.lineWidth=.07;c.lineCap='round';c.beginPath();c.moveTo(0,.32);c.lineTo(0,-.12);c.stroke();RRECT(c,-.17,-.24,.17,-.1,.02);c.restore();},cutP:MOUTH,scale:.75,shift:-.22,box:[1.4,1.1],core:[-.22,0]});
+  if(id==='brokenPC')return {name:'壞掉的筆電',kind:'o',rot:0,core:[0,.1],box:[1.05,1],draw(c){RRECT(c,-.36,-.4,.36,.1,.03);
+    fillP(c,[[-.36,.12],[.36,.12],[.46,.24],[-.46,.24]]);
+    for(const [x,y,r] of [[-.2,.36,.04],[.05,.4,.05],[.28,.34,.035]])fillE(c,x,y,r*.8,r);},
+    cut(c){c.lineWidth=.022;c.lineJoin='round';const o=[.06,-.16];for(const pts of [[[-.3,-.3],[-.14,-.22]],[[.3,-.34],[.18,-.24],[.22,-.12]],[[.3,.02],[.17,-.04]],[[-.28,.04],[-.12,-.06]],[[.02,.06],[0,-.02]]]){c.beginPath();c.moveTo(o[0],o[1]);for(const q of pts.slice().reverse())c.lineTo(q[0],q[1]);c.stroke();}c.lineWidth=.016;c.beginPath();c.moveTo(-.36,.11);c.lineTo(.36,.11);c.stroke();}};
+  if(id==='husbandShock')return profileShape({id:'plain',fixed:1,name:'恍然大悟的先生',extra:EXCL,cutP:c=>{c.lineWidth=.02;c.beginPath();c.arc(.62,.43,.035,0,7);c.stroke();fillE(c,.79,.73,.035,.045);},box:[1.4,1.15]});
+
   if(id==='kidSilent')return profileShape({id:'kid',fixed:1,name:'不說話的孩子',extra:c=>{RRECT(c,.95,.0,1.3,.3,.04);},cutP:c=>{ZIP(c);TXT(c,'4',1.12,.15,22);},scale:.8,shift:-.16,box:[1.3,1.0],core:[-.16,0]});
   if(id==='soup')return {name:'一碗湯',kind:'o',rot:0,core:[-.4,.1],box:[1,.8],draw(c){c.beginPath();c.moveTo(-.4,-.04);c.lineTo(.4,-.04);c.quadraticCurveTo(.36,.3,0,.32);c.quadraticCurveTo(-.36,.3,-.4,-.04);c.closePath();c.fill();
     fillE(c,0,.34,.16,.04);c.lineWidth=.05;c.lineCap='round';c.beginPath();c.moveTo(.18,-.06);c.lineTo(.4,-.34);c.stroke();fillE(c,.42,-.37,.06,.04,-.9);},
@@ -966,6 +978,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'窗戶凍住了',panels:[['frozenWin','寒冬清晨，太太傳訊：「窗戶凍住了，打不開。」'],['husbandTip','先生回：「澆點溫水，再用錘子輕敲邊緣。」'],['brokenPC','十分鐘後，太太傳來：「電腦整個壞了。」'],['husbandShock','先生：「……妳說的窗戶，是電腦那個？」',0,3.5]]},
   {title:'一切都很好',panels:[['kidSilent','孩子四歲了，從沒說過一句話。'],['soup','有一天，媽媽端湯給他。'],['kidSpeak','「湯冷了。」爸媽：「你會說話？！」'],['kidCalm','「之前一切都很好啊。」',0,3.5]]},
   {title:'沉默',panels:[['blankPaper','考卷發回來，一片空白。'],['teacherBlank','老師：「為什麼什麼都沒寫？」'],['studentCalm','學生：「老師……」',1],['silence','「有時候，沉默就是最好的答案。」',0,3.5]]},
   {title:'沒安全感',panels:[['meAnx','我老婆離開我了……'],['momMad','因為她說我太沒安全感。',1],['doorEmpty','等等，她回來了。'],['teaCup','她只是去泡杯茶。',0,3.5]]},
