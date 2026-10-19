@@ -650,7 +650,15 @@ const PINE_CUT=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.lineWidth=.0
 const GUAVA=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);fillE(c,0,.04,.26,.24);c.lineWidth=.035;c.beginPath();c.moveTo(0,-.18);c.lineTo(.02,-.28);c.stroke();fillE(c,.1,-.27,.09,.04,-.4);c.restore();};
 const BED2=c=>{c.fillRect(-.46,.16,.92,.1);c.fillRect(-.46,-.12,.06,.44);c.fillRect(.4,.04,.06,.28);fillE(c,-.3,.08,.08,.06);c.beginPath();c.moveTo(-.22,.16);c.quadraticCurveTo(-.2,-.04,.04,-.02);c.quadraticCurveTo(.3,-.06,.4,.16);c.closePath();c.fill();};
 const ZZ=(c,x,y,k)=>{c.lineWidth=.03*k;c.lineJoin='round';c.beginPath();c.moveTo(x,y);c.lineTo(x+.1*k,y);c.lineTo(x,y+.1*k);c.lineTo(x+.1*k,y+.1*k);c.stroke();};
+const BINO_P=c=>{RRECT(c,.66,.33,1.1,.47,.04);RRECT(c,1.0,.3,1.14,.5,.03);};
 function shapeById(id){
+  if(id==='binoculars')return {name:'望遠鏡',kind:'o',rot:-.15,core:[0,0],box:[1,.8],draw(c){for(const x of [-.2,.2]){RRECT(c,x-.13,-.2,x+.13,.24,.05);RRECT(c,x-.15,.12,x+.15,.3,.04);}c.fillRect(-.08,-.08,.16,.12);},
+    cut(c){for(const x of [-.2,.2]){fillE(c,x,.21,.09,.05);}}};
+  if(id==='generalBino')return profileShape({id:'flat',fixed:1,name:'拿望遠鏡的將軍',extra:c=>{PEAKCAP(c);BINO_P(c);},cutP:MOUTH,scale:.85,shift:-.1,box:[1.3,1.1],core:[-.1,0]});
+  if(id==='dormWin')return {name:'宿舍窗戶',kind:'o',rot:0,core:[0,0],box:[.95,1],draw(c){c.fillRect(-.34,-.4,.68,.8);},
+    cut(c){for(let r=0;r<3;r++)for(let k=0;k<2;k++)c.fillRect(-.26+k*.28,-.32+r*.25,.24,.18);}};
+  if(id==='peeperBino')return profileShape({id:'plain',fixed:1,name:'被抓到的人',extra:c=>{BINO_P(c);c.save();c.translate(-.85,-.55);EXCL(c);c.restore();},cutP:MOUTH,scale:.85,shift:-.06,box:[1.3,1.15],core:[-.06,0]});
+
   if(id==='interviewer')return profileShape({id:'beard',fixed:1,name:'面試官',extra:c=>{TIE(c);QMARK(c);},cutP:GLASSES_CUT,box:[1.4,1.3],core:[0,.1]});
   if(id==='hobbyTalk')return profileShape({id:'flat',fixed:1,name:'自信的我',extra:BUBBLE,cutP:c=>{SMILE(c);BUBBLE_DOTS(c);},scale:.75,shift:-.22,box:[1.4,1.1],core:[-.22,0]});
   if(id==='bedSleep')return {name:'睡覺',kind:'o',rot:0,core:[0,.15],box:[1.05,.85],draw(c){BED2(c);fillE(c,-.24,-.02,.09,.09);ZZ(c,-.1,-.32,1);ZZ(c,.06,-.42,.8);},cut(c){c.lineWidth=.016;c.beginPath();c.moveTo(-.18,.06);c.quadraticCurveTo(.1,.02,.36,.12);c.stroke();}};
@@ -1196,6 +1204,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'望遠鏡',panels:[['binoculars','同樣是拿望遠鏡——'],['generalBino','在戰場上，叫「將軍」。'],['dormWin','在宿舍……'],['peeperBino','叫「變態」。',0,3.5]]},
   {title:'興趣',panels:[['interviewer','面試官：「興趣是什麼？」'],['hobbyTalk','「分成靜態和動態兩種。」'],['bedSleep','靜態：睡覺。'],['bedTurn','動態：翻身。',1,3.5]]},
   {title:'一個人過',panels:[['xmasTree','耶誕節，讓我一個人過。'],['heartAlone','情人節，也讓我一個人過。'],['examPaper','期末考來了……'],['studentYell','「有種，考試也讓我一個人過！」',0,3.5]]},
   {title:'鳳梨酥',panels:[['pineapple','鳳梨跟芭樂約好決鬥。'],['guava','芭樂：「來啊，誰怕誰！」'],['fruitFight','打了半天，誰會輸？'],['pineCake','鳳梨——因為「鳳梨酥」。',0,3.5]]},
