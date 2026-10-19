@@ -644,6 +644,12 @@ function pair(name,cutA,cutB,mid,away){const A=profileShape({id:'flat',fixed:1,n
 const CUBE=(c,x,y,w,h,d)=>{fillP(c,[[x,y],[x+w,y],[x+w+d,y-d*.6],[x+w+d,y+h-d*.6],[x+w,y+h],[x,y+h]]);fillP(c,[[x,y],[x+d,y-d*.6],[x+w+d,y-d*.6],[x+w,y]]);};
 const CUBE_CUT=(c,x,y,w,h,d)=>{c.lineWidth=.016;c.beginPath();c.moveTo(x,y);c.lineTo(x+w,y);c.lineTo(x+w,y+h);c.moveTo(x+w,y);c.lineTo(x+w+d,y-d*.6);c.stroke();};
 function shapeById(id){
+  if(id==='classStand')return {name:'站起來的同學',kind:'o',rot:0,core:[0,.2],box:[1.05,1],draw(c){
+    for(const x of [-.34,-.12,.34])fillE(c,x,.12,.08,.09);c.fillRect(-.46,.24,.92,.06);for(const x of [-.42,-.02,.4])c.fillRect(x,.3,.035,.14);
+    fillE(c,.12,-.3,.09,.1);fillP(c,[[.02,-.16],[.22,-.16],[.24,.24],[.0,.24]]);},cut(c){c.lineWidth=.02;c.beginPath();c.moveTo(-.46,.24);c.lineTo(.46,.24);c.stroke();}};
+  if(id==='teacherHuh')return profileShape({id:'plain',bun:1,fixed:1,name:'驚訝的老師',extra:QMARK,cutP:c=>{GLASSES_CUT(c);MOUTH(c);},box:[1.4,1.15]});
+  if(id==='studentKind')return profileShape({id:'flat',fixed:1,name:'貼心的同學',cutP:c=>{EYE_SHUT(c);SMILE(c);}});
+
   if(id==='roach')return {name:'蟑螂',kind:'o',rot:-.5,core:[0,0],box:[1,1],draw(c){fillE(c,0,.08,.15,.28);fillE(c,0,-.24,.09,.07);c.lineWidth=.025;c.lineCap='round';c.beginPath();
     c.moveTo(-.04,-.3);c.quadraticCurveTo(-.2,-.5,-.36,-.44);c.moveTo(.04,-.3);c.quadraticCurveTo(.2,-.5,.36,-.44);
     for(const [y,dx] of [[-.08,.3],[.08,.34],[.24,.3]]){c.moveTo(-.12,y);c.lineTo(-dx,y+.08);c.moveTo(.12,y);c.lineTo(dx,y+.08);}c.stroke();},
@@ -1135,6 +1141,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'不忍心',panels:[['teacherQ','老師：「覺得自己是全班最醜的，站起來。」'],['classStand','一會兒，班上最聰明的同學站了起來。'],['teacherHuh','老師：「你覺得你最醜？」'],['studentKind','「不是，我只是不忍心讓老師一個人站著。」',1,3.5]]},
   {title:'美紅敢',panels:[['roach','鄉下小學，美紅敢徒手抓蟑螂，全班都很佩服。'],['teacherQ','老師：「老師最怕蟑螂了。誰敢抓？」'],['kidHandUp','小明急著舉手：「老師，李美紅敢啦！」'],['kidOffice','……小明被叫去訓導處。',0,3.5]]},
   {title:'硬幣',panels:[['boyDeal','我：「擲硬幣，正面妳就當我女朋友，」'],['girlOk','「反面，我就當妳男朋友。」她：「好啊。」'],['coinFlip','硬幣拋上天……'],['coinEdge','……立起來了。',0,3.5]]},
   {title:'貓與虎',panels:[['catSit','老婆在外面說話，像溫柔的小貓。'],['wifeBubble','「親愛的～這件事回家再討論好嗎？」'],['house','一進家門——'],['tiger','「你給我解釋清楚，剛剛那句是什麼意思！」',0,3.5]]},
@@ -1217,7 +1224,7 @@ const CATMAP={
   '諧音梗':['美紅敢','仰式','你哪位','哈囉 win','窗戶凍住了','左右腦','換科目','業內人士','找誰接','半手李','閉眼說瞎話','誰是京都人','金口難開','看辦公室','週一休息','看穿'],
   '夫妻家庭':['貓與虎','送回娘家','七十才開始','一模一樣','買菸','需要談談','不敢問','窗戶凍住了','一切都很好','沒安全感','所以要我留下','露台','四個孩子的爸','深夜講座','睜一隻眼','緩解疼痛','九十歲','撞到告訴我','很會說謊','很甜','兩根菸'],
   '搶匪小偷':['金口難開','負數','可能看到了','換科目','業內人士','遙控器','一起找'],
-  '職場校園':['美紅敢','錯的先講','吸菸區','沉默','看辦公室','可以回家','倫理學','很會說謊','烤箱手套'],
+  '職場校園':['不忍心','美紅敢','錯的先講','吸菸區','沉默','看辦公室','可以回家','倫理學','很會說謊','烤箱手套'],
   '時事諷刺':['太晚了','有用','重燃希望','誰是白痴','塗成藍色','我們的願望','白羊吃草','會飛的車'],
   '故事小品':['收拾','放下','恆河','平安','等','釣','慢','午後']};
 STORIES.forEach(S=>{S.cats=CATS.filter(c=>(CATMAP[c]||[]).includes(S.title));if(!S.cats.length)S.cats=['日常冷笑話'];});
