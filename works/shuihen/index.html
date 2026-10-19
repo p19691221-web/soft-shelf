@@ -637,6 +637,11 @@ const PACK_CUT=(c,t)=>{c.lineWidth=.018;c.beginPath();c.moveTo(-.24,-.2);c.lineT
 const NURSECAP=c=>{fillP(c,[[.2,.12],[.26,-.12],[.62,-.14],[.68,.1]]);};
 const NURSECAP_CUT=c=>{c.lineWidth=.025;c.beginPath();c.moveTo(.2,.1);c.lineTo(.68,.08);c.stroke();};
 function shapeById(id){
+  if(id==='weiCall')return profileShape({id:'flat',fixed:1,name:'打電話的韋小明',extra:BUBBLE,cutP:c=>{MOUTH(c);BUBBLE_DOTS(c);},scale:.75,shift:-.22,box:[1.4,1.1],core:[-.22,0]});
+  if(id==='mingAns')return profileShape({id:'plain',fixed:1,name:'接電話的小明',extra:BUBBLE,cutP:c=>{MOUTH(c);BUBBLE_DOTS(c);},scale:.75,shift:-.22,box:[1.4,1.1],core:[-.22,0]});
+  if(id==='weiName')return profileShape({id:'flat',fixed:1,name:'報上名字的韋小明',extra:BUBBLE,cutP:c=>{SMILE(c);BUBBLE_DOTS(c);},scale:.75,shift:-.22,box:[1.4,1.1],core:[-.22,0]});
+  if(id==='mingHang')return profileShape({id:'plain',fixed:1,name:'掛電話的小明',extra:QMARK,cutP:MOUTH,box:[1.4,1.15]});
+
   if(id==='baby')return {name:'包著的寶寶',kind:'o',rot:0,core:[-.05,.05],box:[1.05,.9],draw(c){fillE(c,.22,-.04,.17,.16);c.beginPath();c.moveTo(.1,-.16);c.bezierCurveTo(-.2,-.2,-.48,.0,-.42,.16);c.bezierCurveTo(-.36,.3,.1,.3,.34,.1);c.closePath();c.fill();
     HEART(c,.36,-.34,.07);},cut(c){c.lineWidth=.02;c.beginPath();c.arc(.27,-.06,.03,Math.PI*.1,Math.PI*.9);c.stroke();c.beginPath();c.arc(.16,-.06,.03,Math.PI*.1,Math.PI*.9);c.stroke();
     c.lineWidth=.025;c.beginPath();c.arc(.22,-.04,.19,Math.PI*.55,Math.PI*1.6);c.stroke();c.beginPath();c.moveTo(-.02,.02);c.lineTo(-.22,.16);c.stroke();}};
@@ -1072,6 +1077,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'你哪位',panels:[['weiCall','韋小明打電話：「喂～小明嗎？」'],['mingAns','小明：「是我，你哪位？」'],['weiName','「韋小明。」'],['mingHang','「我是小明啊，你哪位？」嘟嘟嘟……',1,3.5]]},
   {title:'一模一樣',panels:[['baby','護理師：「你們的寶寶好可愛。」'],['dadLaugh','爸爸笑：「妳對每對爸媽都這樣說吧？」'],['nurseNo','「不，只對寶寶好看的說。」'],['nurseSmile','「那其他人呢？」「我說：跟你長得一模一樣。」',1,3.5]]},
   {title:'買菸',panels:[['packWarn','菸盒上的警語，寫了一堆危害。'],['dadOut','十九年前，爸爸說：「我去買包菸。」'],['openDoor','到現在，還沒回來。'],['packBuy','我覺得「買菸」本身，也該印上去。',0,3.5]]},
   {title:'吸菸區',panels:[['firedBox','我被開除了。'],['staffAsk','因為我總問客人：「吸菸區還是非吸菸區？」'],['flame','主管說，該問的是「火葬」……'],['grave','……和「土葬」。',0,3.5]]},
@@ -1142,7 +1148,7 @@ const STORIES=[
 ];
 const CATS=['諧音梗','夫妻家庭','搶匪小偷','職場校園','時事諷刺','日常冷笑話','故事小品'];
 const CATMAP={
-  '諧音梗':['哈囉 win','窗戶凍住了','左右腦','換科目','業內人士','找誰接','半手李','閉眼說瞎話','誰是京都人','金口難開','看辦公室','週一休息','看穿'],
+  '諧音梗':['你哪位','哈囉 win','窗戶凍住了','左右腦','換科目','業內人士','找誰接','半手李','閉眼說瞎話','誰是京都人','金口難開','看辦公室','週一休息','看穿'],
   '夫妻家庭':['一模一樣','買菸','需要談談','不敢問','窗戶凍住了','一切都很好','沒安全感','所以要我留下','露台','四個孩子的爸','深夜講座','睜一隻眼','緩解疼痛','九十歲','撞到告訴我','很會說謊','很甜','兩根菸'],
   '搶匪小偷':['金口難開','負數','可能看到了','換科目','業內人士','遙控器','一起找'],
   '職場校園':['吸菸區','沉默','看辦公室','可以回家','倫理學','很會說謊','烤箱手套'],
