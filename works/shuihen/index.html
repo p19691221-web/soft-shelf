@@ -53,8 +53,13 @@ button:focus-visible{outline:2px solid var(--chalk);outline-offset:2px}
 .sheet{position:fixed;inset:0;z-index:20;background:rgba(20,18,15,.5);display:grid;place-items:center;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
   padding-block:calc(16px + env(safe-area-inset-top,0px)) calc(16px + env(safe-area-inset-bottom,0px))}
-.card{width:min(460px,100%);max-height:78vh;display:grid;grid-template-rows:auto auto minmax(0,1fr);gap:12px;
+.card{width:min(460px,100%);max-height:78vh;display:grid;grid-template-rows:auto auto auto minmax(0,1fr);gap:12px;
   background:rgba(40,36,30,.94);border:1.5px solid var(--chalk-line);border-radius:4px 7px 5px 6px;padding:16px;box-sizing:border-box}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips button{font-size:14px;min-height:34px;padding:5px 10px;border-radius:14px;background:transparent;-webkit-backdrop-filter:none;backdrop-filter:none}
+.chips button[aria-pressed="true"]{background:var(--scrim-on);color:var(--ink);border-color:var(--scrim-on)}
+.chips .k{opacity:.7;margin-left:4px;font-size:12px}
+.list .g{font-size:12px;color:var(--chalk-dim);margin-left:6px;font-weight:400}
 .card header{display:flex;justify-content:space-between;align-items:center;gap:8px}
 .card h2{margin:0;font-size:22px;letter-spacing:.08em}
 .card input{font:inherit;font-size:17px;color:var(--chalk);background:transparent;border:0;border-bottom:1.5px solid var(--chalk-line);padding:8px 2px;min-width:0}
@@ -102,6 +107,7 @@ button:focus-visible{outline:2px solid var(--chalk);outline-offset:2px}
 <div class="sheet" id="sheet" hidden>
   <div class="card" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
     <header><h2 id="sheet-title">找故事</h2><button type="button" id="sheet-close">關閉</button></header>
+    <div class="chips" id="chips" role="group" aria-label="故事分類"></div>
     <input id="q" type="search" placeholder="輸入關鍵字，例如：貓、護身符、阿伯" autocomplete="off">
     <ul class="list" id="list"></ul>
   </div>
@@ -1068,6 +1074,18 @@ const STORIES=[
   {title:'慢',panels:[['snail','蝸牛出門了。'],['egret','白鷺鷥來了又走。'],['snail','蝸牛還在。'],['kid','小孩蹲下來，看了很久。',1]]},
   {title:'午後',panels:[['beard','阿公在樹下睡著。'],['cat','貓也睡著。'],['bird','鳥停了一下。'],['beard','阿公醒來，什麼都不知道。']]}
 ];
+const CATS=['諧音梗','夫妻家庭','搶匪小偷','職場校園','時事諷刺','日常冷笑話','故事小品'];
+const CATMAP={
+  '諧音梗':['哈囉 win','窗戶凍住了','左右腦','換科目','業內人士','找誰接','半手李','閉眼說瞎話','誰是京都人','金口難開','看辦公室','週一休息','看穿'],
+  '夫妻家庭':['不敢問','窗戶凍住了','一切都很好','沒安全感','所以要我留下','露台','四個孩子的爸','深夜講座','睜一隻眼','緩解疼痛','九十歲','撞到告訴我','很會說謊','很甜','兩根菸'],
+  '搶匪小偷':['金口難開','負數','可能看到了','換科目','業內人士','遙控器','一起找'],
+  '職場校園':['沉默','看辦公室','可以回家','倫理學','很會說謊','烤箱手套'],
+  '時事諷刺':['太晚了','有用','重燃希望','誰是白痴','塗成藍色','我們的願望','白羊吃草','會飛的車'],
+  '故事小品':['放下','恆河','平安','等','釣','慢','午後']};
+STORIES.forEach(S=>{S.cats=CATS.filter(c=>(CATMAP[c]||[]).includes(S.title));if(!S.cats.length)S.cats=['日常冷笑話'];});
+let storyCat='all';
+const inCat=S=>storyCat==='all'||S.cats.includes(storyCat);
+
 let mode='story',story=null,storyIdx=-1,chalkA=0,freeCount=0;
 function storyLayout(){
   const tb=document.querySelector('.tag').getBoundingClientRect(),fb=document.querySelector('.foot').getBoundingClientRect();
@@ -1082,7 +1100,8 @@ function storyLayout(){
   return {rects,fsz};
 }
 function planStory(){
-  storyIdx=(storyIdx+1)%STORIES.length;const S=STORIES[storyIdx],cache={};
+  for(let g=0;g<STORIES.length;g++){storyIdx=(storyIdx+1)%STORIES.length;if(inCat(STORIES[storyIdx]))break;}
+  const S=STORIES[storyIdx],cache={};
   const shapes=S.panels.map(([id])=>cache[id]||(cache[id]=shapeById(id)));
   story={S,L:storyLayout(),shapes,capA:[0,0,0,0],jit:S.panels.map(()=>Array.from({length:24},()=>rand(-1.8,1.8)))};
   startPanel(0);
@@ -1339,17 +1358,23 @@ function esc(t){return t.replace(/[&<>"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt
 function hl(t,q){const e=esc(t);if(!q)return e;const qe=esc(q);return e.split(qe).join('<mark>'+qe+'</mark>');}
 function renderList(){const q=$('q').value.trim(),ul=$('list');ul.replaceChildren();let n=0;
   STORIES.forEach((S,i)=>{const caps=S.panels.map(p=>p[1]);
+    if(!inCat(S))return;
     if(q&&!S.title.includes(q)&&!caps.some(c=>c.includes(q)))return;n++;
     const li=document.createElement('li'),b=document.createElement('button');b.type='button';
     if(story&&story.S===S)b.setAttribute('aria-current','true');
-    b.innerHTML=`<span class="t">〈${hl(S.title,q)}〉</span><span class="c">${caps.map(c=>hl(c,q)).join('　')}</span>`;
+    b.innerHTML=`<span class="t">〈${hl(S.title,q)}〉<span class="g">${S.cats.join('・')}</span></span><span class="c">${caps.map(c=>hl(c,q)).join('　')}</span>`;
     b.addEventListener('click',()=>playStory(i));li.append(b);ul.append(li);});
-  if(!n){const li=document.createElement('li');li.className='empty';li.textContent=`沒有包含「${q}」的故事。換個字試試。`;ul.append(li);}}
+  if(!n){const li=document.createElement('li');li.className='empty';li.textContent=storyCat==='all'?`沒有包含「${q}」的故事。換個字試試。`:`「${storyCat}」裡沒有包含「${q}」的故事。試試「全部」。`;ul.append(li);}}
 function playStory(i){closeSheet();storyIdx=i-1;
   if(mode!=='story'){mode='story';document.querySelectorAll('[data-mode]').forEach(x=>x.setAttribute('aria-pressed',x.dataset.mode==='story'?'true':'false'));
     $('catseg').hidden=true;$('pick').hidden=false;}
   startMode();}
-function openSheet(){$('sheet').hidden=false;$('q').value='';renderList();setTimeout(()=>{try{$('q').focus();}catch(e){}},30);}
+function renderChips(){const box=$('chips');box.replaceChildren();
+  for(const c of ['all',...CATS]){const b=document.createElement('button');b.type='button';
+    const k=c==='all'?STORIES.length:STORIES.filter(S=>S.cats.includes(c)).length;
+    b.innerHTML=`${c==='all'?'全部':c}<span class="k">${k}</span>`;b.setAttribute('aria-pressed',storyCat===c?'true':'false');
+    b.addEventListener('click',()=>{storyCat=c;$('pick').textContent=c==='all'?'找故事':`找故事・${c}`;renderChips();renderList();});box.append(b);}}
+function openSheet(){$('sheet').hidden=false;$('q').value='';renderChips();renderList();if(!matchMedia('(pointer:coarse)').matches)setTimeout(()=>{try{$('q').focus();}catch(e){}},30);}
 function closeSheet(){$('sheet').hidden=true;$('pick').focus({preventScroll:true});}
 $('pick').addEventListener('click',openSheet);
 $('sheet-close').addEventListener('click',closeSheet);
