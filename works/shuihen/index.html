@@ -641,7 +641,38 @@ function pair(name,cutA,cutB,mid,away){const A=profileShape({id:'flat',fixed:1,n
   return {name,kind:'o',rot:0,core:[-.22,.42],box:[1.05,.95],draw(c){c.save();c.translate(away?-.26:-.24,.06);c.scale(away?-.5:.5,.5);A.draw(c);c.restore();
     c.save();c.translate(away?.27:.25,.08);c.scale(away?.48:-.48,.48);B.draw(c);c.restore();if(mid)mid(c);},
     cut(c){c.save();c.translate(away?-.26:-.24,.06);c.scale(away?-.5:.5,.5);A.cut&&A.cut(c);c.restore();c.save();c.translate(away?.27:.25,.08);c.scale(away?.48:-.48,.48);B.cut&&B.cut(c);c.restore();}};}
+const CUBE=(c,x,y,w,h,d)=>{fillP(c,[[x,y],[x+w,y],[x+w+d,y-d*.6],[x+w+d,y+h-d*.6],[x+w,y+h],[x,y+h]]);fillP(c,[[x,y],[x+d,y-d*.6],[x+w+d,y-d*.6],[x+w,y]]);};
+const CUBE_CUT=(c,x,y,w,h,d)=>{c.lineWidth=.016;c.beginPath();c.moveTo(x,y);c.lineTo(x+w,y);c.lineTo(x+w,y+h);c.moveTo(x+w,y);c.lineTo(x+w+d,y-d*.6);c.stroke();};
 function shapeById(id){
+  if(id==='bookOpen')return {name:'打開的書',kind:'o',rot:0,core:[0,0],box:[1.05,.8],draw(c){c.beginPath();c.moveTo(0,-.12);c.quadraticCurveTo(-.22,-.24,-.44,-.16);c.lineTo(-.44,.24);c.quadraticCurveTo(-.22,.16,0,.28);c.quadraticCurveTo(.22,.16,.44,.24);c.lineTo(.44,-.16);c.quadraticCurveTo(.22,-.24,0,-.12);c.fill();},
+    cut(c){c.lineWidth=.016;c.beginPath();c.moveTo(0,-.1);c.lineTo(0,.26);for(const s of [-1,1])for(let i=0;i<4;i++){const y=-.08+i*.08;c.moveTo(s*.06,y);c.lineTo(s*.36,y-.02);}c.stroke();}};
+  if(id==='amaSmile')return profileShape({id:'mom',bun:1,fixed:1,name:'笑笑的阿嬤',cutP:c=>{EYE_SHUT(c);SMILE(c);GLASSES_CUT(c);}});
+  if(id==='pills')return {name:'藥罐',kind:'o',rot:0,core:[-.1,.05],box:[1,.95],draw(c){RRECT(c,-.32,-.18,.08,.38,.04);RRECT(c,-.36,-.34,.12,-.2,.03);
+    for(const [x,y] of [[.24,.2],[.36,.3],[.22,.36],[.36,.08]])fillE(c,x,y,.06,.035,.5);},cut(c){RRECT(c,-.26,-.02,.02,.2,.02);}};
+  if(id==='amaCane')return profileShape({id:'mom',bun:1,fixed:1,name:'拄拐杖的阿嬤',extra:c=>{c.lineWidth=.06;c.lineCap='round';c.beginPath();c.moveTo(.96,1.4);c.lineTo(.96,.78);c.quadraticCurveTo(.96,.68,.86,.7);c.stroke();},cutP:c=>{EYE_SHUT(c);MOUTH(c);GLASSES_CUT(c);},box:[1.15,1.4],core:[0,.15]});
+  if(id==='tofu')return {name:'一塊豆腐',kind:'o',rot:0,core:[0,0],box:[1,.9],draw(c){CUBE(c,-.32,-.12,.5,.4,.2);},cut(c){CUBE_CUT(c,-.32,-.12,.5,.4,.2);}};
+  if(id==='tofuThin')return {name:'豆乾與豆皮',kind:'o',rot:0,core:[0,0],box:[1,.9],draw(c){CUBE(c,-.42,.0,.3,.16,.12);CUBE(c,.04,.18,.38,.04,.14);CUBE(c,.04,.04,.38,.04,.14);},cut(c){CUBE_CUT(c,-.42,.0,.3,.16,.12);}};
+  if(id==='soyCup')return {name:'一杯豆漿',kind:'o',rot:0,core:[0,.1],box:[.9,1],draw(c){fillP(c,[[-.22,-.2],[.22,-.2],[.17,.4],[-.17,.4]]);c.fillRect(-.25,-.26,.5,.07);c.lineWidth=.045;c.lineCap='round';c.beginPath();c.moveTo(.05,-.24);c.lineTo(.18,-.48);c.stroke();},
+    cut(c){c.lineWidth=.02;c.beginPath();c.moveTo(-.2,-.06);c.lineTo(.2,-.06);c.stroke();}};
+  if(id==='stinkyTofu')return {name:'臭豆腐',kind:'o',rot:0,core:[0,.2],box:[1,1],draw(c){fillE(c,0,.36,.44,.07);CUBE(c,-.32,.1,.22,.2,.1);CUBE(c,.02,.12,.22,.2,.1);
+    c.lineWidth=.045;c.lineCap='round';for(const x of [-.24,0,.24]){c.beginPath();c.moveTo(x,-.04);c.bezierCurveTo(x-.1,-.14,x+.1,-.22,x,-.3);c.quadraticCurveTo(x-.06,-.38,x+.02,-.44);c.stroke();}},cut(c){CUBE_CUT(c,-.32,.1,.22,.2,.1);CUBE_CUT(c,.02,.12,.22,.2,.1);}};
+  if(id==='giftBox')return {name:'禮物',kind:'o',rot:0,core:[0,.1],box:[.95,.95],draw(c){c.fillRect(-.3,-.06,.6,.44);c.fillRect(-.35,-.18,.7,.13);fillE(c,-.1,-.27,.1,.07,.4);fillE(c,.1,-.27,.1,.07,-.4);},
+    cut(c){c.fillRect(-.035,-.18,.07,.56);c.lineWidth=.016;c.beginPath();c.moveTo(-.3,-.06);c.lineTo(.3,-.06);c.stroke();}};
+  if(id==='wifeSweet')return profileShape({id:'pony',fixed:1,name:'甜甜的老婆',cutP:c=>{EYE_SHUT(c);SMILE(c);}});
+  if(id==='suitcase')return {name:'行李箱',kind:'o',rot:0,core:[0,.05],box:[.85,1],draw(c){RRECT(c,-.24,-.24,.24,.36,.05);c.lineWidth=.045;c.beginPath();c.moveTo(-.08,-.24);c.lineTo(-.08,-.38);c.lineTo(.08,-.38);c.lineTo(.08,-.24);c.stroke();fillE(c,-.16,.42,.04,.04);fillE(c,.16,.42,.04,.04);},
+    cut(c){c.lineWidth=.02;c.beginPath();for(const x of [-.1,.1]){c.moveTo(x,-.18);c.lineTo(x,.3);}c.stroke();}};
+  if(id==='wifeMad')return profileShape({id:'pony',fixed:1,name:'生氣的老婆',extra:ANGER,cutP:MOUTH,box:[1.3,1.15]});
+  if(id==='catSit'){const C=OTHERS.find(o=>o.name==='坐著的貓');return {...C,kind:'o',rot:0};}
+  if(id==='wifeBubble')return profileShape({id:'pony',fixed:1,name:'溫柔的老婆',extra:BUBBLE,cutP:c=>{SMILE(c);BUBBLE_DOTS(c);},scale:.75,shift:-.22,box:[1.4,1.1],core:[-.22,0]});
+  if(id==='house')return {name:'家門',kind:'o',rot:0,core:[0,.1],box:[1,1],draw(c){fillP(c,[[-.42,-.04],[0,-.4],[.42,-.04]]);c.fillRect(-.32,-.06,.64,.44);},cut(c){RRECT(c,-.08,.12,.08,.38,.02);c.fillRect(.14,.02,.12,.1);}};
+  if(id==='tiger')return {name:'老虎',kind:'o',rot:0,core:[0,.05],box:[1,.95],draw(c){fillE(c,0,.04,.34,.3);fillE(c,-.26,-.22,.09,.09);fillE(c,.26,-.22,.09,.09);},
+    cut(c){c.lineWidth=.025;c.beginPath();for(const x of [-.06,0,.06]){c.moveTo(x,-.24);c.lineTo(x,-.12);}c.moveTo(-.3,.0);c.lineTo(-.18,.02);c.moveTo(-.3,.08);c.lineTo(-.18,.08);c.moveTo(.3,.0);c.lineTo(.18,.02);c.moveTo(.3,.08);c.lineTo(.18,.08);c.stroke();
+      fillP(c,[[-.17,-.04],[-.05,-.04],[-.11,-.1]]);fillP(c,[[.05,-.04],[.17,-.04],[.11,-.1]]);fillE(c,0,.08,.04,.03);c.beginPath();c.moveTo(-.1,.18);c.quadraticCurveTo(0,.12,.1,.18);c.stroke();}};
+  if(id==='boyDeal')return profileShape({id:'flat',fixed:1,name:'提議的男生',extra:BUBBLE,cutP:c=>{SMILE(c);BUBBLE_DOTS(c);},scale:.75,shift:-.22,box:[1.4,1.1],core:[-.22,0]});
+  if(id==='girlOk')return profileShape({id:'pony',fixed:1,name:'答應的女生',cutP:c=>{SMILE(c);}});
+  if(id==='coinFlip')return {name:'拋起的硬幣',kind:'o',rot:0,core:[0,-.1],box:[.9,1],draw(c){fillE(c,0,-.14,.2,.08,-.3);c.lineWidth=.035;c.lineCap='round';c.beginPath();for(const x of [-.1,0,.1]){c.moveTo(x,.02);c.lineTo(x,.16);}c.stroke();fillE(c,0,.38,.06,.06);c.lineWidth=.04;c.beginPath();c.moveTo(0,.32);c.lineTo(0,.22);c.stroke();},cut(c){c.lineWidth=.016;c.beginPath();c.ellipse(0,-.14,.13,.045,-.3,0,7);c.stroke();}};
+  if(id==='coinEdge')return {name:'立起來的硬幣',kind:'o',rot:0,core:[0,0],box:[.9,.95],draw(c){fillE(c,0,.0,.1,.3);c.fillRect(-.46,.3,.92,.035);c.save();c.translate(-.82,-.62);EXCL(c);c.restore();},cut(c){c.lineWidth=.016;c.beginPath();c.ellipse(.0,.0,.06,.24,0,0,7);c.stroke();}};
+
   if(id==='coworkFight')return pair('吵架的同事',MOUTH,MOUTH,c=>{c.lineWidth=.035;c.lineCap='round';c.beginPath();c.moveTo(-.06,-.3);c.lineTo(.0,-.18);c.lineTo(-.04,-.14);c.lineTo(.04,-.02);c.stroke();});
   if(id==='mgrAngry')return profileShape({id:'beard',fixed:1,name:'生氣的經理',extra:c=>{TIE(c);ANGER(c);},cutP:MOUTH,box:[1.3,1.3],core:[0,.1]});
   if(id==='coworkMess')return pair('又吵成一團',MOUTH,MOUTH,c=>{c.lineWidth=.03;c.beginPath();for(let i=0;i<9;i++){const a=i*1.4,r=.06+i*.012;c.lineTo(Math.cos(a)*r,-.3+Math.sin(a)*r*.7);}c.stroke();});
@@ -1097,6 +1128,11 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'硬幣',panels:[['boyDeal','我：「擲硬幣，正面妳就當我女朋友，」'],['girlOk','「反面，我就當妳男朋友。」她：「好啊。」'],['coinFlip','硬幣拋上天……'],['coinEdge','……立起來了。',0,3.5]]},
+  {title:'貓與虎',panels:[['catSit','老婆在外面說話，像溫柔的小貓。'],['wifeBubble','「親愛的～這件事回家再討論好嗎？」'],['house','一進家門——'],['tiger','「你給我解釋清楚，剛剛那句是什麼意思！」',0,3.5]]},
+  {title:'送回娘家',panels:[['giftBox','老公：「七夕想要什麼禮物？」'],['wifeSweet','老婆：「你送什麼，我都喜歡。」'],['suitcase','老公：「那我送妳回娘家，」'],['wifeMad','「過兩天再回來。」',1,3.5]]},
+  {title:'做豆腐',panels:[['tofu','我不上班了，改做豆腐。做豆腐最保險。'],['tofuThin','做硬了是豆乾，做薄了是豆皮。'],['soyCup','做稀了是豆花，做沒了是豆漿。'],['stinkyTofu','賣不出去？放臭了，還是臭豆腐。',0,3.5]]},
+  {title:'七十才開始',panels:[['bookOpen','孫女：「書上說，人生七十才開始！」'],['amaSmile','「阿嬤，是要開始什麼？」'],['pills','阿嬤：「開始關節痛、腰痠背痛……」'],['amaCane','「……還有天天吃藥。」',0,3.5]]},
   {title:'錯的先講',panels:[['coworkFight','辦公室裡，兩個同事吵了起來。'],['mgrAngry','經理：「吵什麼？給我說清楚！」'],['coworkMess','兩人搶著講，又吵成一團。'],['coworkQuiet','「夠了！錯的那個先講！」……全場安靜。',0,3.5]]},
   {title:'仰式',panels:[['swimFree','A：「妳很愛游泳？」B：「一週兩三次。」'],['chatPhone','B：「下次一起去游泳吧！」'],['typeA','A 打字：「那妳會『癢是』嗎？」'],['swimBack','B 刪了好友。A：「我是說仰式啦！」',0,3.5]]},
   {title:'你哪位',panels:[['weiCall','韋小明打電話：「喂～小明嗎？」'],['mingAns','小明：「是我，你哪位？」'],['weiName','「韋小明。」'],['mingHang','「我是小明啊，你哪位？」嘟嘟嘟……',1,3.5]]},
@@ -1171,7 +1207,7 @@ const STORIES=[
 const CATS=['諧音梗','夫妻家庭','搶匪小偷','職場校園','時事諷刺','日常冷笑話','故事小品'];
 const CATMAP={
   '諧音梗':['仰式','你哪位','哈囉 win','窗戶凍住了','左右腦','換科目','業內人士','找誰接','半手李','閉眼說瞎話','誰是京都人','金口難開','看辦公室','週一休息','看穿'],
-  '夫妻家庭':['一模一樣','買菸','需要談談','不敢問','窗戶凍住了','一切都很好','沒安全感','所以要我留下','露台','四個孩子的爸','深夜講座','睜一隻眼','緩解疼痛','九十歲','撞到告訴我','很會說謊','很甜','兩根菸'],
+  '夫妻家庭':['貓與虎','送回娘家','七十才開始','一模一樣','買菸','需要談談','不敢問','窗戶凍住了','一切都很好','沒安全感','所以要我留下','露台','四個孩子的爸','深夜講座','睜一隻眼','緩解疼痛','九十歲','撞到告訴我','很會說謊','很甜','兩根菸'],
   '搶匪小偷':['金口難開','負數','可能看到了','換科目','業內人士','遙控器','一起找'],
   '職場校園':['錯的先講','吸菸區','沉默','看辦公室','可以回家','倫理學','很會說謊','烤箱手套'],
   '時事諷刺':['太晚了','有用','重燃希望','誰是白痴','塗成藍色','我們的願望','白羊吃草','會飛的車'],
