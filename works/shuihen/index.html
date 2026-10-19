@@ -619,6 +619,13 @@ const EARTH_CUT=(c,x,y,r)=>{c.save();c.translate(x,y);c.scale(r,r);c.beginPath()
   c.beginPath();c.moveTo(.2,.1);c.quadraticCurveTo(.6,-.1,.7,.3);c.quadraticCurveTo(.4,.7,.1,.5);c.closePath();c.fill();c.restore();};
 const EXCL=c=>{c.save();c.scale(.01,.01);c.font='900 60px '+SERIF;c.textAlign='center';c.textBaseline='middle';c.fillText('！',108,18);c.restore();};
 function shapeById(id){
+  if(id==='oldCouple'){const H=profileShape({id:'beard',fixed:1,name:''}),W=profileShape({id:'plain',bun:1,fixed:1,name:''});
+    return {name:'老夫老妻',kind:'o',rot:0,core:[-.22,.42],box:[1.05,.95],draw(c){c.save();c.translate(-.27,.06);c.scale(.56,.56);H.draw(c);c.restore();
+      c.save();c.translate(.29,.08);c.scale(-.52,.52);W.draw(c);c.restore();HEART(c,.01,-.36,.11);}};}
+  if(id==='heart65')return {name:'六十五年',kind:'o',rot:0,core:[0,.05],box:[1,.95],draw(c){HEART(c,0,.0,.46);},cut(c){TXT(c,'65',0,.02,26);}};
+  if(id==='grandpaWhisper')return profileShape({id:'beard',fixed:1,name:'小聲說話的爺爺',extra:BUBBLE,cutP:c=>{MOUTH(c);BUBBLE_DOTS(c);},scale:.75,shift:-.22,box:[1.4,1.1],core:[-.22,0]});
+  if(id==='grandpaSweat')return profileShape({id:'beard',fixed:1,name:'不敢問的爺爺',extra:SWEAT,cutP:EYE_SHUT,scale:.85,shift:-.06,box:[1.2,1.05],core:[-.06,0]});
+
   if(id==='pumpkin')return {name:'南瓜燈',kind:'o',rot:0,core:[0,.1],box:[1.05,.95],draw(c){fillE(c,-.16,.08,.26,.3);fillE(c,.16,.08,.26,.3);fillE(c,0,.08,.3,.32);
     c.lineWidth=.07;c.lineCap='round';c.beginPath();c.moveTo(0,-.22);c.quadraticCurveTo(.02,-.36,.1,-.4);c.stroke();},
     cut(c){fillP(c,[[-.24,-.02],[-.08,-.02],[-.16,-.14]]);fillP(c,[[.08,-.02],[.24,-.02],[.16,-.14]]);fillP(c,[[-.05,.1],[.05,.1],[0,.02]]);
@@ -989,6 +996,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'不敢問',panels:[['oldCouple','結婚六十五年，爺爺都叫奶奶「親愛的」、「寶貝」。'],['heart65','我問他：「感情長久的祕訣是什麼？」'],['grandpaWhisper','爺爺小聲說：「十年前我就忘了她叫什麼，」'],['grandpaSweat','「……一直不敢問。」',0,3.5]]},
   {title:'哈囉 win',panels:[['pumpkin','萬聖節，大家在玩猜謎。'],['ghostAsk','「講哪兩個字不會輸？」'],['kidHello','小孩舉手：「哈囉！」'],['trophyWin','因為——哈囉 win。',0,3.5]]},
   {title:'窗戶凍住了',panels:[['frozenWin','寒冬清晨，太太傳訊：「窗戶凍住了，打不開。」'],['husbandTip','先生回：「澆點溫水，再用錘子輕敲邊緣。」'],['brokenPC','十分鐘後，太太傳來：「電腦整個壞了。」'],['husbandShock','先生：「……妳說的窗戶，是電腦那個？」',0,3.5]]},
   {title:'一切都很好',panels:[['kidSilent','孩子四歲了，從沒說過一句話。'],['soup','有一天，媽媽端湯給他。'],['kidSpeak','「湯冷了。」爸媽：「你會說話？！」'],['kidCalm','「之前一切都很好啊。」',0,3.5]]},
