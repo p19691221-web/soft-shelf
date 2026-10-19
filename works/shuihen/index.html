@@ -636,7 +636,18 @@ const PACK=c=>{RRECT(c,-.24,-.36,.24,.4,.03);};
 const PACK_CUT=(c,t)=>{c.lineWidth=.018;c.beginPath();c.moveTo(-.24,-.2);c.lineTo(.24,-.2);c.stroke();c.strokeRect(-.17,-.08,.34,.38);TXT(c,t,0,.11,26);};
 const NURSECAP=c=>{fillP(c,[[.2,.12],[.26,-.12],[.62,-.14],[.68,.1]]);};
 const NURSECAP_CUT=c=>{c.lineWidth=.025;c.beginPath();c.moveTo(.2,.1);c.lineTo(.68,.08);c.stroke();};
+const WAVES=(c,y)=>{c.lineWidth=.04;c.lineCap='round';c.beginPath();c.moveTo(-.46,y);for(let i=0;i<6;i++){const x=-.46+i*.16;c.quadraticCurveTo(x+.04,y-.06,x+.08,y);c.quadraticCurveTo(x+.12,y+.06,x+.16,y);}c.stroke();};
 function shapeById(id){
+  if(id==='swimFree')return {name:'自由式',kind:'o',rot:0,core:[0,.1],box:[.97,.8],draw(c){WAVES(c,.14);fillE(c,-.02,.04,.11,.1);fillE(c,-.22,.12,.2,.05);
+    c.lineWidth=.07;c.lineCap='round';c.beginPath();c.moveTo(.06,.06);c.quadraticCurveTo(.2,-.34,.42,-.02);c.stroke();for(const [x,y] of [[-.42,.0],[-.36,-.06],[-.3,.02]])fillE(c,x,y,.025,.025);},
+    cut(c){c.lineWidth=.02;c.beginPath();c.arc(-.02,.0,.1,Math.PI*1.1,Math.PI*1.9);c.stroke();}};
+  if(id==='chatPhone')return {name:'聊天中的手機',kind:'o',rot:0,core:[0,0],box:[.75,1.05],draw(c){RRECT(c,-.24,-.44,.24,.44,.06);},
+    cut(c){RRECT(c,-.18,-.32,.04,-.2,.03);RRECT(c,-.04,-.12,.18,.0,.03);RRECT(c,-.18,.08,.06,.2,.03);fillE(c,0,.36,.03,.03);}};
+  if(id==='typeA')return profileShape({id:'flat',fixed:1,name:'打字的A',extra:BUBBLE,cutP:c=>{SMILE(c);BUBBLE_DOTS(c);},scale:.75,shift:-.22,box:[1.4,1.1],core:[-.22,0]});
+  if(id==='swimBack')return {name:'仰式',kind:'o',rot:0,core:[0,.1],box:[.97,.8],draw(c){WAVES(c,.14);fillE(c,-.22,.08,.11,.09);fillP(c,[[-.24,.02],[-.18,-.04],[-.14,.04]]);fillE(c,.08,.12,.24,.05);
+    c.lineWidth=.07;c.lineCap='round';c.beginPath();c.moveTo(-.14,.1);c.quadraticCurveTo(-.2,-.4,-.44,-.08);c.stroke();for(const [x,y] of [[.38,.0],[.42,-.07],[.46,.02]])fillE(c,x,y,.025,.025);},
+    cut(c){c.lineWidth=.02;c.beginPath();c.arc(-.2,.06,.025,0,7);c.stroke();}};
+
   if(id==='weiCall')return profileShape({id:'flat',fixed:1,name:'打電話的韋小明',extra:BUBBLE,cutP:c=>{MOUTH(c);BUBBLE_DOTS(c);},scale:.75,shift:-.22,box:[1.4,1.1],core:[-.22,0]});
   if(id==='mingAns')return profileShape({id:'plain',fixed:1,name:'接電話的小明',extra:BUBBLE,cutP:c=>{MOUTH(c);BUBBLE_DOTS(c);},scale:.75,shift:-.22,box:[1.4,1.1],core:[-.22,0]});
   if(id==='weiName')return profileShape({id:'flat',fixed:1,name:'報上名字的韋小明',extra:BUBBLE,cutP:c=>{SMILE(c);BUBBLE_DOTS(c);},scale:.75,shift:-.22,box:[1.4,1.1],core:[-.22,0]});
@@ -1077,6 +1088,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'仰式',panels:[['swimFree','A：「妳很愛游泳？」B：「一週兩三次。」'],['chatPhone','B：「下次一起去游泳吧！」'],['typeA','A 打字：「那妳會『癢是』嗎？」'],['swimBack','B 刪了好友。A：「我是說仰式啦！」',0,3.5]]},
   {title:'你哪位',panels:[['weiCall','韋小明打電話：「喂～小明嗎？」'],['mingAns','小明：「是我，你哪位？」'],['weiName','「韋小明。」'],['mingHang','「我是小明啊，你哪位？」嘟嘟嘟……',1,3.5]]},
   {title:'一模一樣',panels:[['baby','護理師：「你們的寶寶好可愛。」'],['dadLaugh','爸爸笑：「妳對每對爸媽都這樣說吧？」'],['nurseNo','「不，只對寶寶好看的說。」'],['nurseSmile','「那其他人呢？」「我說：跟你長得一模一樣。」',1,3.5]]},
   {title:'買菸',panels:[['packWarn','菸盒上的警語，寫了一堆危害。'],['dadOut','十九年前，爸爸說：「我去買包菸。」'],['openDoor','到現在，還沒回來。'],['packBuy','我覺得「買菸」本身，也該印上去。',0,3.5]]},
@@ -1148,7 +1160,7 @@ const STORIES=[
 ];
 const CATS=['諧音梗','夫妻家庭','搶匪小偷','職場校園','時事諷刺','日常冷笑話','故事小品'];
 const CATMAP={
-  '諧音梗':['你哪位','哈囉 win','窗戶凍住了','左右腦','換科目','業內人士','找誰接','半手李','閉眼說瞎話','誰是京都人','金口難開','看辦公室','週一休息','看穿'],
+  '諧音梗':['仰式','你哪位','哈囉 win','窗戶凍住了','左右腦','換科目','業內人士','找誰接','半手李','閉眼說瞎話','誰是京都人','金口難開','看辦公室','週一休息','看穿'],
   '夫妻家庭':['一模一樣','買菸','需要談談','不敢問','窗戶凍住了','一切都很好','沒安全感','所以要我留下','露台','四個孩子的爸','深夜講座','睜一隻眼','緩解疼痛','九十歲','撞到告訴我','很會說謊','很甜','兩根菸'],
   '搶匪小偷':['金口難開','負數','可能看到了','換科目','業內人士','遙控器','一起找'],
   '職場校園':['吸菸區','沉默','看辦公室','可以回家','倫理學','很會說謊','烤箱手套'],
