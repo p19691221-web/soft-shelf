@@ -628,7 +628,20 @@ const VASE=(c,x,y,k)=>{fillE(c,x,y+.13*k,.13*k,.16*k);c.fillRect(x-.05*k,y-.06*k
   c.lineWidth=.025*k;c.lineCap='round';c.beginPath();for(const [dx,dy] of [[-.14,-.3],[0,-.36],[.14,-.3]]){c.moveTo(x,y-.06*k);c.quadraticCurveTo(x+dx*.3*k,y-.2*k,x+dx*k,y+dy*k);}c.stroke();
   for(const [dx,dy] of [[-.14,-.3],[0,-.36],[.14,-.3]])fillE(c,x+dx*k,y+dy*k,.06*k,.06*k);};
 const GROUND=c=>{c.fillRect(-.48,.4,.96,.035);};
+const BIN=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);fillP(c,[[-.2,-.08],[.2,-.08],[.16,.4],[-.16,.4]]);c.fillRect(-.24,-.15,.48,.07);c.restore();};
+const BIN_CUT=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.lineWidth=.025;c.beginPath();for(const u of [-.08,0,.08]){c.moveTo(u*1.1,-.02);c.lineTo(u,.34);}c.stroke();c.restore();};
 function shapeById(id){
+  if(id==='binSmoke')return {name:'冒煙的垃圾桶',kind:'o',rot:0,core:[0,.3],box:[.9,1.05],draw(c){BIN(c,0,.08,1);
+    c.lineWidth=.06;c.lineCap='round';for(const [x,h] of [[-.1,.42],[.06,.52]]){c.beginPath();c.moveTo(x,-.12);c.bezierCurveTo(x-.12,-.22,x+.12,-.3,x,-.12-h*.75);c.quadraticCurveTo(x-.08,-.12-h*.9,x+.03,-.12-h);c.stroke();}},cut(c){BIN_CUT(c,0,.08,1);}};
+  if(id==='shutter')return {name:'拉下一半的鐵門',kind:'o',rot:0,core:[0,-.2],box:[1,.95],draw(c){c.fillRect(-.42,-.42,.84,.06);c.fillRect(-.42,-.36,.05,.78);c.fillRect(.37,-.36,.05,.78);c.fillRect(-.37,-.36,.74,.42);c.fillRect(-.48,.4,.96,.03);},
+    cut(c){c.lineWidth=.016;c.beginPath();for(let y=-.29;y<.05;y+=.07){c.moveTo(-.34,y);c.lineTo(.34,y);}c.stroke();}};
+  if(id==='binDoused')return {name:'被沖熄的垃圾桶',kind:'o',rot:0,core:[0,.3],box:[.9,1],draw(c){BIN(c,.08,.08,.9);
+    c.lineWidth=.05;c.lineCap='round';c.beginPath();c.moveTo(-.45,-.38);c.quadraticCurveTo(-.05,-.48,.06,-.16);c.stroke();
+    for(const [x,y,r] of [[-.1,-.22,.03],[.2,-.24,.025],[.26,-.1,.02],[-.06,-.08,.02]])fillE(c,x,y,r,r*1.3);fillE(c,.08,.47,.3,.05);},cut(c){BIN_CUT(c,.08,.08,.9);}};
+  if(id==='plazaBird')return {name:'回來的鳥',kind:'o',rot:0,core:[0,.1],box:[.9,.8],draw(c){fillE(c,0,.05,.2,.12,-.15);fillE(c,.17,-.07,.085,.08);fillP(c,[[.24,-.09],[.33,-.06],[.24,-.04]]);
+    fillP(c,[[-.15,.04],[-.36,-.02],[-.18,.12]]);c.lineWidth=.025;c.beginPath();c.moveTo(.02,.15);c.lineTo(.0,.28);c.moveTo(.08,.15);c.lineTo(.09,.28);c.stroke();
+    for(const [x,y,w] of [[-.28,.32,.07],[.05,.36,.1],[.3,.31,.05]])fillE(c,x,y,w,w*.3);},cut(c){fillE(c,.19,-.09,.017,.017);}};
+
   if(id==='vases2')return {name:'兩瓶花',kind:'o',rot:0,core:[0,.1],box:[1.05,1.05],draw(c){VASE(c,-.24,-.02,1);VASE(c,.24,-.02,1);}};
   if(id==='vases1')return {name:'放下一瓶',kind:'o',rot:0,core:[0,.1],box:[1.05,1.05],draw(c){GROUND(c);VASE(c,-.24,.22,.75);VASE(c,.24,-.1,1);}};
   if(id==='emptyHands')return profileShape({id:'plain',fixed:1,name:'兩手空空的黑指',extra:QMARK,box:[1.4,1.15]});
@@ -1012,6 +1025,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'收拾',panels:[['binSmoke','夜裡，廣場邊的垃圾桶還在冒煙。'],['shutter','天亮了，店家的鐵門只拉起一半。'],['binDoused','阿伯拉來水管，把火沖熄。'],['plazaBird','水乾了，鳥又回來。廣場還是廣場。',0,3.5]]},
   {title:'放下',panels:[['vases2','黑指捧兩瓶花供佛。佛說：「放下。」'],['vases1','他放下一瓶。佛又說：「放下。」'],['emptyHands','兩手已空，佛仍說放下。「還要放下什麼？」'],['enso','「放下的不是花，是心裡一直抓著的。」',0,3.5]]},
   {title:'不敢問',panels:[['oldCouple','結婚六十五年，爺爺都叫奶奶「親愛的」、「寶貝」。'],['heart65','我問他：「感情長久的祕訣是什麼？」'],['grandpaWhisper','爺爺小聲說：「十年前我就忘了她叫什麼，」'],['grandpaSweat','「……一直不敢問。」',0,3.5]]},
   {title:'哈囉 win',panels:[['pumpkin','萬聖節，大家在玩猜謎。'],['ghostAsk','「講哪兩個字不會輸？」'],['kidHello','小孩舉手：「哈囉！」'],['trophyWin','因為——哈囉 win。',0,3.5]]},
@@ -1081,7 +1095,7 @@ const CATMAP={
   '搶匪小偷':['金口難開','負數','可能看到了','換科目','業內人士','遙控器','一起找'],
   '職場校園':['沉默','看辦公室','可以回家','倫理學','很會說謊','烤箱手套'],
   '時事諷刺':['太晚了','有用','重燃希望','誰是白痴','塗成藍色','我們的願望','白羊吃草','會飛的車'],
-  '故事小品':['放下','恆河','平安','等','釣','慢','午後']};
+  '故事小品':['收拾','放下','恆河','平安','等','釣','慢','午後']};
 STORIES.forEach(S=>{S.cats=CATS.filter(c=>(CATMAP[c]||[]).includes(S.title));if(!S.cats.length)S.cats=['日常冷笑話'];});
 let storyCat='all';
 const inCat=S=>storyCat==='all'||S.cats.includes(storyCat);
