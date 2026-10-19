@@ -648,7 +648,15 @@ const TAG=c=>{fillP(c,[[-.3,-.2],[.2,-.2],[.38,0],[.2,.2],[-.3,.2]]);};
 const PINE=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);fillE(c,0,.12,.2,.28);for(const [dx,h,a] of [[0,.36,0],[-.08,.28,-.4],[.08,.28,.4],[-.14,.2,-.8],[.14,.2,.8]]){c.save();c.translate(dx*.5,-.14);c.rotate(a);fillP(c,[[-.04,0],[.04,0],[0,-h]]);c.restore();}c.restore();};
 const PINE_CUT=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.lineWidth=.014;c.beginPath();for(let i=-3;i<=3;i++){c.moveTo(i*.08-.2,-.1);c.lineTo(i*.08+.2,.38);c.moveTo(i*.08+.2,-.1);c.lineTo(i*.08-.2,.38);}c.stroke();c.restore();};
 const GUAVA=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);fillE(c,0,.04,.26,.24);c.lineWidth=.035;c.beginPath();c.moveTo(0,-.18);c.lineTo(.02,-.28);c.stroke();fillE(c,.1,-.27,.09,.04,-.4);c.restore();};
+const BED2=c=>{c.fillRect(-.46,.16,.92,.1);c.fillRect(-.46,-.12,.06,.44);c.fillRect(.4,.04,.06,.28);fillE(c,-.3,.08,.08,.06);c.beginPath();c.moveTo(-.22,.16);c.quadraticCurveTo(-.2,-.04,.04,-.02);c.quadraticCurveTo(.3,-.06,.4,.16);c.closePath();c.fill();};
+const ZZ=(c,x,y,k)=>{c.lineWidth=.03*k;c.lineJoin='round';c.beginPath();c.moveTo(x,y);c.lineTo(x+.1*k,y);c.lineTo(x,y+.1*k);c.lineTo(x+.1*k,y+.1*k);c.stroke();};
 function shapeById(id){
+  if(id==='interviewer')return profileShape({id:'beard',fixed:1,name:'面試官',extra:c=>{TIE(c);QMARK(c);},cutP:GLASSES_CUT,box:[1.4,1.3],core:[0,.1]});
+  if(id==='hobbyTalk')return profileShape({id:'flat',fixed:1,name:'自信的我',extra:BUBBLE,cutP:c=>{SMILE(c);BUBBLE_DOTS(c);},scale:.75,shift:-.22,box:[1.4,1.1],core:[-.22,0]});
+  if(id==='bedSleep')return {name:'睡覺',kind:'o',rot:0,core:[0,.15],box:[1.05,.85],draw(c){BED2(c);fillE(c,-.24,-.02,.09,.09);ZZ(c,-.1,-.32,1);ZZ(c,.06,-.42,.8);},cut(c){c.lineWidth=.016;c.beginPath();c.moveTo(-.18,.06);c.quadraticCurveTo(.1,.02,.36,.12);c.stroke();}};
+  if(id==='bedTurn')return {name:'翻身',kind:'o',rot:0,core:[0,.15],box:[1.05,.85],draw(c){BED2(c);fillE(c,-.24,-.02,.09,.09);c.lineWidth=.04;c.lineCap='round';c.beginPath();c.arc(.02,-.12,.22,Math.PI*1.1,Math.PI*1.85);c.stroke();
+    fillP(c,[[.2,-.26],[.28,-.18],[.16,-.16]]);for(const [x,y] of [[.34,-.06],[.4,-.14]]){c.beginPath();c.moveTo(x,y);c.lineTo(x+.06,y-.04);c.stroke();}},cut(c){c.lineWidth=.016;c.beginPath();c.moveTo(-.18,.06);c.quadraticCurveTo(.1,.0,.36,.12);c.stroke();}};
+
   if(id==='xmasTree')return {name:'耶誕樹',kind:'o',rot:0,core:[0,.15],box:[.85,1.05],draw(c){fillP(c,[[0,-.36],[-.2,-.08],[.2,-.08]]);fillP(c,[[0,-.2],[-.27,.12],[.27,.12]]);fillP(c,[[0,-.02],[-.34,.32],[.34,.32]]);c.fillRect(-.05,.3,.1,.12);
     fillP(c,[[0,-.5],[.03,-.43],[.1,-.42],[.04,-.38],[.06,-.31],[0,-.35],[-.06,-.31],[-.04,-.38],[-.1,-.42],[-.03,-.43]]);},cut(c){for(const [x,y] of [[-.06,-.14],[.1,.04],[-.14,.2],[.12,.24]])fillE(c,x,y,.025,.025);}};
   if(id==='heartAlone')return {name:'一顆愛心',kind:'o',rot:0,core:[0,.05],box:[1,.95],draw(c){HEART(c,0,.0,.42);},cut(c){c.lineWidth=.022;c.beginPath();c.moveTo(-.02,-.2);c.lineTo(.06,-.06);c.lineTo(-.04,.04);c.lineTo(.04,.2);c.stroke();}};
@@ -1188,6 +1196,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'興趣',panels:[['interviewer','面試官：「興趣是什麼？」'],['hobbyTalk','「分成靜態和動態兩種。」'],['bedSleep','靜態：睡覺。'],['bedTurn','動態：翻身。',1,3.5]]},
   {title:'一個人過',panels:[['xmasTree','耶誕節，讓我一個人過。'],['heartAlone','情人節，也讓我一個人過。'],['examPaper','期末考來了……'],['studentYell','「有種，考試也讓我一個人過！」',0,3.5]]},
   {title:'鳳梨酥',panels:[['pineapple','鳳梨跟芭樂約好決鬥。'],['guava','芭樂：「來啊，誰怕誰！」'],['fruitFight','打了半天，誰會輸？'],['pineCake','鳳梨——因為「鳳梨酥」。',0,3.5]]},
   {title:'仙草蜜',panels:[['officeBldg','公司下週要裁員了。'],['grassJelly','同事遞來一杯仙草蜜。'],['workerShock','我一看，嚇得馬上放下。'],['bossFire','仙草蜜——「先炒你」。',0,3.5]]},
