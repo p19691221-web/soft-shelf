@@ -60,6 +60,13 @@ button:focus-visible{outline:2px solid var(--chalk);outline-offset:2px}
 .chips button[aria-pressed="true"]{background:var(--scrim-on);color:var(--ink);border-color:var(--scrim-on)}
 .chips .k{opacity:.7;margin-left:4px;font-size:12px}
 .list .g{font-size:12px;color:var(--chalk-dim);margin-left:6px;font-weight:400}
+.share-card{grid-template-rows:auto auto auto auto}
+.share-t{margin:0;font-size:18px;font-weight:700}
+.share-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.share-grid a,.share-grid button{display:flex;align-items:center;justify-content:center;min-height:44px;font:inherit;font-size:16px;color:var(--chalk);text-decoration:none;
+  background:var(--scrim);border:1.5px solid var(--chalk-line);border-radius:4px;padding:8px}
+.share-grid a:hover,.share-grid button:hover{border-color:var(--chalk)}
+#share-url{font:inherit;font-size:13px;color:var(--chalk-dim);background:transparent;border:0;border-bottom:1.5px solid var(--chalk-line);padding:6px 2px;min-width:0;width:100%}
 .card header{display:flex;justify-content:space-between;align-items:center;gap:8px}
 .card h2{margin:0;font-size:22px;letter-spacing:.08em}
 .card input{font:inherit;font-size:17px;color:var(--chalk);background:transparent;border:0;border-bottom:1.5px solid var(--chalk-line);padding:8px 2px;min-width:0}
@@ -105,6 +112,19 @@ button:focus-visible{outline:2px solid var(--chalk);outline-offset:2px}
   </div>
 </div>
 
+<div class="sheet" id="shareSheet" hidden>
+  <div class="card share-card" role="dialog" aria-modal="true" aria-labelledby="share-title">
+    <header><h2 id="share-title">分享這則</h2><button type="button" id="share-close">關閉</button></header>
+    <p class="share-t" id="share-name"></p>
+    <div class="share-grid">
+      <a id="sh-line" target="_blank" rel="noopener">LINE</a>
+      <a id="sh-threads" target="_blank" rel="noopener">Threads</a>
+      <a id="sh-fb" target="_blank" rel="noopener">Facebook</a>
+      <button type="button" id="sh-copy">複製連結</button>
+    </div>
+    <input id="share-url" type="text" readonly aria-label="故事連結">
+  </div>
+</div>
 <div class="sheet" id="sheet" hidden>
   <div class="card" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
     <header><h2 id="sheet-title">找故事</h2><button type="button" id="sheet-close">關閉</button></header>
@@ -1630,7 +1650,7 @@ $('pick').addEventListener('click',openSheet);
 $('sheet-close').addEventListener('click',closeSheet);
 $('sheet').addEventListener('click',e=>{if(e.target===$('sheet'))closeSheet();});
 $('q').addEventListener('input',renderList);
-document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('sheet').hidden)closeSheet();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('sheet').hidden)closeSheet();if(e.key==='Escape')$('shareSheet').hidden=true;});
 showHint();
 
 let last=performance.now();
@@ -1641,10 +1661,21 @@ function storyFromHash(){try{const m=location.hash.match(/^#s=(.+)$/);if(!m)retu
 {const i=storyFromHash();if(i>=0)storyIdx=i-1;}
 window.addEventListener('hashchange',()=>{const i=storyFromHash();if(i>=0&&!(story&&story.S===STORIES[i]))playStory(i);});
 function flash(t){$('hint').textContent=t;$('hint').classList.remove('gone');clearTimeout(hintT);hintT=setTimeout(()=>$('hint').classList.add('gone'),3000);}
+function openShare(t,url){$('share-name').textContent=`〈${t}〉`;$('share-url').value=url;
+  const txt=`〈${t}〉——一條水管，在老水泥地上畫的四格故事`;
+  $('sh-line').href='https://social-plugins.line.me/lineit/share?url='+encodeURIComponent(url);
+  $('sh-threads').href='https://www.threads.net/intent/post?text='+encodeURIComponent(txt+'\n'+url);
+  $('sh-fb').href='https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(url);
+  $('sh-copy').textContent='複製連結';$('shareSheet').hidden=false;}
+$('sh-copy').addEventListener('click',async()=>{const url=$('share-url').value;
+  try{await navigator.clipboard.writeText(url);}catch(e){const u=$('share-url');u.focus();u.select();try{document.execCommand('copy');}catch(e2){}}
+  $('sh-copy').textContent='已複製 ✓';});
+$('share-close').addEventListener('click',()=>{$('shareSheet').hidden=true;});
+$('shareSheet').addEventListener('click',e=>{if(e.target===$('shareSheet'))$('shareSheet').hidden=true;});
 $('share').addEventListener('click',async()=>{if(!story)return;const t=story.S.title,url=SHARE_BASE+'#s='+encodeURIComponent(t);
   const data={title:`水泥地水痕〈${t}〉`,text:`〈${t}〉——一條水管，在老水泥地上畫的四格故事`,url};
-  try{if(navigator.share){await navigator.share(data);return;}}catch(e){if(e&&e.name==='AbortError')return;}
-  try{await navigator.clipboard.writeText(url);flash(`〈${t}〉的連結已複製`);}catch(e){window.prompt('複製這個連結：',url);}});
+  if(navigator.share&&window.top===window.self){try{await navigator.share(data);return;}catch(e){if(e&&e.name==='AbortError')return;}}
+  openShare(t,url);});
 resize();requestAnimationFrame(frame);
 })();
 </script>
