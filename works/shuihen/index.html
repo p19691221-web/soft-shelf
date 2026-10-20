@@ -88,6 +88,7 @@ button:focus-visible{outline:2px solid var(--chalk);outline-offset:2px}
     <div class="bar">
       <button id="pause" type="button">暫停</button>
       <button id="pick" type="button">找故事</button>
+      <button id="share" type="button">分享這則</button>
       <button id="next" type="button">換下一個</button>
       <button id="speed" type="button">速度 1×</button>
       <button id="sound" type="button" aria-pressed="false">開聲音</button>
@@ -1350,6 +1351,7 @@ function storyLayout(){
 function planStory(){
   for(let g=0;g<STORIES.length;g++){storyIdx=(storyIdx+1)%STORIES.length;if(inCat(STORIES[storyIdx]))break;}
   const S=STORIES[storyIdx],cache={};
+  try{if(/github\.io$/.test(location.hostname))history.replaceState(null,'','#s='+encodeURIComponent(S.title));}catch(e){}
   const shapes=S.panels.map(([id])=>cache[id]||(cache[id]=shapeById(id)));
   story={S,L:storyLayout(),shapes,capA:[0,0,0,0],jit:S.panels.map(()=>Array.from({length:24},()=>rand(-1.8,1.8)))};
   startPanel(0);
@@ -1601,7 +1603,7 @@ document.querySelectorAll('[data-cat]').forEach(b=>b.addEventListener('click',()
   document.querySelectorAll('[data-cat]').forEach(x=>x.setAttribute('aria-pressed',x===b?'true':'false'));}));
 document.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',()=>{if(b.dataset.mode===mode)return;mode=b.dataset.mode;
   document.querySelectorAll('[data-mode]').forEach(x=>x.setAttribute('aria-pressed',x===b?'true':'false'));
-  $('catseg').hidden=mode==='story';$('pick').hidden=mode!=='story';showHint();startMode();}));
+  $('catseg').hidden=mode==='story';$('pick').hidden=mode!=='story';$('share').hidden=mode!=='story';showHint();startMode();}));
 function esc(t){return t.replace(/[&<>"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));}
 function hl(t,q){const e=esc(t);if(!q)return e;const qe=esc(q);return e.split(qe).join('<mark>'+qe+'</mark>');}
 function renderList(){const q=$('q').value.trim(),ul=$('list');ul.replaceChildren();let n=0;
@@ -1634,6 +1636,15 @@ showHint();
 let last=performance.now();
 function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;
   if(!paused)step(dt*SPEEDS[speedIdx]);render();soundTick();requestAnimationFrame(frame);}
+const SHARE_BASE='https://p19691221-web.github.io/soft-shelf/works/shuihen/';
+function storyFromHash(){try{const m=location.hash.match(/^#s=(.+)$/);if(!m)return -1;const t=decodeURIComponent(m[1]);return STORIES.findIndex(S=>S.title===t);}catch(e){return -1;}}
+{const i=storyFromHash();if(i>=0)storyIdx=i-1;}
+window.addEventListener('hashchange',()=>{const i=storyFromHash();if(i>=0&&!(story&&story.S===STORIES[i]))playStory(i);});
+function flash(t){$('hint').textContent=t;$('hint').classList.remove('gone');clearTimeout(hintT);hintT=setTimeout(()=>$('hint').classList.add('gone'),3000);}
+$('share').addEventListener('click',async()=>{if(!story)return;const t=story.S.title,url=SHARE_BASE+'#s='+encodeURIComponent(t);
+  const data={title:`水泥地水痕〈${t}〉`,text:`〈${t}〉——一條水管，在老水泥地上畫的四格故事`,url};
+  try{if(navigator.share){await navigator.share(data);return;}}catch(e){if(e&&e.name==='AbortError')return;}
+  try{await navigator.clipboard.writeText(url);flash(`〈${t}〉的連結已複製`);}catch(e){window.prompt('複製這個連結：',url);}});
 resize();requestAnimationFrame(frame);
 })();
 </script>
