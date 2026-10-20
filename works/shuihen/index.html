@@ -680,6 +680,8 @@ const ANT=(c,x,y,k,na)=>{c.save();c.translate(x,y);c.scale(k,k);fillE(c,-.22,.04
 const DOG=c=>{fillE(c,-.06,.04,.26,.13);fillE(c,.24,-.12,.13,.12);fillP(c,[[.3,-.12],[.46,-.08],[.44,.0],[.3,.0]]);fillP(c,[[.14,-.2],[.16,-.36],[.24,-.22]]);
   c.lineWidth=.06;c.lineCap='round';c.beginPath();for(const x of [-.24,-.12,.06,.16]){c.moveTo(x,.12);c.lineTo(x,.34);}c.moveTo(-.3,0);c.quadraticCurveTo(-.44,-.06,-.42,-.2);c.stroke();c.fillRect(-.48,.36,.96,.04);};
 function shapeById(id){
+  if(id==='kids5')return {name:'五個小孩',kind:'o',rot:0,core:[0,.1],box:[1.05,.85],draw(c){for(const [x,k] of [[-.38,.85],[-.19,.95],[0,1.05],[.19,.95],[.38,.85]])KIDFIG(c,x,(1.05-k)*.3-.06,k*.95);c.fillRect(-.48,.32,.96,.04);},cut(c){}};
+
   if(id==='hospBed')return {name:'病床',kind:'o',rot:0,core:[0,.15],box:[1.05,.9],draw(c){BED2(c);fillE(c,-.24,-.02,.09,.09);c.fillRect(.34,-.44,.03,.4);RRECT(c,.28,-.44,.42,-.3,.03);c.lineWidth=.02;c.beginPath();c.moveTo(.355,-.3);c.quadraticCurveTo(.3,-.1,-.1,.0);c.stroke();},cut(c){}};
   if(id==='patientWeak')return profileShape({id:'flat',fixed:1,name:'虛弱的病人',extra:c=>{for(const [x,y] of [[.95,.3],[1.08,.2],[1.2,.1]])fillE(c,x,y,.03,.03);},cutP:c=>{EYE_SHUT(c);MOUTH(c);},box:[1.3,1.12]});
   if(id==='patientShock')return profileShape({id:'flat',fixed:1,name:'嚇到的病人',extra:c=>{EXCL(c);SWEAT(c);},cutP:c=>{c.lineWidth=.02;c.beginPath();c.arc(.62,.43,.035,0,7);c.stroke();fillE(c,.79,.73,.035,.045);},box:[1.4,1.15]});
@@ -1308,6 +1310,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'五個媽',panels:[['beerMugs','小瑋：「養家真辛苦。」'],['friendQ','小張：「你有幾個小孩？」'],['kids5','「五個。」「難怪難養！」'],['workerShock','「是五個媽難養。」',0,3.5]]},
   {title:'慰問信',panels:[['hospBed','護理師：「你朋友寄慰問信來了。」'],['patientWeak','病人：「沒力氣看，幫我念吧。」'],['letter','「工作太忙，沒空探病……」'],['patientShock','「……但出殯一定到。」',0,3.5]]},
   {title:'不是我的狗',panels:[['dogMean','老王過橋，看到阿伯和一隻兇狗。'],['friendQ','老王：「阿伯，你的狗會咬人嗎？」'],['abeSay','阿伯：「我的狗絕不咬人。」',1],['dogBite','被咬了。「那不是我的狗。」',0,3.5]]},
   {title:'雨多甜',panels:[['wifeBubble','老婆：「日本的宇多田好有名喔！」'],['friendQ','老公：「神經病，我又沒去過日本。」'],['sweetRain','「哪知道那邊雨多甜？」'],['wifeMad','老婆：「……」',1,3.5]]},
@@ -1410,7 +1413,7 @@ const STORIES=[
 const CATS=['諧音梗','夫妻家庭','搶匪小偷','職場校園','時事諷刺','日常冷笑話','故事小品'];
 const CATMAP={
   '諧音梗':['雨多甜','還沒滾','蟻后','坐白宮','擲筊','一個人過','鳳梨酥','仙草蜜','一波三折','八天的','飢童','美紅敢','仰式','你哪位','哈囉 win','窗戶凍住了','左右腦','換科目','業內人士','找誰接','半手李','閉眼說瞎話','誰是京都人','金口難開','看辦公室','週一休息','看穿'],
-  '夫妻家庭':['雨多甜','還沒滾','看不到你','多生兩個','貓與虎','送回娘家','七十才開始','一模一樣','買菸','需要談談','不敢問','窗戶凍住了','一切都很好','沒安全感','所以要我留下','露台','四個孩子的爸','深夜講座','睜一隻眼','緩解疼痛','九十歲','撞到告訴我','很會說謊','很甜','兩根菸'],
+  '夫妻家庭':['五個媽','雨多甜','還沒滾','看不到你','多生兩個','貓與虎','送回娘家','七十才開始','一模一樣','買菸','需要談談','不敢問','窗戶凍住了','一切都很好','沒安全感','所以要我留下','露台','四個孩子的爸','深夜講座','睜一隻眼','緩解疼痛','九十歲','撞到告訴我','很會說謊','很甜','兩根菸'],
   '搶匪小偷':['金口難開','負數','可能看到了','換科目','業內人士','遙控器','一起找'],
   '職場校園':['一個人過','仙草蜜','飢童','不忍心','美紅敢','錯的先講','吸菸區','沉默','看辦公室','可以回家','倫理學','很會說謊','烤箱手套'],
   '時事諷刺':['民調','太晚了','有用','重燃希望','誰是白痴','塗成藍色','我們的願望','白羊吃草','會飛的車'],
