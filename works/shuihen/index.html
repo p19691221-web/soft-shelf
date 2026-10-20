@@ -1420,7 +1420,7 @@ function planRound(opt={}){
   label();
 }
 function label(){
-  if(round.rect&&story){$('no').textContent=`〈${story.S.title}〉`;$('nm').textContent=`第 ${round.k+1} 格，共 4 格`;}
+  if(round.rect&&story){$('no').textContent=`〈${story.S.title}〉`;$('nm').textContent=`第 ${round.k+1} 格，共 4 格`+(story.S.by?`　投稿：${story.S.by}`:'');}
   else{$('no').textContent=`第 ${freeCount} 灘`;$('nm').textContent=round.sh.name;}
   lastPh='';setPhase();
 }
@@ -1652,7 +1652,7 @@ function renderList(){const q=$('q').value.trim(),ul=$('list');ul.replaceChildre
     if(q&&!S.title.includes(q)&&!caps.some(c=>c.includes(q)))return;n++;
     const li=document.createElement('li'),b=document.createElement('button');b.type='button';
     if(story&&story.S===S)b.setAttribute('aria-current','true');
-    b.innerHTML=`<span class="t">〈${hl(S.title,q)}〉<span class="g">${S.cats.join('・')}</span></span><span class="c">${caps.map(c=>hl(c,q)).join('　')}</span>`;
+    b.innerHTML=`<span class="t">〈${hl(S.title,q)}〉<span class="g">${S.cats.join('・')}${S.by?'　投稿：'+esc(S.by):''}</span></span><span class="c">${caps.map(c=>hl(c,q)).join('　')}</span>`;
     b.addEventListener('click',()=>playStory(i));li.append(b);ul.append(li);});
   if(!n){const li=document.createElement('li');li.className='empty';li.textContent=storyCat==='all'?`沒有包含「${q}」的故事。換個字試試。`:`「${storyCat}」裡沒有包含「${q}」的故事。試試「全部」。`;ul.append(li);}}
 function playStory(i){closeSheet();storyIdx=i-1;
