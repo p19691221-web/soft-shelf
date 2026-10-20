@@ -681,6 +681,12 @@ const DOG=c=>{fillE(c,-.06,.04,.26,.13);fillE(c,.24,-.12,.13,.12);fillP(c,[[.3,-
   c.lineWidth=.06;c.lineCap='round';c.beginPath();for(const x of [-.24,-.12,.06,.16]){c.moveTo(x,.12);c.lineTo(x,.34);}c.moveTo(-.3,0);c.quadraticCurveTo(-.44,-.06,-.42,-.2);c.stroke();c.fillRect(-.48,.36,.96,.04);};
 const SLAP=c=>{fillE(c,.48,.66,.07,.08);c.lineWidth=.03;c.lineCap='round';c.beginPath();for(const [dx,dy] of [[-.08,-.14],[-.03,-.17],[.02,-.17],[.07,-.14]]){c.moveTo(.48+dx*.6,.6);c.lineTo(.48+dx,.6+dy*.7);}c.moveTo(.42,.7);c.lineTo(.36,.66);c.stroke();};
 function shapeById(id){
+  if(id==='meFaint')return profileShape({id:'flat',fixed:1,name:'存在感很低的我',extra:QMARK,cutP:c=>{MOUTH(c);c.lineWidth=.02;c.setLineDash([.05,.04]);c.beginPath();c.moveTo(.3,.2);c.lineTo(.3,1.0);c.stroke();c.setLineDash([]);},box:[1.4,1.15]});
+  if(id==='templeSun')return {name:'打開的寺門',kind:'o',rot:0,core:[0,.1],box:[1.05,1],draw(c){c.beginPath();c.moveTo(-.48,-.12);c.quadraticCurveTo(-.3,-.1,-.22,-.28);c.lineTo(.22,-.28);c.quadraticCurveTo(.3,-.1,.48,-.12);c.lineTo(.38,-.04);c.lineTo(-.38,-.04);c.closePath();c.fill();
+    c.fillRect(-.34,-.04,.14,.42);c.fillRect(.2,-.04,.14,.42);c.fillRect(-.42,.38,.84,.05);},cut(c){}};
+  if(id==='meHopeful2')return profileShape({id:'flat',fixed:1,name:'恍然大悟的我',extra:c=>{for(const [x,y] of [[.98,.1],[1.12,.22],[1.0,.32]]){c.lineWidth=.03;c.beginPath();c.moveTo(x,y);c.lineTo(x+.08,y-.04);c.stroke();}},cutP:c=>{SMILE(c);},box:[1.3,1.12]});
+  if(id==='monkSquint')return profileShape({id:'plain',fixed:1,name:'瞇眼的禪師',extra:c=>{c.lineWidth=.06;c.lineCap='round';c.beginPath();c.moveTo(.56,.36);c.lineTo(.76,.38);c.stroke();},cutP:c=>{c.lineWidth=.02;c.beginPath();c.moveTo(.58,.44);c.lineTo(.72,.44);c.stroke();MOUTH(c);}});
+
   if(id==='taxiNight')return {name:'深夜計程車',kind:'o',rot:0,core:[0,.1],box:[1.05,.9],draw(c){c.save();c.translate(0,.1);c.scale(1.1,1.1);carBody(c);c.fillRect(-.02,-.3,.16,.08);c.restore();
     c.beginPath();c.arc(-.3,-.32,.1,0,7);c.fill();},cut(c){c.save();c.translate(0,.1);c.scale(1.1,1.1);carCut(c);c.restore();fillE(c,-.26,-.35,.08,.08);}};
   if(id==='driverStare')return profileShape({id:'plain',bun:1,fixed:1,name:'盯著看的女司機',cutP:c=>{c.lineWidth=.02;c.beginPath();c.arc(.62,.43,.04,0,7);c.stroke();MOUTH(c);}});
@@ -1335,6 +1341,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'看清楚',panels:[['meFaint','「大師，大家都看不見我。」'],['templeSun','禪師不語，打開寺門讓陽光進來。'],['meHopeful2','「要我打開心扉，對嗎？」'],['monkSquint','「不，老衲只是想看清楚你在哪。」',1,3.5]]},
   {title:'從哪掏',panels:[['taxiNight','深夜，一個光溜溜的男人攔了計程車。'],['driverStare','女司機一直盯著他看。'],['manAngry','他大罵：「看什麼看！」'],['wallet','「我是在看你錢要從哪掏！」',0,3.5]]},
   {title:'哪邊涼快',panels:[['gifts2','不景氣，公司照樣發資深員工禮物。'],['riceCooker','林仔拿到電子鍋。「叫你回去吃自己！」'],['fan','阿水拿到電扇——'],['friendShock','「叫你哪邊涼快哪邊去！」',0,3.5]]},
   {title:'不在人事',panels:[['deskPhone','朋友來電：「張主任在嗎？」'],['signHR','「抱歉，他不在人事了。」'],['friendQ','「什麼？前天才通過電話……」'],['friendShock','「怎麼就不在人世了？！」',0,3.5]]},
