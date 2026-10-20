@@ -680,7 +680,16 @@ const ANT=(c,x,y,k,na)=>{c.save();c.translate(x,y);c.scale(k,k);fillE(c,-.22,.04
 const DOG=c=>{fillE(c,-.06,.04,.26,.13);fillE(c,.24,-.12,.13,.12);fillP(c,[[.3,-.12],[.46,-.08],[.44,.0],[.3,.0]]);fillP(c,[[.14,-.2],[.16,-.36],[.24,-.22]]);
   c.lineWidth=.06;c.lineCap='round';c.beginPath();for(const x of [-.24,-.12,.06,.16]){c.moveTo(x,.12);c.lineTo(x,.34);}c.moveTo(-.3,0);c.quadraticCurveTo(-.44,-.06,-.42,-.2);c.stroke();c.fillRect(-.48,.36,.96,.04);};
 const SLAP=c=>{fillE(c,.48,.66,.07,.08);c.lineWidth=.03;c.lineCap='round';c.beginPath();for(const [dx,dy] of [[-.08,-.14],[-.03,-.17],[.02,-.17],[.07,-.14]]){c.moveTo(.48+dx*.6,.6);c.lineTo(.48+dx,.6+dy*.7);}c.moveTo(.42,.7);c.lineTo(.36,.66);c.stroke();};
+const YAM=(c,x,y,k,a)=>{c.save();c.translate(x,y);c.rotate(a||0);c.scale(k,k);c.beginPath();c.moveTo(-.4,.0);c.bezierCurveTo(-.3,-.2,.2,-.22,.36,-.04);c.bezierCurveTo(.42,.04,.3,.18,.0,.16);c.bezierCurveTo(-.24,.14,-.36,.1,-.4,0);c.fill();
+  c.lineWidth=.03;c.lineCap='round';c.beginPath();c.moveTo(-.4,0);c.lineTo(-.5,.02);c.moveTo(.37,-.03);c.lineTo(.46,-.08);c.stroke();c.restore();};
 function shapeById(id){
+  if(id==='yamSun')return {name:'曬太陽的地瓜',kind:'o',rot:0,core:[0,.15],box:[1,.9],draw(c){YAM(c,0,.18,1.05);fillE(c,.26,-.3,.1,.1);c.lineWidth=.03;c.lineCap='round';c.beginPath();for(let i=0;i<8;i++){const a=i*Math.PI/4;c.moveTo(.26+Math.cos(a)*.14,-.3+Math.sin(a)*.14);c.lineTo(.26+Math.cos(a)*.2,-.3+Math.sin(a)*.2);}c.stroke();},
+    cut(c){c.lineWidth=.016;c.beginPath();c.moveTo(-.18,.12);c.lineTo(-.12,.16);c.moveTo(.06,.08);c.lineTo(.12,.12);c.stroke();}};
+  if(id==='yamTurn')return {name:'翻身的地瓜',kind:'o',rot:0,core:[0,.1],box:[1,.9],draw(c){YAM(c,0,.16,1,-.25);c.lineWidth=.04;c.lineCap='round';c.beginPath();c.arc(0,.06,.36,Math.PI*1.15,Math.PI*1.85);c.stroke();fillP(c,[[.28,-.24],[.38,-.18],[.26,-.12]]);},cut(c){}};
+  if(id==='yamIce')return {name:'冰心地瓜',kind:'o',rot:0,core:[0,.15],box:[1,.9],draw(c){YAM(c,0,.18,1.05);
+    for(const [x,y,r] of [[-.3,-.22,.12],[.3,-.26,.11],[.0,-.4,.1]]){c.lineWidth=.03;c.beginPath();for(let a=0;a<3;a++){const t=a*Math.PI/3;c.moveTo(x-Math.cos(t)*r,y-Math.sin(t)*r);c.lineTo(x+Math.cos(t)*r,y+Math.sin(t)*r);}c.stroke();}},
+    cut(c){c.lineWidth=.02;c.beginPath();c.moveTo(-.2,.14);c.lineTo(-.12,.2);c.moveTo(.04,.1);c.lineTo(.12,.16);c.stroke();}};
+
   if(id==='meFaint')return profileShape({id:'flat',fixed:1,name:'存在感很低的我',extra:QMARK,cutP:c=>{MOUTH(c);c.lineWidth=.02;c.setLineDash([.05,.04]);c.beginPath();c.moveTo(.3,.2);c.lineTo(.3,1.0);c.stroke();c.setLineDash([]);},box:[1.4,1.15]});
   if(id==='templeSun')return {name:'打開的寺門',kind:'o',rot:0,core:[0,.1],box:[1.05,1],draw(c){c.beginPath();c.moveTo(-.48,-.12);c.quadraticCurveTo(-.3,-.1,-.22,-.28);c.lineTo(.22,-.28);c.quadraticCurveTo(.3,-.1,.48,-.12);c.lineTo(.38,-.04);c.lineTo(-.38,-.04);c.closePath();c.fill();
     c.fillRect(-.34,-.04,.14,.42);c.fillRect(.2,-.04,.14,.42);c.fillRect(-.42,.38,.84,.05);},cut(c){}};
@@ -1341,6 +1350,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'冰心地瓜',panels:[['yamSun','地瓜躺在地上曬太陽。'],['yamSun','曬久了，想翻個身。',1],['yamTurn','一翻身——'],['yamIce','變成「冰心地瓜」！（台語「翻身」）',0,3.5]]},
   {title:'看清楚',panels:[['meFaint','「大師，大家都看不見我。」'],['templeSun','禪師不語，打開寺門讓陽光進來。'],['meHopeful2','「要我打開心扉，對嗎？」'],['monkSquint','「不，老衲只是想看清楚你在哪。」',1,3.5]]},
   {title:'從哪掏',panels:[['taxiNight','深夜，一個光溜溜的男人攔了計程車。'],['driverStare','女司機一直盯著他看。'],['manAngry','他大罵：「看什麼看！」'],['wallet','「我是在看你錢要從哪掏！」',0,3.5]]},
   {title:'哪邊涼快',panels:[['gifts2','不景氣，公司照樣發資深員工禮物。'],['riceCooker','林仔拿到電子鍋。「叫你回去吃自己！」'],['fan','阿水拿到電扇——'],['friendShock','「叫你哪邊涼快哪邊去！」',0,3.5]]},
@@ -1448,7 +1458,7 @@ const STORIES=[
 ];
 const CATS=['諧音梗','夫妻家庭','搶匪小偷','職場校園','時事諷刺','日常冷笑話','故事小品'];
 const CATMAP={
-  '諧音梗':['不在人事','多大','雨多甜','還沒滾','蟻后','坐白宮','擲筊','一個人過','鳳梨酥','仙草蜜','一波三折','八天的','飢童','美紅敢','仰式','你哪位','哈囉 win','窗戶凍住了','左右腦','換科目','業內人士','找誰接','半手李','閉眼說瞎話','誰是京都人','金口難開','看辦公室','週一休息','看穿'],
+  '諧音梗':['冰心地瓜','不在人事','多大','雨多甜','還沒滾','蟻后','坐白宮','擲筊','一個人過','鳳梨酥','仙草蜜','一波三折','八天的','飢童','美紅敢','仰式','你哪位','哈囉 win','窗戶凍住了','左右腦','換科目','業內人士','找誰接','半手李','閉眼說瞎話','誰是京都人','金口難開','看辦公室','週一休息','看穿'],
   '夫妻家庭':['五個媽','雨多甜','還沒滾','看不到你','多生兩個','貓與虎','送回娘家','七十才開始','一模一樣','買菸','需要談談','不敢問','窗戶凍住了','一切都很好','沒安全感','所以要我留下','露台','四個孩子的爸','深夜講座','睜一隻眼','緩解疼痛','九十歲','撞到告訴我','很會說謊','很甜','兩根菸'],
   '搶匪小偷':['金口難開','負數','可能看到了','換科目','業內人士','遙控器','一起找'],
   '職場校園':['哪邊涼快','不在人事','一個人過','仙草蜜','飢童','不忍心','美紅敢','錯的先講','吸菸區','沉默','看辦公室','可以回家','倫理學','很會說謊','烤箱手套'],
