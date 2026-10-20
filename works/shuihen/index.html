@@ -678,6 +678,10 @@ const ANT=(c,x,y,k,na)=>{c.save();c.translate(x,y);c.scale(k,k);fillE(c,-.22,.04
   for(const [dx,s] of [[-.06,-1],[0,0],[.06,1]]){c.moveTo(dx,.03);c.lineTo(dx+s*.1-.04,.2);c.moveTo(dx,-.03);c.lineTo(dx+s*.1-.04,-.18);}
   if(!na){c.moveTo(.22,-.1);c.quadraticCurveTo(.28,-.24,.36,-.22);c.moveTo(.2,-.1);c.quadraticCurveTo(.2,-.26,.28,-.3);}c.stroke();c.restore();};
 function shapeById(id){
+  if(id==='kettle')return {name:'燒水壺',kind:'o',rot:0,core:[0,.1],box:[1,.95],draw(c){c.beginPath();c.moveTo(-.26,.22);c.quadraticCurveTo(-.3,-.12,0,-.14);c.quadraticCurveTo(.3,-.12,.26,.22);c.closePath();c.fill();
+    fillE(c,0,-.16,.06,.04);c.lineWidth=.05;c.beginPath();c.moveTo(-.16,-.08);c.quadraticCurveTo(0,-.36,.16,-.08);c.stroke();fillP(c,[[.22,.02],[.44,-.12],[.42,-.06],[.26,.12]]);
+    c.fillRect(-.36,.24,.72,.05);c.fillRect(-.3,.29,.06,.1);c.fillRect(.24,.29,.06,.1);},cut(c){c.lineWidth=.016;c.beginPath();c.moveTo(-.24,.1);c.lineTo(.24,.1);c.stroke();}};
+
   if(id==='typhoon')return {name:'颱風',kind:'o',rot:0,core:[0,0],box:[1,1],draw(c){fillE(c,0,0,.13,.13);c.lineCap='round';
     for(let a=0;a<3;a++){c.lineWidth=.09;c.beginPath();for(let t=0;t<=1;t+=.05){const r=.12+t*.3,ang=a*2.09+t*2.4;c[t?'lineTo':'moveTo'](Math.cos(ang)*r,Math.sin(ang)*r);}c.stroke();}},cut(c){fillE(c,0,0,.045,.045);}};
   if(id==='hoseCoil')return {name:'收好的水管',kind:'o',rot:0,core:[0,.05],box:[1,.9],draw(c){c.lineWidth=.07;for(const r of [.32,.22,.12]){c.beginPath();c.ellipse(0,.06,r*1.15,r*.85,0,0,7);c.stroke();}
@@ -1289,6 +1293,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'還沒滾',panels:[['coworkFight','老王跟老婆吵架，躲進廚房燒水泡茶。'],['kettle','水壺放上爐子，等著。'],['wifeBubble','老婆心軟，走進廚房：「還沒滾啊？」'],['openDoor','之後，老王再也沒回家。',0,3.5]]},
   {title:'颱風要來',panels:[['typhoon','強颱要來了，倒數三天。'],['hoseCoil','阿伯把水管捲好收起來。'],['windowTape','窗戶貼好，盆栽搬進來。'],['rainPlaza','這幾天，換雨水來畫。',0,3.5]]},
   {title:'蟻后',panels:[['antOne','什麼昆蟲最有遠見？'],['antLine','螞蟻。每天辛苦搬東西。'],['antHill','全部搬回窩裡存起來——'],['antQueen','為「蟻后（以後）」著想。',0,3.5]]},
   {title:'換一個',panels:[['generalAsk','將軍：「前線情況怎樣？」'],['rockSniper','士兵：「石堆後有個狙擊手，槍法超爛。」'],['generalMad','將軍：「怎麼不幹掉他？」'],['soldierSmart','「他們會換個更準的。」',1,3.5]]},
@@ -1386,8 +1391,8 @@ const STORIES=[
 ];
 const CATS=['諧音梗','夫妻家庭','搶匪小偷','職場校園','時事諷刺','日常冷笑話','故事小品'];
 const CATMAP={
-  '諧音梗':['蟻后','坐白宮','擲筊','一個人過','鳳梨酥','仙草蜜','一波三折','八天的','飢童','美紅敢','仰式','你哪位','哈囉 win','窗戶凍住了','左右腦','換科目','業內人士','找誰接','半手李','閉眼說瞎話','誰是京都人','金口難開','看辦公室','週一休息','看穿'],
-  '夫妻家庭':['看不到你','多生兩個','貓與虎','送回娘家','七十才開始','一模一樣','買菸','需要談談','不敢問','窗戶凍住了','一切都很好','沒安全感','所以要我留下','露台','四個孩子的爸','深夜講座','睜一隻眼','緩解疼痛','九十歲','撞到告訴我','很會說謊','很甜','兩根菸'],
+  '諧音梗':['還沒滾','蟻后','坐白宮','擲筊','一個人過','鳳梨酥','仙草蜜','一波三折','八天的','飢童','美紅敢','仰式','你哪位','哈囉 win','窗戶凍住了','左右腦','換科目','業內人士','找誰接','半手李','閉眼說瞎話','誰是京都人','金口難開','看辦公室','週一休息','看穿'],
+  '夫妻家庭':['還沒滾','看不到你','多生兩個','貓與虎','送回娘家','七十才開始','一模一樣','買菸','需要談談','不敢問','窗戶凍住了','一切都很好','沒安全感','所以要我留下','露台','四個孩子的爸','深夜講座','睜一隻眼','緩解疼痛','九十歲','撞到告訴我','很會說謊','很甜','兩根菸'],
   '搶匪小偷':['金口難開','負數','可能看到了','換科目','業內人士','遙控器','一起找'],
   '職場校園':['一個人過','仙草蜜','飢童','不忍心','美紅敢','錯的先講','吸菸區','沉默','看辦公室','可以回家','倫理學','很會說謊','烤箱手套'],
   '時事諷刺':['民調','太晚了','有用','重燃希望','誰是白痴','塗成藍色','我們的願望','白羊吃草','會飛的車'],
