@@ -675,6 +675,12 @@ const BINO_P=c=>{RRECT(c,.66,.33,1.1,.47,.04);RRECT(c,1.0,.3,1.14,.5,.03);};
 const KIDFIG=(c,x,y,k)=>{fillE(c,x,y,.06*k,.065*k);fillP(c,[[x-.07*k,y+.09*k],[x+.07*k,y+.09*k],[x+.09*k,y+.3*k],[x-.09*k,y+.3*k]]);};
 const BARS=(c,a,b)=>{c.fillRect(-.42,.36,.84,.04);c.fillRect(-.42,-.4,.04,.8);c.fillRect(-.24,.36-a,.2,a);c.fillRect(.12,.36-b,.2,b);};
 function shapeById(id){
+  if(id==='loveCouple')return pair('熱戀的兩人',SMILE,SMILE,c=>{HEART(c,.0,-.3,.09);});
+  if(id==='coupleApart')return pair('吵架的兩人',MOUTH,MOUTH,null,true);
+  if(id==='letter')return {name:'道歉信',kind:'o',rot:-.1,core:[0,0],box:[1,.8],draw(c){c.fillRect(-.38,-.24,.76,.5);},
+    cut(c){c.lineWidth=.025;c.beginPath();c.moveTo(-.38,-.24);c.lineTo(0,.06);c.lineTo(.38,-.24);c.stroke();HEART(c,0,.14,.05);}};
+  if(id==='herFurious')return profileShape({id:'pony',fixed:1,name:'更火大的她',extra:ANGER,cutP:MOUTH,box:[1.3,1.15]});
+
   if(id==='flags')return {name:'一排旗子',kind:'o',rot:0,core:[0,.1],box:[1.05,1],draw(c){for(const x of [-.34,-.02,.3]){c.fillRect(x-.03,-.36,.06,.78);c.beginPath();c.moveTo(x,-.36);c.quadraticCurveTo(x+.1,-.4,x+.2,-.34);c.lineTo(x+.2,-.1);c.quadraticCurveTo(x+.1,-.16,x,-.12);c.closePath();c.fill();}c.fillRect(-.48,.4,.96,.05);},cut(c){}};
   if(id==='pollEven')return {name:'差不多的民調',kind:'o',rot:0,core:[0,.1],box:[1,1],draw(c){BARS(c,.42,.4);},cut(c){c.lineWidth=.016;c.setLineDash([.04,.03]);c.beginPath();c.moveTo(-.36,-.06);c.lineTo(.4,-.06);c.stroke();c.setLineDash([]);}};
   if(id==='pollLop')return {name:'一邊大贏的民調',kind:'o',rot:0,core:[0,.1],box:[1,1],draw(c){BARS(c,.66,.3)},cut(c){}};
@@ -1258,6 +1264,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'看不到你',panels:[['loveCouple','熱戀的兩人，約好一起去弔祭長輩。'],['coupleApart','後來吵架，出殯那天只有他去。'],['letter','他寫信道歉——'],['herFurious','「去殯儀館想看你，卻看不到你……」',1,3.5]]},
   {title:'民調',panels:[['flags','選舉到了，路口插滿旗子。'],['pollEven','九月民調：兩邊差不多。'],['pollLop','十月民調：一邊大贏。'],['douli','阿伯沖著地：「投票那天才算數啦。」',1,3.5]]},
   {title:'多生兩個',panels:[['ringCrack','阿珍：「妳為什麼跟張先生解除婚約？」'],['crystalBall','阿娟：「昨天我們去算命。」'],['kids2v4','「算命說我會生兩個，他會生四個。」'],['juanMad','「多的兩個，跟誰生的？」',1,3.5]]},
   {title:'坐白宮',panels:[['globe','哪國元首的 CP 值最低？'],['leader','答案：美國。'],['whiteHouse','因為歷任總統都——'],['leaderTired','「坐白宮」（做白工）。',0,3.5]]},
@@ -1352,7 +1359,7 @@ const STORIES=[
 const CATS=['諧音梗','夫妻家庭','搶匪小偷','職場校園','時事諷刺','日常冷笑話','故事小品'];
 const CATMAP={
   '諧音梗':['坐白宮','擲筊','一個人過','鳳梨酥','仙草蜜','一波三折','八天的','飢童','美紅敢','仰式','你哪位','哈囉 win','窗戶凍住了','左右腦','換科目','業內人士','找誰接','半手李','閉眼說瞎話','誰是京都人','金口難開','看辦公室','週一休息','看穿'],
-  '夫妻家庭':['多生兩個','貓與虎','送回娘家','七十才開始','一模一樣','買菸','需要談談','不敢問','窗戶凍住了','一切都很好','沒安全感','所以要我留下','露台','四個孩子的爸','深夜講座','睜一隻眼','緩解疼痛','九十歲','撞到告訴我','很會說謊','很甜','兩根菸'],
+  '夫妻家庭':['看不到你','多生兩個','貓與虎','送回娘家','七十才開始','一模一樣','買菸','需要談談','不敢問','窗戶凍住了','一切都很好','沒安全感','所以要我留下','露台','四個孩子的爸','深夜講座','睜一隻眼','緩解疼痛','九十歲','撞到告訴我','很會說謊','很甜','兩根菸'],
   '搶匪小偷':['金口難開','負數','可能看到了','換科目','業內人士','遙控器','一起找'],
   '職場校園':['一個人過','仙草蜜','飢童','不忍心','美紅敢','錯的先講','吸菸區','沉默','看辦公室','可以回家','倫理學','很會說謊','烤箱手套'],
   '時事諷刺':['民調','太晚了','有用','重燃希望','誰是白痴','塗成藍色','我們的願望','白羊吃草','會飛的車'],
