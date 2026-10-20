@@ -681,6 +681,11 @@ const DOG=c=>{fillE(c,-.06,.04,.26,.13);fillE(c,.24,-.12,.13,.12);fillP(c,[[.3,-
   c.lineWidth=.06;c.lineCap='round';c.beginPath();for(const x of [-.24,-.12,.06,.16]){c.moveTo(x,.12);c.lineTo(x,.34);}c.moveTo(-.3,0);c.quadraticCurveTo(-.44,-.06,-.42,-.2);c.stroke();c.fillRect(-.48,.36,.96,.04);};
 const SLAP=c=>{fillE(c,.48,.66,.07,.08);c.lineWidth=.03;c.lineCap='round';c.beginPath();for(const [dx,dy] of [[-.08,-.14],[-.03,-.17],[.02,-.17],[.07,-.14]]){c.moveTo(.48+dx*.6,.6);c.lineTo(.48+dx,.6+dy*.7);}c.moveTo(.42,.7);c.lineTo(.36,.66);c.stroke();};
 function shapeById(id){
+  if(id==='deskPhone')return {name:'辦公室電話',kind:'o',rot:0,core:[0,.1],box:[1,.9],draw(c){fillP(c,[[-.34,.0],[.34,.0],[.4,.32],[-.4,.32]]);c.save();c.translate(0,-.12);c.beginPath();c.moveTo(-.38,.06);c.quadraticCurveTo(0,-.2,.38,.06);c.lineTo(.3,.12);c.quadraticCurveTo(0,-.06,-.3,.12);c.closePath();c.fill();fillE(c,-.33,.08,.08,.06);fillE(c,.33,.08,.08,.06);c.restore();
+    for(const r of [.16,.24]){c.lineWidth=.03;c.beginPath();c.arc(.36,-.18,r,-.9,-.2);c.stroke();}},cut(c){for(let r=0;r<2;r++)for(let k=0;k<3;k++)fillE(c,-.12+k*.12,.12+r*.1,.03,.025);}};
+  if(id==='signHR')return {name:'人事部門牌',kind:'o',rot:0,core:[0,0],box:[.95,.8],draw(c){c.fillRect(-.36,-.18,.72,.36);c.fillRect(-.03,-.36,.06,.18);},cut(c){TXT(c,'人事',0,.01,30);}};
+  if(id==='friendShock')return profileShape({id:'plain',fixed:1,name:'嚇到的朋友',extra:c=>{EXCL(c);SWEAT(c);},cutP:c=>{c.lineWidth=.02;c.beginPath();c.arc(.62,.43,.035,0,7);c.stroke();fillE(c,.79,.73,.035,.045);},box:[1.4,1.15]});
+
   if(id==='bdayCake')return {name:'生日蛋糕',kind:'o',rot:0,core:[0,.15],box:[1,.95],draw(c){c.fillRect(-.34,.04,.68,.3);c.fillRect(-.24,-.16,.48,.2);c.fillRect(-.42,.34,.84,.05);
     c.lineWidth=.035;c.beginPath();for(const x of [-.12,0,.12]){c.moveTo(x,-.16);c.lineTo(x,-.3);}c.stroke();for(const x of [-.12,0,.12]){c.beginPath();c.moveTo(x,-.42);c.quadraticCurveTo(x+.04,-.34,x,-.32);c.quadraticCurveTo(x-.04,-.34,x,-.42);c.fill();}},
     cut(c){c.lineWidth=.02;c.beginPath();c.moveTo(-.34,.14);for(let i=0;i<8;i++)c.quadraticCurveTo(-.3+i*.085,.2,-.26+i*.085,.14);c.stroke();}};
@@ -1317,6 +1322,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'不在人事',panels:[['deskPhone','朋友來電：「張主任在嗎？」'],['signHR','「抱歉，他不在人事了。」'],['friendQ','「什麼？前天才通過電話……」'],['friendShock','「怎麼就不在人世了？！」',0,3.5]]},
   {title:'多大',panels:[['bdayCake','阿土去送生日蛋糕。'],['atuSlap','回來時，臉上多了個掌印。'],['interviewer','老闆：「你說了什麼？」'],['atuSweat','「我問她：妳奶奶多大？」',0,3.5]]},
   {title:'五個媽',panels:[['beerMugs','小瑋：「養家真辛苦。」'],['friendQ','小張：「你有幾個小孩？」'],['kids5','「五個。」「難怪難養！」'],['workerShock','「是五個媽難養。」',0,3.5]]},
   {title:'慰問信',panels:[['hospBed','護理師：「你朋友寄慰問信來了。」'],['patientWeak','病人：「沒力氣看，幫我念吧。」'],['letter','「工作太忙，沒空探病……」'],['patientShock','「……但出殯一定到。」',0,3.5]]},
@@ -1420,10 +1426,10 @@ const STORIES=[
 ];
 const CATS=['諧音梗','夫妻家庭','搶匪小偷','職場校園','時事諷刺','日常冷笑話','故事小品'];
 const CATMAP={
-  '諧音梗':['多大','雨多甜','還沒滾','蟻后','坐白宮','擲筊','一個人過','鳳梨酥','仙草蜜','一波三折','八天的','飢童','美紅敢','仰式','你哪位','哈囉 win','窗戶凍住了','左右腦','換科目','業內人士','找誰接','半手李','閉眼說瞎話','誰是京都人','金口難開','看辦公室','週一休息','看穿'],
+  '諧音梗':['不在人事','多大','雨多甜','還沒滾','蟻后','坐白宮','擲筊','一個人過','鳳梨酥','仙草蜜','一波三折','八天的','飢童','美紅敢','仰式','你哪位','哈囉 win','窗戶凍住了','左右腦','換科目','業內人士','找誰接','半手李','閉眼說瞎話','誰是京都人','金口難開','看辦公室','週一休息','看穿'],
   '夫妻家庭':['五個媽','雨多甜','還沒滾','看不到你','多生兩個','貓與虎','送回娘家','七十才開始','一模一樣','買菸','需要談談','不敢問','窗戶凍住了','一切都很好','沒安全感','所以要我留下','露台','四個孩子的爸','深夜講座','睜一隻眼','緩解疼痛','九十歲','撞到告訴我','很會說謊','很甜','兩根菸'],
   '搶匪小偷':['金口難開','負數','可能看到了','換科目','業內人士','遙控器','一起找'],
-  '職場校園':['一個人過','仙草蜜','飢童','不忍心','美紅敢','錯的先講','吸菸區','沉默','看辦公室','可以回家','倫理學','很會說謊','烤箱手套'],
+  '職場校園':['不在人事','一個人過','仙草蜜','飢童','不忍心','美紅敢','錯的先講','吸菸區','沉默','看辦公室','可以回家','倫理學','很會說謊','烤箱手套'],
   '時事諷刺':['民調','太晚了','有用','重燃希望','誰是白痴','塗成藍色','我們的願望','白羊吃草','會飛的車'],
   '故事小品':['颱風要來','收拾','放下','恆河','平安','等','釣','慢','午後']};
 STORIES.forEach(S=>{S.cats=CATS.filter(c=>(CATMAP[c]||[]).includes(S.title));if(!S.cats.length)S.cats=['日常冷笑話'];});
