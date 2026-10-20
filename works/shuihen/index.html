@@ -50,10 +50,10 @@ button:focus-visible{outline:2px solid var(--chalk);outline-offset:2px}
 .seg button:last-child{border-radius:0 5px 4px 0}
 .seg button+button{border-left-width:0}
 .seg button[aria-pressed="true"]{background:var(--scrim-on);color:var(--ink)}
-.sheet{position:fixed;inset:0;z-index:20;background:rgba(20,18,15,.5);display:grid;place-items:center;
+.sheet{position:fixed;inset:0;z-index:20;background:rgba(20,18,15,.5);display:grid;place-items:start center;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
   padding-block:calc(16px + env(safe-area-inset-top,0px)) calc(16px + env(safe-area-inset-bottom,0px))}
-.card{width:min(460px,100%);max-height:78vh;display:grid;grid-template-rows:auto auto auto minmax(0,1fr);gap:12px;
+.card{width:min(460px,100%);margin:auto 0;display:grid;grid-template-rows:auto auto auto auto;gap:12px;
   background:rgba(40,36,30,.94);border:1.5px solid var(--chalk-line);border-radius:4px 7px 5px 6px;padding:16px;box-sizing:border-box}
 .chips{display:flex;flex-wrap:wrap;gap:6px}
 .chips button{font-size:14px;min-height:34px;padding:5px 10px;border-radius:14px;background:transparent;-webkit-backdrop-filter:none;backdrop-filter:none}
@@ -67,12 +67,12 @@ button:focus-visible{outline:2px solid var(--chalk);outline-offset:2px}
   background:var(--scrim);border:1.5px solid var(--chalk-line);border-radius:4px;padding:8px}
 .share-grid a:hover,.share-grid button:hover{border-color:var(--chalk)}
 #share-url{font:inherit;font-size:13px;color:var(--chalk-dim);background:transparent;border:0;border-bottom:1.5px solid var(--chalk-line);padding:6px 2px;min-width:0;width:100%}
-.card header{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.card header{display:flex;justify-content:space-between;align-items:center;gap:8px;position:sticky;top:-16px;z-index:2;background:rgb(40,36,30);margin:-16px -16px 0;padding:16px 16px 8px}
 .card h2{margin:0;font-size:22px;letter-spacing:.08em}
 .card input{font:inherit;font-size:17px;color:var(--chalk);background:transparent;border:0;border-bottom:1.5px solid var(--chalk-line);padding:8px 2px;min-width:0}
 .card input:focus-visible{outline:none;border-bottom-color:var(--chalk)}
 .card input::placeholder{color:var(--chalk-dim)}
-.list{list-style:none;margin:0;padding:0;overflow-y:auto;display:grid;gap:6px;align-content:start}
+.list{list-style:none;margin:0;padding:0;display:grid;gap:6px;align-content:start}
 .list button{width:100%;text-align:left;display:grid;gap:3px;border-radius:3px;background:transparent;-webkit-backdrop-filter:none;backdrop-filter:none}
 .list button[aria-current="true"]{border-color:var(--chalk);background:rgba(247,244,234,.1)}
 .list .t{font-size:18px;font-weight:700}
