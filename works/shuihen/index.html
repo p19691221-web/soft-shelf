@@ -1308,7 +1308,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
-  {title:'慰問信',panels:[['hospBed','護理師：「你朋友寄慰問信來了。」'],['patientWeak','病人：「沒力氣看，幫我念吧。」'],['letter','「工作太忙，無法前去探病……」'],['patientShock','「……不過出殯那天，一定到。」',0,3.5]]},
+  {title:'慰問信',panels:[['hospBed','護理師：「你朋友寄慰問信來了。」'],['patientWeak','病人：「沒力氣看，幫我念吧。」'],['letter','「工作太忙，沒空探病……」'],['patientShock','「……但出殯一定到。」',0,3.5]]},
   {title:'不是我的狗',panels:[['dogMean','老王過橋，看到阿伯和一隻兇狗。'],['friendQ','老王：「阿伯，你的狗會咬人嗎？」'],['abeSay','阿伯：「我的狗絕不咬人。」',1],['dogBite','被咬了。「那不是我的狗。」',0,3.5]]},
   {title:'雨多甜',panels:[['wifeBubble','老婆：「日本的宇多田好有名喔！」'],['friendQ','老公：「神經病，我又沒去過日本。」'],['sweetRain','「哪知道那邊雨多甜？」'],['wifeMad','老婆：「……」',1,3.5]]},
   {title:'還沒滾',panels:[['coworkFight','老王跟老婆吵架，躲進廚房燒水泡茶。'],['kettle','水壺放上爐子，等著。'],['wifeBubble','老婆心軟，走進廚房：「還沒滾啊？」'],['openDoor','之後，老王再也沒回家。',0,3.5]]},
