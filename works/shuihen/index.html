@@ -693,7 +693,15 @@ const SHRIMP=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);
   c.lineWidth=.03;c.beginPath();for(const a of [.2,.7,1.2]){c.moveTo(Math.cos(a)*.3,Math.sin(a)*.3);c.lineTo(Math.cos(a)*.4,Math.sin(a)*.4);}c.stroke();c.restore();};
 const CHEST=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.fillRect(-.3,-.02,.6,.3);c.beginPath();c.moveTo(-.3,-.02);c.quadraticCurveTo(0,-.24,.3,-.02);c.closePath();c.fill();c.restore();};
 const CHEST_CUT=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.lineWidth=.025;c.beginPath();c.moveTo(-.3,.02);c.lineTo(.3,.02);c.stroke();c.fillRect(-.04,-.02,.08,.1);c.restore();};
+const COLA=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.beginPath();c.moveTo(-.04,-.4);c.lineTo(.04,-.4);c.lineTo(.05,-.26);c.quadraticCurveTo(.14,-.16,.13,-.02);c.quadraticCurveTo(.1,.08,.12,.16);c.lineTo(.12,.36);c.quadraticCurveTo(0,.42,-.12,.36);c.lineTo(-.12,.16);c.quadraticCurveTo(-.1,.08,-.13,-.02);c.quadraticCurveTo(-.14,-.16,-.05,-.26);c.closePath();c.fill();c.fillRect(-.06,-.46,.12,.06);c.restore();};
+const CUP=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);fillP(c,[[-.16,-.1],[.16,-.1],[.13,.26],[-.13,.26]]);c.lineWidth=.05;c.beginPath();c.arc(.18,.06,.08,-1.3,1.3);c.stroke();fillE(c,0,.3,.22,.04);c.restore();};
 function shapeById(id){
+  if(id==='colaCoffee')return {name:'可樂和咖啡',kind:'o',rot:0,core:[0,.1],box:[1.05,.95],draw(c){COLA(c,-.24,0,1);CUP(c,.22,.06,1.1);c.lineWidth=.03;c.lineCap='round';for(const x of [.16,.28]){c.beginPath();c.moveTo(x,-.12);c.quadraticCurveTo(x-.04,-.2,x,-.28);c.stroke();}},
+    cut(c){c.save();c.translate(-.24,0);c.lineWidth=.016;c.beginPath();c.moveTo(-.12,.06);c.lineTo(.12,.06);c.moveTo(-.12,.14);c.lineTo(.12,.14);c.stroke();c.restore();}};
+  if(id==='colaFizz')return {name:'冒泡的可樂',kind:'o',rot:0,core:[0,.1],box:[1.05,1.25],draw(c){COLA(c,0,.06,1.15);for(const [x,y,r] of [[-.12,-.42,.03],[.06,-.5,.035],[.16,-.4,.025],[-.04,-.58,.025],[.2,-.56,.02]])fillE(c,x,y,r,r);c.save();c.translate(-.75,-.65);c.scale(.8,.8);QMARK(c);c.restore();},cut(c){}};
+  if(id==='coffeeTalk')return {name:'說教的咖啡',kind:'o',rot:0,core:[0,.1],box:[1.05,.9],draw(c){CUP(c,-.14,.06,1.3);fillE(c,.3,-.24,.17,.11);fillP(c,[[.18,-.16],[.12,-.04],[.24,-.15]]);},cut(c){for(const x of [.22,.3,.38])fillE(c,x,-.24,.025,.025);}};
+  if(id==='colaFlat')return {name:'沒氣的可樂',kind:'o',rot:-.35,core:[0,.1],box:[1,.95],draw(c){COLA(c,0,.06,1.1);},cut(c){c.lineWidth=.02;c.beginPath();c.moveTo(-.06,-.02);c.lineTo(-.02,.02);c.moveTo(-.02,-.02);c.lineTo(-.06,.02);c.moveTo(.02,-.02);c.lineTo(.06,.02);c.moveTo(.06,-.02);c.lineTo(.02,.02);c.stroke();}};
+
   if(id==='engBook')return {name:'英文書',kind:'o',rot:0,core:[0,0],box:[1.05,.8],draw(c){c.beginPath();c.moveTo(0,-.12);c.quadraticCurveTo(-.22,-.24,-.44,-.16);c.lineTo(-.44,.24);c.quadraticCurveTo(-.22,.16,0,.28);c.quadraticCurveTo(.22,.16,.44,.24);c.lineTo(.44,-.16);c.quadraticCurveTo(.22,-.24,0,-.12);c.fill();c.save();c.translate(-.6,-.6);c.scale(.75,.75);QMARK(c);c.restore();},
     cut(c){TXT(c,'ABC',-.22,.02,20);c.lineWidth=.016;c.beginPath();c.moveTo(0,-.1);c.lineTo(0,.26);for(let i=0;i<3;i++){c.moveTo(.06,-.06+i*.1);c.lineTo(.36,-.08+i*.1);}c.stroke();}};
   if(id==='meIdk')return profileShape({id:'flat',fixed:1,name:'老實回答的我',extra:BUBBLE,cutP:c=>{MOUTH(c);BUBBLE_DOTS(c);},scale:.75,shift:-.22,box:[1.4,1.1],core:[-.22,0]});
@@ -1444,6 +1452,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'沒氣了',panels:[['colaCoffee','可樂和咖啡在聊天。'],['colaFizz','可樂：「誰會比較長壽？」'],['coffeeTalk','咖啡：「要早睡、多運動……」'],['colaFlat','聊著聊著，可樂就沒氣了。',0,3.5]]},
   {title:'我不知道',panels:[['engBook','媽：「I don\'t know 是啥？」'],['meIdk','我：「我不知道。」'],['momFrown','「大學白讀了？什麼都不知道！」'],['dadSweat','「就是『我不知道』啊！」「還嘴硬！」',0,3.5]]},
   {title:'我知道',panels:[['engBook','媽：「那 I know 呢？」'],['meIdk','我：「我知道。」'],['momFrown','「知道就快說！」'],['dadSweat','「就是『我知道』啊！」「不懂裝懂！」',0,3.5]]},
   {title:'鏡子都敢照',panels:[['bus','放學公車上，阿華：「來講鬼故事！」'],['ghost','小明：「不要啦，我會怕。」'],['tvRose','「我連玫瑰之夜都不敢看！」'],['mirror','阿華：「鏡子都敢照，還怕？」',0,3.5]]},
@@ -1569,7 +1578,7 @@ const STORIES=[
 ];
 const CATS=['諧音梗','夫妻家庭','搶匪小偷','職場校園','時事諷刺','日常冷笑話','故事小品'];
 const CATMAP={
-  '諧音梗':['南方','最甜的蜜','小氣蝦','瓦斯怎麼叫','缺陷','冰心地瓜','不在人事','多大','雨多甜','還沒滾','蟻后','坐白宮','擲筊','一個人過','鳳梨酥','仙草蜜','一波三折','八天的','飢童','美紅敢','仰式','你哪位','哈囉 win','窗戶凍住了','左右腦','換科目','業內人士','找誰接','半手李','閉眼說瞎話','誰是京都人','金口難開','看辦公室','週一休息','看穿'],
+  '諧音梗':['沒氣了','南方','最甜的蜜','小氣蝦','瓦斯怎麼叫','缺陷','冰心地瓜','不在人事','多大','雨多甜','還沒滾','蟻后','坐白宮','擲筊','一個人過','鳳梨酥','仙草蜜','一波三折','八天的','飢童','美紅敢','仰式','你哪位','哈囉 win','窗戶凍住了','左右腦','換科目','業內人士','找誰接','半手李','閉眼說瞎話','誰是京都人','金口難開','看辦公室','週一休息','看穿'],
   '夫妻家庭':['我不知道','我知道','第一次','會下蛋嗎','南方','挑食','五個媽','雨多甜','還沒滾','看不到你','多生兩個','貓與虎','送回娘家','七十才開始','一模一樣','買菸','需要談談','不敢問','窗戶凍住了','一切都很好','沒安全感','所以要我留下','露台','四個孩子的爸','深夜講座','睜一隻眼','緩解疼痛','九十歲','撞到告訴我','很會說謊','很甜','兩根菸'],
   '搶匪小偷':['金口難開','負數','可能看到了','換科目','業內人士','遙控器','一起找'],
   '職場校園':['鏡子都敢照','不會再問我','自己寫','哪邊涼快','不在人事','一個人過','仙草蜜','飢童','不忍心','美紅敢','錯的先講','吸菸區','沉默','看辦公室','可以回家','倫理學','很會說謊','烤箱手套'],
