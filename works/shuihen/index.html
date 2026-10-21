@@ -694,6 +694,10 @@ const SHRIMP=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);
 const CHEST=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.fillRect(-.3,-.02,.6,.3);c.beginPath();c.moveTo(-.3,-.02);c.quadraticCurveTo(0,-.24,.3,-.02);c.closePath();c.fill();c.restore();};
 const CHEST_CUT=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.lineWidth=.025;c.beginPath();c.moveTo(-.3,.02);c.lineTo(.3,.02);c.stroke();c.fillRect(-.04,-.02,.08,.1);c.restore();};
 function shapeById(id){
+  if(id==='dadSweat')return profileShape({id:'flat',fixed:1,name:'尷尬的爸爸',extra:SWEAT,cutP:c=>{EYE_SHUT(c);MOUTH(c);},scale:.85,shift:-.06,box:[1.2,1.05],core:[-.06,0]});
+  if(id==='eggNest')return {name:'鳥巢裡的蛋',kind:'o',rot:0,core:[0,.1],box:[1,.85],draw(c){c.beginPath();c.moveTo(-.44,.1);c.quadraticCurveTo(0,.48,.44,.1);c.closePath();c.fill();for(const [x,y] of [[-.22,-.06],[0,-.14],[.22,-.06]])fillE(c,x,y,.09,.12);c.save();c.translate(-.98,-.7);c.scale(.75,.75);QMARK(c);c.restore();},
+    cut(c){c.lineWidth=.03;for(const [x,y] of [[-.22,-.06],[0,-.14],[.22,-.06]]){c.beginPath();c.ellipse(x,y,.1,.13,0,0,7);c.stroke();}c.lineWidth=.018;c.beginPath();for(const y of [.16,.24]){c.moveTo(-.34,y);c.quadraticCurveTo(0,y+.1,.34,y);}c.stroke();}};
+
   if(id==='momFrown')return profileShape({id:'mom',bun:1,fixed:1,name:'臉一沉的媽媽',extra:ANGER,cutP:MOUTH,box:[1.3,1.15]});
   if(id==='girlQ')return profileShape({id:'pony',fixed:1,name:'納悶的女兒',extra:QMARK,cutP:MOUTH,box:[1.4,1.15]});
   if(id==='momScoff')return profileShape({id:'mom',bun:1,fixed:1,name:'不屑的媽媽',extra:BUBBLE,cutP:c=>{EYE_SHUT(c);MOUTH(c);BUBBLE_DOTS(c);},scale:.75,shift:-.22,box:[1.4,1.1],core:[-.22,0]});
@@ -1403,6 +1407,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'會下蛋嗎',panels:[['swimFree','夏天，兒子吵著要去游泳。'],['dadSweat','爸：「我……不會游。」'],['fish','「小明爸常吃魚才會游。」'],['eggNest','「你天天吃雞，會下蛋？」',0,3.5]]},
   {title:'南方',panels:[['crystalBall','算命：「她會嫁南方的。」'],['momFrown','媽媽臉一沉，拉人就走。'],['girlQ','女兒：媽討厭南方人？'],['momScoff','媽：「嫁男方，還用你算？」',0,3.5]]},
   {title:'挑食',panels:[['kidsPair','路過幼稚園，聽到兩個小朋友聊天。'],['kidAsk','「為什麼大人都不挑食？」'],['groceryBag','「買的都是他們愛吃的啊。」'],['workerShock','我當場石化：真理啊。',0,3.5]]},
   {title:'最甜的蜜',panels:[['honeyJar','最甜的蜂蜜，是什麼蜜？'],['bee','連蜜蜂都想不出來。'],['loveCouple','答案是——'],['heartMe','「You and me」（蜜）。',0,3.5]]},
@@ -1520,7 +1525,7 @@ const STORIES=[
 const CATS=['諧音梗','夫妻家庭','搶匪小偷','職場校園','時事諷刺','日常冷笑話','故事小品'];
 const CATMAP={
   '諧音梗':['南方','最甜的蜜','小氣蝦','瓦斯怎麼叫','缺陷','冰心地瓜','不在人事','多大','雨多甜','還沒滾','蟻后','坐白宮','擲筊','一個人過','鳳梨酥','仙草蜜','一波三折','八天的','飢童','美紅敢','仰式','你哪位','哈囉 win','窗戶凍住了','左右腦','換科目','業內人士','找誰接','半手李','閉眼說瞎話','誰是京都人','金口難開','看辦公室','週一休息','看穿'],
-  '夫妻家庭':['南方','挑食','五個媽','雨多甜','還沒滾','看不到你','多生兩個','貓與虎','送回娘家','七十才開始','一模一樣','買菸','需要談談','不敢問','窗戶凍住了','一切都很好','沒安全感','所以要我留下','露台','四個孩子的爸','深夜講座','睜一隻眼','緩解疼痛','九十歲','撞到告訴我','很會說謊','很甜','兩根菸'],
+  '夫妻家庭':['會下蛋嗎','南方','挑食','五個媽','雨多甜','還沒滾','看不到你','多生兩個','貓與虎','送回娘家','七十才開始','一模一樣','買菸','需要談談','不敢問','窗戶凍住了','一切都很好','沒安全感','所以要我留下','露台','四個孩子的爸','深夜講座','睜一隻眼','緩解疼痛','九十歲','撞到告訴我','很會說謊','很甜','兩根菸'],
   '搶匪小偷':['金口難開','負數','可能看到了','換科目','業內人士','遙控器','一起找'],
   '職場校園':['自己寫','哪邊涼快','不在人事','一個人過','仙草蜜','飢童','不忍心','美紅敢','錯的先講','吸菸區','沉默','看辦公室','可以回家','倫理學','很會說謊','烤箱手套'],
   '時事諷刺':['民調','太晚了','有用','重燃希望','誰是白痴','塗成藍色','我們的願望','白羊吃草','會飛的車'],
