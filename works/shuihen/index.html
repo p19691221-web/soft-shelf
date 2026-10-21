@@ -694,6 +694,12 @@ const SHRIMP=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);
 const CHEST=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.fillRect(-.3,-.02,.6,.3);c.beginPath();c.moveTo(-.3,-.02);c.quadraticCurveTo(0,-.24,.3,-.02);c.closePath();c.fill();c.restore();};
 const CHEST_CUT=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.lineWidth=.025;c.beginPath();c.moveTo(-.3,.02);c.lineTo(.3,.02);c.stroke();c.fillRect(-.04,-.02,.08,.1);c.restore();};
 function shapeById(id){
+  if(id==='bus')return {name:'公車',kind:'o',rot:0,core:[0,.05],box:[1.05,.8],draw(c){RRECT(c,-.46,-.22,.46,.2,.06);fillE(c,-.28,.22,.08,.08);fillE(c,.28,.22,.08,.08);c.fillRect(-.48,.3,.96,.03);},
+    cut(c){for(const x of [-.36,-.16,.04])RRECT(c,x,-.15,x+.16,-.01,.02);RRECT(c,.26,-.15,.38,.12,.02);fillE(c,-.28,.22,.03,.03);fillE(c,.28,.22,.03,.03);}};
+  if(id==='tvRose')return {name:'電視鬼節目',kind:'o',rot:0,core:[-.38,.3],box:[1,.95],draw(c){TV(c,0,.04,1.25);},cut(c){c.save();c.translate(-.06,.02);GHOST(c,0,0,.42);c.restore();}};
+  if(id==='mirror')return {name:'鏡子',kind:'o',rot:0,core:[0,.1],box:[.85,1.05],draw(c){fillE(c,0,-.08,.26,.32);c.fillRect(-.03,.22,.06,.14);fillE(c,0,.38,.16,.04);c.save();c.translate(-.98,-.5);c.scale(.75,.75);EXCL(c);c.restore();},
+    cut(c){fillE(c,0,-.08,.2,.26);c.globalCompositeOperation='source-over';c.lineWidth=.03;c.lineCap='round';c.beginPath();c.moveTo(-.1,-.24);c.lineTo(-.02,-.3);c.moveTo(-.12,-.14);c.lineTo(.04,-.26);c.stroke();}};
+
   if(id==='kidSleep')return profileShape({id:'kid',fixed:1,name:'打瞌睡的小明',extra:c=>{ZZ(c,.88,.12,1.6);ZZ(c,1.08,-.1,1.3);},cutP:c=>{EYE_SHUT(c);MOUTH(c);},scale:.85,shift:-.1,box:[1.35,1.1],core:[-.1,0]});
   if(id==='boardSolved')return {name:'解完的黑板',kind:'o',rot:0,core:[0,0],box:[1.05,.85],draw(c){c.fillRect(-.44,-.28,.88,.52);c.fillRect(-.47,.24,.94,.04);},
     cut(c){TXT(c,'x=3',-.12,-.04,30);c.lineWidth=.05;c.lineCap='round';c.beginPath();c.moveTo(.16,-.04);c.lineTo(.24,.06);c.lineTo(.38,-.16);c.stroke();}};
@@ -1434,6 +1440,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'鏡子都敢照',panels:[['bus','放學公車上，阿華：「來講鬼故事！」'],['ghost','小明：「不要啦，我會怕。」'],['tvRose','「我連玫瑰之夜都不敢看！」'],['mirror','阿華：「鏡子都敢照，還怕？」',0,3.5]]},
   {title:'不會再問我',panels:[['kidSleep','數學課，小明在睡覺。'],['teacherMad','老師：「上來解！解不出來？」'],['boardSolved','結果小明解得又快又漂亮。'],['kidSleep','「我先睡，不會再叫我。」',0,3.5]]},
   {title:'第一次',panels:[['hotSun','阿公走了，等公祭的那幾天很熱。'],['kidAlarm','孫子：「阿公在流汗！」'],['amaShush','阿嬤：「噓……」'],['amaSmile','「阿公第一次死，會緊張。」',0,3.5]]},
   {title:'逃命',panels:[['tvRace','阿嬤在看電視轉播的賽跑。'],['startGun','「砰！」一聲槍響——'],['runners','所有選手拚命往前衝。'],['amaPity','阿嬤：「好可憐，一開槍都在逃命……」',0,3.5]]},
@@ -1559,7 +1566,7 @@ const CATMAP={
   '諧音梗':['南方','最甜的蜜','小氣蝦','瓦斯怎麼叫','缺陷','冰心地瓜','不在人事','多大','雨多甜','還沒滾','蟻后','坐白宮','擲筊','一個人過','鳳梨酥','仙草蜜','一波三折','八天的','飢童','美紅敢','仰式','你哪位','哈囉 win','窗戶凍住了','左右腦','換科目','業內人士','找誰接','半手李','閉眼說瞎話','誰是京都人','金口難開','看辦公室','週一休息','看穿'],
   '夫妻家庭':['第一次','會下蛋嗎','南方','挑食','五個媽','雨多甜','還沒滾','看不到你','多生兩個','貓與虎','送回娘家','七十才開始','一模一樣','買菸','需要談談','不敢問','窗戶凍住了','一切都很好','沒安全感','所以要我留下','露台','四個孩子的爸','深夜講座','睜一隻眼','緩解疼痛','九十歲','撞到告訴我','很會說謊','很甜','兩根菸'],
   '搶匪小偷':['金口難開','負數','可能看到了','換科目','業內人士','遙控器','一起找'],
-  '職場校園':['不會再問我','自己寫','哪邊涼快','不在人事','一個人過','仙草蜜','飢童','不忍心','美紅敢','錯的先講','吸菸區','沉默','看辦公室','可以回家','倫理學','很會說謊','烤箱手套'],
+  '職場校園':['鏡子都敢照','不會再問我','自己寫','哪邊涼快','不在人事','一個人過','仙草蜜','飢童','不忍心','美紅敢','錯的先講','吸菸區','沉默','看辦公室','可以回家','倫理學','很會說謊','烤箱手套'],
   '時事諷刺':['民調','太晚了','有用','重燃希望','誰是白痴','塗成藍色','我們的願望','白羊吃草','會飛的車'],
   '故事小品':['颱風要來','收拾','放下','恆河','平安','等','釣','慢','午後']};
 STORIES.forEach(S=>{S.cats=CATS.filter(c=>(CATMAP[c]||[]).includes(S.title));if(!S.cats.length)S.cats=['日常冷笑話'];});
