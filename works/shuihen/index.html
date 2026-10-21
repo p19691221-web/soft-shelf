@@ -694,6 +694,11 @@ const SHRIMP=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);
 const CHEST=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.fillRect(-.3,-.02,.6,.3);c.beginPath();c.moveTo(-.3,-.02);c.quadraticCurveTo(0,-.24,.3,-.02);c.closePath();c.fill();c.restore();};
 const CHEST_CUT=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.lineWidth=.025;c.beginPath();c.moveTo(-.3,.02);c.lineTo(.3,.02);c.stroke();c.fillRect(-.04,-.02,.08,.1);c.restore();};
 function shapeById(id){
+  if(id==='kidWrite')return {name:'寫信的小明',kind:'o',rot:0,core:[-.2,.1],box:[1.05,.95],draw(c){c.save();c.translate(-.24,-.06);c.scale(.6,.6);profileShape({id:'kid',fixed:1,name:''}).draw(c);c.restore();
+    c.fillRect(-.46,.3,.92,.04);fillP(c,[[-.02,.12],[.34,.08],[.38,.28],[0,.3]]);c.lineWidth=.03;c.lineCap='round';c.beginPath();c.moveTo(.1,.22);c.lineTo(.24,-.02);c.stroke();},cut(c){c.lineWidth=.014;c.beginPath();c.moveTo(.06,.18);c.lineTo(.3,.15);c.moveTo(.07,.24);c.lineTo(.31,.21);c.stroke();}};
+  if(id==='momAsk')return profileShape({id:'mom',bun:1,fixed:1,name:'好奇的媽媽',extra:QMARK,cutP:MOUTH,box:[1.4,1.15]});
+  if(id==='kidSmug')return profileShape({id:'kid',fixed:1,name:'理直氣壯的小明',extra:BUBBLE,cutP:c=>{SMILE(c);BUBBLE_DOTS(c);},scale:.75,shift:-.22,box:[1.4,1.1],core:[-.22,0]});
+
   if(id==='prizePhone')return {name:'中獎通知',kind:'o',rot:0,core:[0,.05],box:[1,1],draw(c){c.fillRect(-.36,-.24,.72,.48);c.fillRect(-.03,-.42,.06,.18);for(const a of [-.6,0,.6]){c.save();c.rotate(a);c.fillRect(-.02,-.5,.04,.08);c.restore();}},cut(c){TXT(c,'中獎',0,.01,34);}};
   if(id==='parcel')return {name:'送來的箱子',kind:'o',rot:0,core:[0,.1],box:[1,.95],draw(c){CUBE(c,-.34,-.1,.52,.44,.18);},cut(c){CUBE_CUT(c,-.34,-.1,.52,.44,.18);c.fillRect(-.1,-.1,.06,.44);}};
   if(id==='riceEmpty')return {name:'快見底的米缸',kind:'o',rot:0,core:[0,.1],box:[.95,.95],draw(c){fillP(c,[[-.3,-.2],[.3,-.2],[.26,.38],[-.26,.38]]);fillE(c,0,-.2,.32,.06);},cut(c){fillP(c,[[-.25,-.16],[.25,-.16],[.22,.26],[-.22,.26]]);}};
@@ -1412,6 +1417,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'寫給自己',panels:[['kidWrite','小明在寫信。'],['momAsk','媽：「寫給誰？」「寫給我自己。」'],['letter','媽：「那你寫了什麼？」'],['kidSmug','「我還沒收到，怎麼知道？」',0,3.5]]},
   {title:'一袋大米',panels:[['prizePhone','網路抽獎，抽中一袋米！'],['riceEmpty','米快沒了，媽就先不買。'],['parcel','等了幾天，終於送到——'],['riceTiny','一簽收：大米，500 克。',0,3.5]]},
   {title:'會下蛋嗎',panels:[['swimFree','夏天，兒子吵著要去游泳。'],['dadSweat','爸：「我……不會游。」'],['fish','「小明爸常吃魚才會游。」'],['eggNest','「你天天吃雞，會下蛋？」',0,3.5]]},
   {title:'南方',panels:[['crystalBall','算命：「她會嫁南方的。」'],['momFrown','媽媽臉一沉，拉人就走。'],['girlQ','女兒：媽討厭南方人？'],['momScoff','媽：「嫁男方，還用你算？」',0,3.5]]},
