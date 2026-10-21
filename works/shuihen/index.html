@@ -696,6 +696,9 @@ const CHEST_CUT=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.lineWidth=.
 const COLA=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.beginPath();c.moveTo(-.04,-.4);c.lineTo(.04,-.4);c.lineTo(.05,-.26);c.quadraticCurveTo(.14,-.16,.13,-.02);c.quadraticCurveTo(.1,.08,.12,.16);c.lineTo(.12,.36);c.quadraticCurveTo(0,.42,-.12,.36);c.lineTo(-.12,.16);c.quadraticCurveTo(-.1,.08,-.13,-.02);c.quadraticCurveTo(-.14,-.16,-.05,-.26);c.closePath();c.fill();c.fillRect(-.06,-.46,.12,.06);c.restore();};
 const CUP=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);fillP(c,[[-.16,-.1],[.16,-.1],[.13,.26],[-.13,.26]]);c.lineWidth=.05;c.beginPath();c.arc(.18,.06,.08,-1.3,1.3);c.stroke();fillE(c,0,.3,.22,.04);c.restore();};
 function shapeById(id){
+  if(id==='husbandBlank')return profileShape({id:'flat',fixed:1,name:'面無表情的老公',cutP:c=>{c.lineWidth=.022;c.beginPath();c.moveTo(.58,.43);c.lineTo(.7,.43);c.moveTo(.72,.73);c.lineTo(.8,.73);c.stroke();}});
+  if(id==='fairyWife')return profileShape({id:'pony',fixed:1,name:'仙女老婆',extra:c=>{for(const [x,y,r] of [[.96,.1,.09],[1.12,.3,.07],[.1,-.1,.07]])fillP(c,[[x,y-r],[x+r*.3,y-r*.3],[x+r,y],[x+r*.3,y+r*.3],[x,y+r],[x-r*.3,y+r*.3],[x-r,y],[x-r*.3,y-r*.3]]);c.lineWidth=.05;c.beginPath();c.ellipse(.42,-.12,.26,.06,0,0,7);c.stroke();},cutP:c=>{EYE_SHUT(c);SMILE(c);},box:[1.3,1.3],core:[0,.1]});
+
   if(id==='gfTear')return profileShape({id:'pony',fixed:1,name:'流淚的她',box:[1.2,1.12],extra:c=>{for(const [x,y,r] of [[.9,.56,.05],[.95,.74,.045],[.88,.9,.04]]){c.beginPath();c.moveTo(x,y-r*1.6);c.quadraticCurveTo(x+r*1.2,y+r*.4,x,y+r);c.quadraticCurveTo(x-r*1.2,y+r*.4,x,y-r*1.6);c.fill();}},cutP:c=>{EYE_SHUT(c);MOUTH(c);}});
   if(id==='hugPair'){const A=profileShape({id:'flat',fixed:1,name:'',cutP:EYE_SHUT}),B=profileShape({id:'pony',fixed:1,name:'',cutP:EYE_SHUT});
     return {name:'擁抱',kind:'o',rot:0,core:[0,.42],box:[1.05,.95],draw(c){c.save();c.translate(-.16,.06);c.scale(.5,.5);A.draw(c);c.restore();c.save();c.translate(.17,.08);c.scale(-.47,.47);B.draw(c);c.restore();HEART(c,0,-.34,.1);},
@@ -1500,6 +1503,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'仙女',panels:[['wifeBubble','老婆：「老公，誇誇我嘛。」'],['husbandBlank','我面無表情地看著她。'],['wifeMad','「現在連敷衍都懶了？」'],['fairyWife','「我不配跟仙女說話。」',0,3.5]]},
   {title:'誤點',panels:[['loveCouple','月台送別，倒數三十分：「我愛你。」'],['gfTear','倒數二十分，她落下醞釀好久的淚。'],['hugPair','倒數十分，兩人緊緊相擁。'],['speaker','廣播：「誤點一小時四十分。」',0,3.5]]},
   {title:'慣性',panels:[['laptopOn','懶是一種慣性：開了電腦就不想關，'],['sofaLie','躺下了就不想起，'],['bedSleep','睡著了就不想醒，'],['thinkYou','想你了，就不想停。',0,3.5]]},
   {title:'看很久',panels:[['meStare','看到特別好看的人，我會一直盯著看。'],['clock','一直看，看很久……'],['armTired','直到手痠了——'],['handMirror','才捨得放下鏡子。',0,3.5]]},
@@ -1636,7 +1640,7 @@ const STORIES=[
 const CATS=['諧音梗','夫妻家庭','搶匪小偷','職場校園','時事諷刺','日常冷笑話','故事小品'];
 const CATMAP={
   '諧音梗':['沒氣了','南方','最甜的蜜','小氣蝦','瓦斯怎麼叫','缺陷','冰心地瓜','不在人事','多大','雨多甜','還沒滾','蟻后','坐白宮','擲筊','一個人過','鳳梨酥','仙草蜜','一波三折','八天的','飢童','美紅敢','仰式','你哪位','哈囉 win','窗戶凍住了','左右腦','換科目','業內人士','找誰接','半手李','閉眼說瞎話','誰是京都人','金口難開','看辦公室','週一休息','看穿'],
-  '夫妻家庭':['誤點','玩夠沒','瓶蓋','最佳搭檔','帶過來的','明天減肥','我不知道','我知道','第一次','會下蛋嗎','南方','挑食','五個媽','雨多甜','還沒滾','看不到你','多生兩個','貓與虎','送回娘家','七十才開始','一模一樣','買菸','需要談談','不敢問','窗戶凍住了','一切都很好','沒安全感','所以要我留下','露台','四個孩子的爸','深夜講座','睜一隻眼','緩解疼痛','九十歲','撞到告訴我','很會說謊','很甜','兩根菸'],
+  '夫妻家庭':['仙女','誤點','玩夠沒','瓶蓋','最佳搭檔','帶過來的','明天減肥','我不知道','我知道','第一次','會下蛋嗎','南方','挑食','五個媽','雨多甜','還沒滾','看不到你','多生兩個','貓與虎','送回娘家','七十才開始','一模一樣','買菸','需要談談','不敢問','窗戶凍住了','一切都很好','沒安全感','所以要我留下','露台','四個孩子的爸','深夜講座','睜一隻眼','緩解疼痛','九十歲','撞到告訴我','很會說謊','很甜','兩根菸'],
   '搶匪小偷':['金口難開','負數','可能看到了','換科目','業內人士','遙控器','一起找'],
   '職場校園':['送行宴','鏡子都敢照','不會再問我','自己寫','哪邊涼快','不在人事','一個人過','仙草蜜','飢童','不忍心','美紅敢','錯的先講','吸菸區','沉默','看辦公室','可以回家','倫理學','很會說謊','烤箱手套'],
   '時事諷刺':['民調','太晚了','有用','重燃希望','誰是白痴','塗成藍色','我們的願望','白羊吃草','會飛的車'],
