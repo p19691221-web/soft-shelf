@@ -694,6 +694,14 @@ const SHRIMP=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);
 const CHEST=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.fillRect(-.3,-.02,.6,.3);c.beginPath();c.moveTo(-.3,-.02);c.quadraticCurveTo(0,-.24,.3,-.02);c.closePath();c.fill();c.restore();};
 const CHEST_CUT=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.lineWidth=.025;c.beginPath();c.moveTo(-.3,.02);c.lineTo(.3,.02);c.stroke();c.fillRect(-.04,-.02,.08,.1);c.restore();};
 function shapeById(id){
+  if(id==='tvRace')return {name:'電視轉播賽跑',kind:'o',rot:0,core:[0,.1],box:[1,.95],draw(c){TV(c,0,.06,1.3);},cut(c){c.lineWidth=.03;c.beginPath();c.moveTo(-.32,.2);c.lineTo(.3,.2);c.stroke();for(const x of [-.2,0,.2]){fillE(c,x,-.06,.035,.035);c.beginPath();c.moveTo(x,-.02);c.lineTo(x,.1);c.moveTo(x,.1);c.lineTo(x-.04,.18);c.moveTo(x,.1);c.lineTo(x+.04,.18);c.stroke();}}};
+  if(id==='startGun')return {name:'起跑槍',kind:'o',rot:0,core:[0,.1],box:[.95,1.05],draw(c){
+    const pts=[];for(let k=0;k<16;k++){const a=k*Math.PI/8,r=k%2?.17:.3;pts.push([Math.cos(a)*r,-.18+Math.sin(a)*r]);}fillP(c,pts);
+    c.fillRect(-.05,.12,.1,.2);fillP(c,[[-.05,.28],[.2,.28],[.18,.42],[-.05,.42]]);},
+    cut(c){TXT(c,'砰',0,-.18,30);}};
+  if(id==='runners')return {name:'衝刺的選手',kind:'o',rot:0,core:[0,.1],box:[1.05,.9],draw(c){c.lineCap='round';for(const [x,k] of [[-.28,.9],[0,1],[.28,.9]]){fillE(c,x+.06*k,-.2*k,.06*k,.06*k);c.lineWidth=.06*k;c.beginPath();c.moveTo(x+.04*k,-.12*k);c.lineTo(x-.04*k,.08*k);c.lineTo(x+.08*k,.28*k);c.moveTo(x-.04*k,.08*k);c.lineTo(x-.14*k,.26*k);c.moveTo(x+.02*k,-.06*k);c.lineTo(x+.14*k,.02*k);c.moveTo(x+.02*k,-.06*k);c.lineTo(x-.1*k,-.02*k);c.stroke();}c.fillRect(-.48,.32,.96,.04);},cut(c){}};
+  if(id==='amaPity')return profileShape({id:'mom',bun:1,fixed:1,name:'心疼的阿嬤',extra:SWEAT,cutP:c=>{EYE_SHUT(c);MOUTH(c);GLASSES_CUT(c);},scale:.85,shift:-.06,box:[1.2,1.05],core:[-.06,0]});
+
   if(id==='kidWrite')return {name:'寫信的小明',kind:'o',rot:0,core:[-.2,.1],box:[1.05,.95],draw(c){c.save();c.translate(-.24,-.06);c.scale(.6,.6);profileShape({id:'kid',fixed:1,name:''}).draw(c);c.restore();
     c.fillRect(-.46,.3,.92,.04);fillP(c,[[-.02,.12],[.34,.08],[.38,.28],[0,.3]]);c.lineWidth=.03;c.lineCap='round';c.beginPath();c.moveTo(.1,.22);c.lineTo(.24,-.02);c.stroke();},cut(c){c.lineWidth=.014;c.beginPath();c.moveTo(.06,.18);c.lineTo(.3,.15);c.moveTo(.07,.24);c.lineTo(.31,.21);c.stroke();}};
   if(id==='momAsk')return profileShape({id:'mom',bun:1,fixed:1,name:'好奇的媽媽',extra:QMARK,cutP:MOUTH,box:[1.4,1.15]});
@@ -1417,6 +1425,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'逃命',panels:[['tvRace','阿嬤在看電視轉播的賽跑。'],['startGun','「砰！」一聲槍響——'],['runners','所有選手拚命往前衝。'],['amaPity','阿嬤：「好可憐，一開槍都在逃命……」',0,3.5]]},
   {title:'寫給自己',panels:[['kidWrite','小明在寫信。'],['momAsk','媽：「寫給誰？」「寫給我自己。」'],['letter','媽：「那你寫了什麼？」'],['kidSmug','「我還沒收到，怎麼知道？」',0,3.5]]},
   {title:'一袋大米',panels:[['prizePhone','網路抽獎，抽中一袋米！'],['riceEmpty','米快沒了，媽就先不買。'],['parcel','等了幾天，終於送到——'],['riceTiny','一簽收：大米，500 克。',0,3.5]]},
   {title:'會下蛋嗎',panels:[['swimFree','夏天，兒子吵著要去游泳。'],['dadSweat','爸：「我……不會游。」'],['fish','「小明爸常吃魚才會游。」'],['eggNest','「你天天吃雞，會下蛋？」',0,3.5]]},
