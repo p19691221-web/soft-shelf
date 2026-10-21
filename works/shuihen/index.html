@@ -696,6 +696,12 @@ const CHEST_CUT=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.lineWidth=.
 const COLA=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.beginPath();c.moveTo(-.04,-.4);c.lineTo(.04,-.4);c.lineTo(.05,-.26);c.quadraticCurveTo(.14,-.16,.13,-.02);c.quadraticCurveTo(.1,.08,.12,.16);c.lineTo(.12,.36);c.quadraticCurveTo(0,.42,-.12,.36);c.lineTo(-.12,.16);c.quadraticCurveTo(-.1,.08,-.13,-.02);c.quadraticCurveTo(-.14,-.16,-.05,-.26);c.closePath();c.fill();c.fillRect(-.06,-.46,.12,.06);c.restore();};
 const CUP=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);fillP(c,[[-.16,-.1],[.16,-.1],[.13,.26],[-.13,.26]]);c.lineWidth=.05;c.beginPath();c.arc(.18,.06,.08,-1.3,1.3);c.stroke();fillE(c,0,.3,.22,.04);c.restore();};
 function shapeById(id){
+  if(id==='divingBoard')return {name:'跳水台',kind:'o',rot:0,core:[-.2,.1],box:[1.05,1],draw(c){c.fillRect(-.42,-.2,.08,.62);c.fillRect(-.42,-.24,.6,.06);WAVES(c,.36);c.lineWidth=.03;c.beginPath();c.moveTo(.3,-.1);c.quadraticCurveTo(.42,.0,.36,.2);c.stroke();fillP(c,[[.33,.18],[.36,.26],[.4,.17]]);c.save();c.translate(-.7,-.6);c.scale(.75,.75);QMARK(c);c.restore();},cut(c){}};
+  if(id==='momWife'){const M=profileShape({id:'mom',bun:1,fixed:1,name:'',cutP:SMILE}),W=profileShape({id:'pony',fixed:1,name:'',cutP:SMILE});
+    return {name:'婆婆和媳婦',kind:'o',rot:0,core:[-.22,.42],box:[1.05,.95],draw(c){c.save();c.translate(-.24,.08);c.scale(.48,.48);M.draw(c);c.restore();c.save();c.translate(.26,.1);c.scale(-.46,.46);W.draw(c);c.restore();},
+    cut(c){c.save();c.translate(-.24,.08);c.scale(.48,.48);M.cut(c);c.restore();c.save();c.translate(.26,.1);c.scale(-.46,.46);W.cut(c);c.restore();}};}
+  if(id==='twoSplash')return {name:'同時落水',kind:'o',rot:0,core:[0,.1],box:[1.05,.85],draw(c){WAVES(c,.12);for(const x of [-.2,.2]){fillE(c,x,.02,.1,.1);for(const [dx,dy] of [[-.14,-.12],[.14,-.14],[0,-.2]])fillE(c,x+dx,.02+dy,.025,.03);}c.lineWidth=.05;c.lineCap='round';c.beginPath();c.moveTo(-.34,.06);c.lineTo(-.42,-.12);c.moveTo(.34,.06);c.lineTo(.42,-.12);c.stroke();},cut(c){}};
+
   if(id==='dowry')return {name:'嫁妝家電',kind:'o',rot:0,core:[0,.1],box:[1.05,.95],draw(c){RRECT(c,-.44,-.36,.0,-.08,.03);c.fillRect(-.26,-.08,.08,.06);RRECT(c,.06,-.32,.44,-.16,.04);RRECT(c,-.18,.0,.22,.4,.04);c.fillRect(-.48,.4,.96,.04);},
     cut(c){RRECT(c,-.4,-.32,-.04,-.12,.02);c.lineWidth=.016;c.beginPath();for(const y of [-.22,-.2])c.moveTo(.1,y),c.lineTo(.4,y);c.stroke();c.beginPath();c.arc(.02,.22,.11,0,7);c.fill();}};
 
@@ -1461,6 +1467,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'最佳搭檔',panels:[['divingBoard','雙人跳水，誰是最佳搭檔？'],['momWife','答案：婆婆和媳婦。'],['twoSplash','幾十年來，總是一起掉進水裡——'],['dadSweat','「先救誰？」',0,3.5]]},
   {title:'帶過來的',panels:[['wifeMad','老婆又嫌老公沒本事。'],['dowry','「電視冷氣洗衣機，全是我帶來的！」'],['kidCalm','老公看了看孩子——'],['hobbyTalk','「孩子也是妳帶來的？」',0,3.5]]},
   {title:'明天減肥',panels:[['burgerFries','速食店，隔壁桌的情侶。'],['girlVow','她：「最後一次！明天減肥！」'],['bfEat','他頭也沒抬——'],['calTomorrow','「准你明天再說一次。」',0,3.5]]},
   {title:'沒氣了',panels:[['colaCoffee','可樂和咖啡在聊天。'],['colaFizz','可樂：「誰會比較長壽？」'],['coffeeTalk','咖啡：「要早睡、多運動……」'],['colaFlat','聊著聊著，可樂就沒氣了。',0,3.5]]},
@@ -1590,7 +1597,7 @@ const STORIES=[
 const CATS=['諧音梗','夫妻家庭','搶匪小偷','職場校園','時事諷刺','日常冷笑話','故事小品'];
 const CATMAP={
   '諧音梗':['沒氣了','南方','最甜的蜜','小氣蝦','瓦斯怎麼叫','缺陷','冰心地瓜','不在人事','多大','雨多甜','還沒滾','蟻后','坐白宮','擲筊','一個人過','鳳梨酥','仙草蜜','一波三折','八天的','飢童','美紅敢','仰式','你哪位','哈囉 win','窗戶凍住了','左右腦','換科目','業內人士','找誰接','半手李','閉眼說瞎話','誰是京都人','金口難開','看辦公室','週一休息','看穿'],
-  '夫妻家庭':['帶過來的','明天減肥','我不知道','我知道','第一次','會下蛋嗎','南方','挑食','五個媽','雨多甜','還沒滾','看不到你','多生兩個','貓與虎','送回娘家','七十才開始','一模一樣','買菸','需要談談','不敢問','窗戶凍住了','一切都很好','沒安全感','所以要我留下','露台','四個孩子的爸','深夜講座','睜一隻眼','緩解疼痛','九十歲','撞到告訴我','很會說謊','很甜','兩根菸'],
+  '夫妻家庭':['最佳搭檔','帶過來的','明天減肥','我不知道','我知道','第一次','會下蛋嗎','南方','挑食','五個媽','雨多甜','還沒滾','看不到你','多生兩個','貓與虎','送回娘家','七十才開始','一模一樣','買菸','需要談談','不敢問','窗戶凍住了','一切都很好','沒安全感','所以要我留下','露台','四個孩子的爸','深夜講座','睜一隻眼','緩解疼痛','九十歲','撞到告訴我','很會說謊','很甜','兩根菸'],
   '搶匪小偷':['金口難開','負數','可能看到了','換科目','業內人士','遙控器','一起找'],
   '職場校園':['鏡子都敢照','不會再問我','自己寫','哪邊涼快','不在人事','一個人過','仙草蜜','飢童','不忍心','美紅敢','錯的先講','吸菸區','沉默','看辦公室','可以回家','倫理學','很會說謊','烤箱手套'],
   '時事諷刺':['民調','太晚了','有用','重燃希望','誰是白痴','塗成藍色','我們的願望','白羊吃草','會飛的車'],
