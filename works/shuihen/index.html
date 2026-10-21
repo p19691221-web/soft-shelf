@@ -696,6 +696,12 @@ const CHEST_CUT=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.lineWidth=.
 const COLA=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.beginPath();c.moveTo(-.04,-.4);c.lineTo(.04,-.4);c.lineTo(.05,-.26);c.quadraticCurveTo(.14,-.16,.13,-.02);c.quadraticCurveTo(.1,.08,.12,.16);c.lineTo(.12,.36);c.quadraticCurveTo(0,.42,-.12,.36);c.lineTo(-.12,.16);c.quadraticCurveTo(-.1,.08,-.13,-.02);c.quadraticCurveTo(-.14,-.16,-.05,-.26);c.closePath();c.fill();c.fillRect(-.06,-.46,.12,.06);c.restore();};
 const CUP=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);fillP(c,[[-.16,-.1],[.16,-.1],[.13,.26],[-.13,.26]]);c.lineWidth=.05;c.beginPath();c.arc(.18,.06,.08,-1.3,1.3);c.stroke();fillE(c,0,.3,.22,.04);c.restore();};
 function shapeById(id){
+  if(id==='meStare')return profileShape({id:'flat',fixed:1,name:'盯著看的我',extra:c=>{HEART(c,.98,.3,.11);HEART(c,1.12,.12,.08);},cutP:c=>{c.lineWidth=.02;c.beginPath();c.arc(.62,.43,.04,0,7);c.stroke();SMILE(c);},scale:.85,shift:-.08,box:[1.25,1.1],core:[-.08,0]});
+  if(id==='clock')return {name:'時鐘',kind:'o',rot:0,core:[0,0],box:[.9,.9],draw(c){fillE(c,0,0,.34,.34);},cut(c){c.lineWidth=.03;c.beginPath();c.arc(0,0,.28,0,7);c.stroke();c.lineWidth=.04;c.lineCap='round';c.beginPath();c.moveTo(0,0);c.lineTo(0,-.2);c.moveTo(0,0);c.lineTo(.16,.06);c.stroke();for(let i=0;i<12;i++){const a=i*Math.PI/6;fillE(c,Math.cos(a)*.24,Math.sin(a)*.24,.015,.015);}}};
+  if(id==='handMirror')return {name:'手鏡',kind:'o',rot:-.3,core:[0,.1],box:[.85,1.05],draw(c){fillE(c,0,-.12,.24,.28);RRECT(c,-.07,.12,.07,.44,.04);},
+    cut(c){c.lineWidth=.025;c.beginPath();c.ellipse(0,-.12,.19,.23,0,0,7);c.stroke();c.lineWidth=.04;c.lineCap='round';c.beginPath();c.moveTo(-.1,-.22);c.lineTo(-.02,-.3);c.moveTo(-.12,-.1);c.lineTo(.04,-.26);c.stroke();c.fillRect(-.06,.24,.12,.03);}};
+  if(id==='armTired')return profileShape({id:'flat',fixed:1,name:'手痠的我',extra:SWEAT,cutP:c=>{EYE_SHUT(c);SMILE(c);},scale:.85,shift:-.06,box:[1.2,1.05],core:[-.06,0]});
+
   if(id==='slide')return {name:'溜滑梯',kind:'o',rot:0,core:[0,.1],box:[1.05,.95],draw(c){c.fillRect(-.36,-.24,.06,.64);c.fillRect(-.16,-.24,.06,.64);for(let i=0;i<4;i++)c.fillRect(-.36,-.14+i*.14,.26,.04);c.fillRect(-.38,-.28,.3,.06);
     c.lineWidth=.08;c.lineCap='round';c.beginPath();c.moveTo(-.1,-.24);c.quadraticCurveTo(.2,-.1,.24,.24);c.lineTo(.42,.36);c.stroke();c.fillRect(-.48,.4,.96,.04);},cut(c){}};
   if(id==='kidBored')return profileShape({id:'kid',fixed:1,name:'不開心的兒子',extra:c=>{for(const [x,y] of [[.95,.3],[1.08,.2],[1.2,.1]])fillE(c,x,y,.03,.03);},cutP:c=>{EYE_SHUT(c);c.lineWidth=.025;c.beginPath();c.moveTo(.7,.73);c.lineTo(.8,.73);c.stroke();},box:[1.3,1.12]});
@@ -1483,6 +1489,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'看很久',panels:[['meStare','看到特別好看的人，我會一直盯著看。'],['clock','一直看，看很久……'],['armTired','直到手痠了——'],['handMirror','才捨得放下鏡子。',0,3.5]]},
   {title:'玩夠沒',panels:[['slide','每次陪兒子去遊樂場——'],['kidBored','他都不太開心。'],['dadSlide','我在溜滑梯……他又抱怨了：'],['kidAsk','「爸，你到底玩夠沒？」',0,3.5]]},
   {title:'送行宴',panels:[['planBoard','同事離職，總監說好聚好散，辦送行宴。'],['party','準備一週，大家吃得爽、玩得嗨。'],['emptySeat','唯一的遺憾——'],['workerShock','大家都忘了通知那位同事。',0,3.5]]},
   {title:'瓶蓋',panels:[['coupleApart','跟老婆吵架，越想越氣。'],['bottlesTight','趁她洗澡，把瓶蓋全轉死。'],['wifeBubble','想像她拿瓶子來求我……'],['meHopeful','心情好多了。',0,3.5]]},
