@@ -687,6 +687,9 @@ const MANTOU=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.beginPath();c.
 const BAOZI=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.beginPath();c.moveTo(-.3,.14);c.bezierCurveTo(-.34,-.12,-.1,-.2,0,-.26);c.bezierCurveTo(.1,-.2,.34,-.12,.3,.14);c.closePath();c.fill();fillE(c,0,-.26,.05,.04);c.restore();};
 const BAOZI_CUT=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.lineWidth=.018;c.beginPath();for(const a of [-.6,-.3,0,.3,.6]){c.moveTo(0,-.24);c.quadraticCurveTo(a*.3,-.14,a*.42,-.02);}c.stroke();c.restore();};
 function shapeById(id){
+  if(id==='homework100')return {name:'滿分作業',kind:'o',rot:-.06,core:[0,0],box:[.85,1.05],draw(c){c.fillRect(-.3,-.42,.6,.84);},
+    cut(c){c.lineWidth=.02;c.beginPath();for(let i=0;i<5;i++){c.moveTo(-.22,-.06+i*.1);c.lineTo(.22,-.06+i*.1);}c.stroke();c.lineWidth=.03;c.beginPath();c.ellipse(.06,-.26,.18,.1,0,0,7);c.stroke();TXT(c,'100',.06,-.26,18);}};
+
   if(id==='milkBottle')return {name:'奶瓶',kind:'o',rot:-.2,core:[0,.1],box:[.75,1],draw(c){RRECT(c,-.16,-.2,.16,.4,.06);c.fillRect(-.12,-.28,.24,.08);c.beginPath();c.moveTo(-.07,-.28);c.quadraticCurveTo(-.06,-.44,0,-.46);c.quadraticCurveTo(.06,-.44,.07,-.28);c.fill();},
     cut(c){c.lineWidth=.018;c.beginPath();for(const y of [-.06,.06,.18,.3]){c.moveTo(-.16,y);c.lineTo(-.06,y);}c.stroke();}};
   if(id==='scale9')return {name:'體重計',kind:'o',rot:0,core:[0,.1],box:[1,.85],draw(c){RRECT(c,-.38,-.2,.38,.32,.06);},cut(c){TXT(c,'+9',0,.06,44);c.lineWidth=.02;c.beginPath();c.moveTo(-.3,-.12);c.lineTo(.3,-.12);c.stroke();}};
@@ -1372,6 +1375,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'自己寫',panels:[['homework100','作業交上來，寫得特別好。'],['teacherQ','老師：「爸爸有幫你寫嗎？」'],['kidCalm','學生：「沒有。」'],['teacherHuh','「他全部自己寫的。」',0,3.5]]},
   {title:'象奶',panels:[['milkBottle','A：「有個寶寶喝象奶——」'],['scale9','「一週胖了九公斤！」'],['friendQ','B：「不可能！誰的寶寶？」'],['babyEle','A：「大象的。」',0,3.5]]},
   {title:'瓦斯怎麼叫',panels:[['catSit','貓咪怎麼叫？「喵～」'],['dogHappy','狗狗怎麼叫？「汪汪！」'],['gasTank','那瓦斯怎麼叫？'],['deskPhone','打電話叫啊！',0,3.5]]},
   {title:'缺陷',panels:[['bunPair','饅頭為何比不上包子？'],['baoziCut','包子切開，裡面有餡。'],['mantouCut','饅頭切開——空的。'],['mantouSad','因為它有「缺陷」（缺餡）。',0,3.5]]},
@@ -1486,7 +1490,7 @@ const CATMAP={
   '諧音梗':['瓦斯怎麼叫','缺陷','冰心地瓜','不在人事','多大','雨多甜','還沒滾','蟻后','坐白宮','擲筊','一個人過','鳳梨酥','仙草蜜','一波三折','八天的','飢童','美紅敢','仰式','你哪位','哈囉 win','窗戶凍住了','左右腦','換科目','業內人士','找誰接','半手李','閉眼說瞎話','誰是京都人','金口難開','看辦公室','週一休息','看穿'],
   '夫妻家庭':['五個媽','雨多甜','還沒滾','看不到你','多生兩個','貓與虎','送回娘家','七十才開始','一模一樣','買菸','需要談談','不敢問','窗戶凍住了','一切都很好','沒安全感','所以要我留下','露台','四個孩子的爸','深夜講座','睜一隻眼','緩解疼痛','九十歲','撞到告訴我','很會說謊','很甜','兩根菸'],
   '搶匪小偷':['金口難開','負數','可能看到了','換科目','業內人士','遙控器','一起找'],
-  '職場校園':['哪邊涼快','不在人事','一個人過','仙草蜜','飢童','不忍心','美紅敢','錯的先講','吸菸區','沉默','看辦公室','可以回家','倫理學','很會說謊','烤箱手套'],
+  '職場校園':['自己寫','哪邊涼快','不在人事','一個人過','仙草蜜','飢童','不忍心','美紅敢','錯的先講','吸菸區','沉默','看辦公室','可以回家','倫理學','很會說謊','烤箱手套'],
   '時事諷刺':['民調','太晚了','有用','重燃希望','誰是白痴','塗成藍色','我們的願望','白羊吃草','會飛的車'],
   '故事小品':['颱風要來','收拾','放下','恆河','平安','等','釣','慢','午後']};
 STORIES.forEach(S=>{S.cats=CATS.filter(c=>(CATMAP[c]||[]).includes(S.title));if(!S.cats.length)S.cats=['日常冷笑話'];});
