@@ -699,7 +699,7 @@ const SCOOTER=c=>{fillE(c,-.3,.26,.11,.11);fillE(c,.3,.26,.11,.11);fillP(c,[[-.3
   c.beginPath();c.moveTo(-.34,.0);c.quadraticCurveTo(-.36,-.12,-.2,-.12);c.lineTo(.12,-.12);c.quadraticCurveTo(.18,-.1,.16,.0);c.closePath();c.fill();};
 const SCOOTER_CUT=(c,pts)=>{fillE(c,-.3,.26,.04,.04);fillE(c,.3,.26,.04,.04);for(const [x,y] of pts){fillE(c,x,y,.03,.022);fillE(c,x+.01,y-.012,.012,.01);}};
 function shapeById(id){
-  if(id==='seatFull')return {name:'滿是鳥屎的椅墊',kind:'o',rot:0,core:[0,.1],box:[1.05,.85],draw(c){SCOOTER(c);c.save();c.translate(-.85,-.62);EXCL(c);c.restore();},cut(c){SCOOTER_CUT(c,[[-.26,-.07],[-.16,-.05],[-.06,-.08],[.04,-.05],[.1,-.08],[-.2,-.03],[0,-.03],[-.1,-.04]]);}};
+  if(id==='seatFull')return {name:'滿是鳥屎的椅墊',kind:'o',rot:0,core:[0,.1],box:[1.05,.85],draw(c){SCOOTER(c);},cut(c){SCOOTER_CUT(c,[[-.26,-.07],[-.16,-.05],[-.06,-.08],[.04,-.05],[.1,-.08],[-.2,-.03],[0,-.03],[-.1,-.04]]);}};
   if(id==='seatClean')return {name:'乾淨的椅墊',kind:'o',rot:0,core:[0,.1],box:[1.05,.85],draw(c){SCOOTER(c);},cut(c){SCOOTER_CUT(c,[]);c.lineWidth=.02;c.beginPath();for(const [x,y] of [[-.2,-.32],[-.06,-.38],[.08,-.32]]){c.moveTo(x,y);c.lineTo(x+.04,y-.05);}c.stroke();}};
   if(id==='seatFew')return {name:'沒擦乾淨的椅墊',kind:'o',rot:0,core:[0,.1],box:[1.05,.85],draw(c){SCOOTER(c);},cut(c){SCOOTER_CUT(c,[[-.18,-.06],[.02,-.07]]);}};
 
@@ -1539,7 +1539,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
-  {title:'破窗效應',panels:[['seatFull','早上牽車，椅墊上滿滿鳥大便。'],['seatClean','旁邊的機車，一坨都沒有。'],['seatFew','都是之前沒擦乾淨的那兩三坨……'],['plazaBird','吸引小鳥來集中火力。',0,3.5]]},
+  {title:'破窗效應',panels:[['seatFull','早上牽車，滿座鳥大便。'],['seatClean','旁邊的機車，一坨都沒有。'],['seatFew','都怪之前沒擦掉的那幾坨……'],['plazaBird','吸引小鳥來集中火力。',0,3.5]]},
   {title:'在下',panels:[['kidCalm','正要跟老爸出門買晚餐。'],['rainPlaza','我：「在下毛毛雨。」'],['dadBow','老爸一拱手：「失敬失敬，」'],['sweetRain','「原來是毛毛雨大人。」',0,3.5]]},
   {title:'目光',panels:[['hobbyTalk','「欸，妳臉上有東西。」'],['girlTouch','「蛤？什麼東西？」'],['meHopeful','「是……」'],['gazeBeam','「我的目光。」',0,3.5]]},
   {title:'泡你',panels:[['friendQ','「你是泡麵的話，什麼口味？」'],['gfCozy','「呃……韓式泡菜？」'],['noodleCup','「那——」'],['kettlePour','「我可以泡你嗎？」',0,3.5]]},
