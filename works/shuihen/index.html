@@ -694,6 +694,11 @@ const SHRIMP=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);
 const CHEST=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.fillRect(-.3,-.02,.6,.3);c.beginPath();c.moveTo(-.3,-.02);c.quadraticCurveTo(0,-.24,.3,-.02);c.closePath();c.fill();c.restore();};
 const CHEST_CUT=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.lineWidth=.025;c.beginPath();c.moveTo(-.3,.02);c.lineTo(.3,.02);c.stroke();c.fillRect(-.04,-.02,.08,.1);c.restore();};
 function shapeById(id){
+  if(id==='prizePhone')return {name:'中獎通知',kind:'o',rot:0,core:[0,.05],box:[1,1],draw(c){c.fillRect(-.36,-.24,.72,.48);c.fillRect(-.03,-.42,.06,.18);for(const a of [-.6,0,.6]){c.save();c.rotate(a);c.fillRect(-.02,-.5,.04,.08);c.restore();}},cut(c){TXT(c,'中獎',0,.01,34);}};
+  if(id==='parcel')return {name:'送來的箱子',kind:'o',rot:0,core:[0,.1],box:[1,.95],draw(c){CUBE(c,-.34,-.1,.52,.44,.18);},cut(c){CUBE_CUT(c,-.34,-.1,.52,.44,.18);c.fillRect(-.1,-.1,.06,.44);}};
+  if(id==='riceEmpty')return {name:'快見底的米缸',kind:'o',rot:0,core:[0,.1],box:[.95,.95],draw(c){fillP(c,[[-.3,-.2],[.3,-.2],[.26,.38],[-.26,.38]]);fillE(c,0,-.2,.32,.06);},cut(c){fillP(c,[[-.25,-.16],[.25,-.16],[.22,.26],[-.22,.26]]);}};
+  if(id==='riceTiny')return {name:'一小包米',kind:'o',rot:0,core:[0,.2],box:[1.05,1],draw(c){c.fillRect(-.46,.36,.92,.04);fillP(c,[[-.08,.18],[.08,.18],[.1,.36],[-.1,.36]]);c.fillRect(-.06,.14,.12,.05);c.save();c.translate(-.85,-.6);EXCL(c);c.restore();},cut(c){}};
+
   if(id==='dadSweat')return profileShape({id:'flat',fixed:1,name:'尷尬的爸爸',extra:SWEAT,cutP:c=>{EYE_SHUT(c);MOUTH(c);},scale:.85,shift:-.06,box:[1.2,1.05],core:[-.06,0]});
   if(id==='eggNest')return {name:'鳥巢裡的蛋',kind:'o',rot:0,core:[0,.1],box:[1,.85],draw(c){c.beginPath();c.moveTo(-.44,.1);c.quadraticCurveTo(0,.48,.44,.1);c.closePath();c.fill();for(const [x,y] of [[-.22,-.06],[0,-.14],[.22,-.06]])fillE(c,x,y,.09,.12);c.save();c.translate(-.98,-.7);c.scale(.75,.75);QMARK(c);c.restore();},
     cut(c){c.lineWidth=.03;for(const [x,y] of [[-.22,-.06],[0,-.14],[.22,-.06]]){c.beginPath();c.ellipse(x,y,.1,.13,0,0,7);c.stroke();}c.lineWidth=.018;c.beginPath();for(const y of [.16,.24]){c.moveTo(-.34,y);c.quadraticCurveTo(0,y+.1,.34,y);}c.stroke();}};
@@ -1407,6 +1412,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'一袋大米',panels:[['prizePhone','網路抽獎，抽中一袋米！'],['riceEmpty','米快沒了，媽就先不買。'],['parcel','等了幾天，終於送到——'],['riceTiny','一簽收：大米，500 克。',0,3.5]]},
   {title:'會下蛋嗎',panels:[['swimFree','夏天，兒子吵著要去游泳。'],['dadSweat','爸：「我……不會游。」'],['fish','「小明爸常吃魚才會游。」'],['eggNest','「你天天吃雞，會下蛋？」',0,3.5]]},
   {title:'南方',panels:[['crystalBall','算命：「她會嫁南方的。」'],['momFrown','媽媽臉一沉，拉人就走。'],['girlQ','女兒：媽討厭南方人？'],['momScoff','媽：「嫁男方，還用你算？」',0,3.5]]},
   {title:'挑食',panels:[['kidsPair','路過幼稚園，聽到兩個小朋友聊天。'],['kidAsk','「為什麼大人都不挑食？」'],['groceryBag','「買的都是他們愛吃的啊。」'],['workerShock','我當場石化：真理啊。',0,3.5]]},
