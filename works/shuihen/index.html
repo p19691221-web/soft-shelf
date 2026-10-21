@@ -687,6 +687,13 @@ const MANTOU=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.beginPath();c.
 const BAOZI=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.beginPath();c.moveTo(-.3,.14);c.bezierCurveTo(-.34,-.12,-.1,-.2,0,-.26);c.bezierCurveTo(.1,-.2,.34,-.12,.3,.14);c.closePath();c.fill();fillE(c,0,-.26,.05,.04);c.restore();};
 const BAOZI_CUT=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.lineWidth=.018;c.beginPath();for(const a of [-.6,-.3,0,.3,.6]){c.moveTo(0,-.24);c.quadraticCurveTo(a*.3,-.14,a*.42,-.02);}c.stroke();c.restore();};
 function shapeById(id){
+  if(id==='milkBottle')return {name:'奶瓶',kind:'o',rot:-.2,core:[0,.1],box:[.75,1],draw(c){RRECT(c,-.16,-.2,.16,.4,.06);c.fillRect(-.12,-.28,.24,.08);c.beginPath();c.moveTo(-.07,-.28);c.quadraticCurveTo(-.06,-.44,0,-.46);c.quadraticCurveTo(.06,-.44,.07,-.28);c.fill();},
+    cut(c){c.lineWidth=.018;c.beginPath();for(const y of [-.06,.06,.18,.3]){c.moveTo(-.16,y);c.lineTo(-.06,y);}c.stroke();}};
+  if(id==='scale9')return {name:'體重計',kind:'o',rot:0,core:[0,.1],box:[1,.85],draw(c){RRECT(c,-.38,-.2,.38,.32,.06);},cut(c){TXT(c,'+9',0,.06,44);c.lineWidth=.02;c.beginPath();c.moveTo(-.3,-.12);c.lineTo(.3,-.12);c.stroke();}};
+  if(id==='babyEle')return {name:'小象',kind:'o',rot:0,core:[-.05,.1],box:[1.05,.95],draw(c){fillE(c,-.08,.08,.3,.2);fillE(c,.26,-.06,.16,.15);fillE(c,.16,-.06,.13,.17,.2);
+    c.lineWidth=.08;c.lineCap='round';c.beginPath();c.moveTo(.4,-.02);c.quadraticCurveTo(.48,.18,.4,.28);c.stroke();c.lineWidth=.09;c.beginPath();for(const x of [-.28,-.12,.06,.18]){c.moveTo(x,.2);c.lineTo(x,.36);}c.stroke();
+    c.lineWidth=.025;c.beginPath();c.moveTo(-.38,.04);c.lineTo(-.46,.12);c.stroke();c.fillRect(-.48,.4,.96,.04);},cut(c){fillE(c,.3,-.1,.02,.02);c.lineWidth=.016;c.beginPath();c.arc(.16,-.06,.09,-1.2,1.2);c.stroke();}};
+
   if(id==='dogHappy')return {name:'汪汪叫的狗',kind:'o',rot:0,core:[0,.1],box:[1,.9],draw(c){DOG(c);},cut(c){fillE(c,.24,-.15,.022,.022);c.lineWidth=.02;c.beginPath();c.moveTo(.32,-.02);c.quadraticCurveTo(.38,.02,.44,-.02);c.stroke();}};
   if(id==='gasTank')return {name:'瓦斯桶',kind:'o',rot:0,core:[0,.1],box:[.8,1],draw(c){RRECT(c,-.24,-.24,.24,.38,.1);c.fillRect(-.08,-.36,.16,.14);c.fillRect(-.14,-.42,.28,.06);c.fillRect(-.2,.36,.4,.06);c.save();c.translate(-.85,-.52);c.scale(.8,.8);QMARK(c);c.restore();},
     cut(c){c.lineWidth=.02;c.beginPath();c.moveTo(-.24,-.06);c.lineTo(.24,-.06);c.moveTo(-.24,.2);c.lineTo(.24,.2);c.stroke();}};
@@ -1365,6 +1372,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'象奶',panels:[['milkBottle','A：「有個寶寶喝象奶——」'],['scale9','「一週胖了九公斤！」'],['friendQ','B：「不可能！誰的寶寶？」'],['babyEle','A：「大象的。」',0,3.5]]},
   {title:'瓦斯怎麼叫',panels:[['catSit','貓咪怎麼叫？「喵～」'],['dogHappy','狗狗怎麼叫？「汪汪！」'],['gasTank','那瓦斯怎麼叫？'],['deskPhone','打電話叫啊！',0,3.5]]},
   {title:'缺陷',panels:[['bunPair','饅頭為何比不上包子？'],['baoziCut','包子切開，裡面有餡。'],['mantouCut','饅頭切開——空的。'],['mantouSad','因為它有「缺陷」（缺餡）。',0,3.5]]},
   {title:'冰心地瓜',panels:[['yamSun','地瓜躺在地上曬太陽。'],['yamSun','曬久了，想翻個身。',1],['yamTurn','一翻身——'],['yamIce','變成「冰心地瓜」！（台語「翻身」）',0,3.5]]},
