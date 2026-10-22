@@ -699,6 +699,11 @@ const SCOOTER=c=>{fillE(c,-.3,.26,.11,.11);fillE(c,.3,.26,.11,.11);fillP(c,[[-.3
   c.beginPath();c.moveTo(-.34,.0);c.quadraticCurveTo(-.36,-.12,-.2,-.12);c.lineTo(.12,-.12);c.quadraticCurveTo(.18,-.1,.16,.0);c.closePath();c.fill();};
 const SCOOTER_CUT=(c,pts)=>{fillE(c,-.3,.26,.04,.04);fillE(c,.3,.26,.04,.04);for(const [x,y] of pts){fillE(c,x,y,.03,.022);fillE(c,x+.01,y-.012,.012,.01);}};
 function shapeById(id){
+  if(id==='monkCalm')return profileShape({id:'plain',fixed:1,name:'坐著的禪師',cutP:c=>{EYE_SHUT(c);SMILE(c);}});
+  if(id==='fanTap')return {name:'扇子一敲',kind:'o',rot:0,core:[0,.15],box:[1.05,.95],draw(c){c.save();c.translate(-.1,.2);c.rotate(-.5);c.beginPath();c.moveTo(0,0);c.arc(0,0,.42,-Math.PI*.82,-Math.PI*.18);c.closePath();c.fill();c.restore();
+    fillE(c,.3,.12,.16,.16);for(const [x,y] of [[.24,-.18],[.34,-.22],[.44,-.16]]){c.lineWidth=.03;c.lineCap='round';c.beginPath();c.moveTo(x,y);c.lineTo(x+.03,y-.07);c.stroke();}},
+    cut(c){c.save();c.translate(-.1,.2);c.rotate(-.5);c.lineWidth=.016;c.beginPath();for(let i=1;i<6;i++){const a=-Math.PI*.82+i*Math.PI*.64/6;c.moveTo(0,0);c.lineTo(Math.cos(a)*.4,Math.sin(a)*.4);}c.stroke();c.restore();}};
+
   if(id==='seatFull')return {name:'滿是鳥屎的椅墊',kind:'o',rot:0,core:[0,.1],box:[1.05,.85],draw(c){SCOOTER(c);},cut(c){SCOOTER_CUT(c,[[-.26,-.07],[-.16,-.05],[-.06,-.08],[.04,-.05],[.1,-.08],[-.2,-.03],[0,-.03],[-.1,-.04]]);}};
   if(id==='seatClean')return {name:'乾淨的椅墊',kind:'o',rot:0,core:[0,.1],box:[1.05,.85],draw(c){SCOOTER(c);},cut(c){SCOOTER_CUT(c,[]);c.lineWidth=.02;c.beginPath();for(const [x,y] of [[-.2,-.32],[-.06,-.38],[.08,-.32]]){c.moveTo(x,y);c.lineTo(x+.04,y-.05);}c.stroke();}};
   if(id==='seatFew')return {name:'沒擦乾淨的椅墊',kind:'o',rot:0,core:[0,.1],box:[1.05,.85],draw(c){SCOOTER(c);},cut(c){SCOOTER_CUT(c,[[-.18,-.06],[.02,-.07]]);}};
@@ -1539,6 +1544,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'不打你',panels:[['templeSun','秀才來訪，禪師坐著不起。'],['monkCalm','「我不起身，便是起身。」'],['fanTap','秀才拿扇子往他頭上一敲。'],['hobbyTalk','「我打你，就是不打你。」',0,3.5]]},
   {title:'破窗效應',panels:[['seatFull','早上牽車，滿座鳥大便。'],['seatClean','旁邊的機車，一坨都沒有。'],['seatFew','都怪之前沒擦掉的那幾坨……'],['plazaBird','吸引小鳥來集中火力。',0,3.5]]},
   {title:'在下',panels:[['kidCalm','正要跟老爸出門買晚餐。'],['rainPlaza','我：「在下毛毛雨。」'],['dadBow','老爸一拱手：「失敬失敬，」'],['sweetRain','「原來是毛毛雨大人。」',0,3.5]]},
   {title:'目光',panels:[['hobbyTalk','「欸，妳臉上有東西。」'],['girlTouch','「蛤？什麼東西？」'],['meHopeful','「是……」'],['gazeBeam','「我的目光。」',0,3.5]]},
@@ -1689,7 +1695,7 @@ const CATMAP={
   '搶匪小偷':['金口難開','負數','可能看到了','換科目','業內人士','遙控器','一起找'],
   '職場校園':['送行宴','鏡子都敢照','不會再問我','自己寫','哪邊涼快','不在人事','一個人過','仙草蜜','飢童','不忍心','美紅敢','錯的先講','吸菸區','沉默','看辦公室','可以回家','倫理學','很會說謊','烤箱手套'],
   '時事諷刺':['民調','太晚了','有用','重燃希望','誰是白痴','塗成藍色','我們的願望','白羊吃草','會飛的車'],
-  '故事小品':['慣性','颱風要來','收拾','放下','恆河','平安','等','釣','慢','午後']};
+  '故事小品':['不打你','慣性','颱風要來','收拾','放下','恆河','平安','等','釣','慢','午後']};
 STORIES.forEach(S=>{S.cats=CATS.filter(c=>(CATMAP[c]||[]).includes(S.title));if(!S.cats.length)S.cats=['日常冷笑話'];});
 let storyCat='all';
 const inCat=S=>storyCat==='all'||S.cats.includes(storyCat);
