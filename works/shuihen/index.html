@@ -700,6 +700,14 @@ const SCOOTER=c=>{fillE(c,-.3,.26,.11,.11);fillE(c,.3,.26,.11,.11);fillP(c,[[-.3
 const SCOOTER_CUT=(c,pts)=>{fillE(c,-.3,.26,.04,.04);fillE(c,.3,.26,.04,.04);for(const [x,y] of pts){fillE(c,x,y,.03,.022);fillE(c,x+.01,y-.012,.012,.01);}};
 const LEAF=(c,x,y,k,a)=>{c.save();c.translate(x,y);c.rotate(a||0);c.scale(k,k);c.beginPath();c.moveTo(-.45,.05);c.quadraticCurveTo(-.05,-.44,.46,-.05);c.quadraticCurveTo(.05,.38,-.45,.05);c.fill();c.restore();};
 function shapeById(id){
+  if(id==='askGift')return pair('問生日禮物的他',MOUTH,SMILE,c=>{c.save();c.translate(-.95,-.6);c.scale(.8,.8);QMARK(c);c.restore();});
+  if(id==='wantHand')return profileShape({id:'pony',fixed:1,name:'想要手作禮物的她',extra:c=>{HEART(c,1.22,.02,.16);},cutP:SMILE,scale:.75,shift:-.22,box:[1.4,1.1],core:[-.22,0]});
+  if(id==='makeGift')return profileShape({id:'flat',fixed:1,name:'自己做禮物的他',extra:c=>{CUBE(c,.98,.4,.34,.3,.12);},cutP:c=>{EYE_SHUT(c);CUBE_CUT(c,.98,.4,.34,.3,.12);c.lineWidth=.04;c.beginPath();c.moveTo(1.15,.33);c.lineTo(1.15,.7);c.stroke();},scale:.75,shift:-.22,box:[1.45,1.1],core:[-.22,0]});
+  if(id==='drinkOffer')return pair('回請飲料',SMILE,MOUTH,c=>{fillP(c,[[-.08,-.42],[.08,-.42],[.06,-.18],[-.06,-.18]]);c.fillRect(-.09,-.46,.18,.04);c.lineWidth=.025;c.lineCap='round';c.beginPath();c.moveTo(.01,-.45);c.lineTo(.05,-.58);c.stroke();});
+  if(id==='caneTea')return {name:'兩杯甘蔗青茶',kind:'o',rot:0,core:[0,.1],box:[1,1],draw(c){for(const x of [-.22,.22]){fillP(c,[[x-.16,-.2],[x+.16,-.2],[x+.12,.4],[x-.12,.4]]);c.fillRect(x-.19,-.27,.38,.07);c.lineWidth=.045;c.lineCap='round';c.beginPath();c.moveTo(x+.04,-.25);c.lineTo(x+.1,-.46);c.stroke();}},cut(c){c.lineWidth=.02;for(const x of [-.22,.22]){c.beginPath();c.moveTo(x-.13,.0);c.lineTo(x+.13,.0);c.stroke();}}};
+  if(id==='quietTwo')return pair('只剩兩個人',MOUTH,MOUTH,c=>{for(const x of [-.08,0,.08])fillE(c,x,-.3,.025,.025);});
+  if(id==='sayLike')return pair('擠出一句的他',MOUTH,MOUTH,c=>{HEART(c,-.04,-.32,.09);});
+  if(id==='justAdmire')return pair('只是欣賞',MOUTH,SMILE,c=>{const x=-.06,y=-.32,r=.07;c.beginPath();c.moveTo(x,y-r*1.6);c.quadraticCurveTo(x+r*1.2,y+r*.4,x,y+r);c.quadraticCurveTo(x-r*1.2,y+r*.4,x,y-r*1.6);c.fill();});
   if(id==='bigSky')return {name:'天空',kind:'o',rot:0,core:[0,0],box:[1.05,.9],draw(c){fillE(c,-.22,.06,.2,.14);fillE(c,.06,-.04,.26,.2);fillE(c,.3,.08,.16,.12);c.fillRect(-.4,.08,.84,.14);fillE(c,.3,-.3,.08,.08);c.lineWidth=.025;c.lineCap='round';c.beginPath();for(let i=0;i<8;i++){const a=i*Math.PI/4;c.moveTo(.3+Math.cos(a)*.11,-.3+Math.sin(a)*.11);c.lineTo(.3+Math.cos(a)*.16,-.3+Math.sin(a)*.16);}c.stroke();},cut(c){}};
   if(id==='oneLeaf')return {name:'一片樹葉',kind:'o',rot:0,core:[0,0],box:[1,.7],draw(c){LEAF(c,0,0,.8,-.2);},cut(c){c.save();c.rotate(-.2);c.scale(.8,.8);c.lineWidth=.025;c.beginPath();c.moveTo(-.4,.04);c.quadraticCurveTo(0,-.08,.42,-.04);c.stroke();c.restore();}};
   if(id==='skyEye')return profileShape({id:'flat',fixed:1,name:'看天的弟子',extra:c=>{fillE(c,1.14,-.06,.22,.14);fillE(c,1.3,.02,.14,.1);},cutP:c=>{c.lineWidth=.02;c.beginPath();c.arc(.62,.43,.04,0,7);c.stroke();MOUTH(c);},scale:.8,shift:-.18,box:[1.35,1.1],core:[-.18,0]});
@@ -1560,6 +1568,8 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'手作禮物',panels:[['askGift','「妳生日想要什麼禮物？」'],['wantHand','「我要手作的。」'],['makeGift','「好，我自己做。」'],['drinkOffer','「回請你飲料，加奶嗎？」「不用。」']]},
+  {title:'只是欣賞',panels:[['caneTea','她請我喝甘蔗青茶。'],['quietTwo','只剩我們兩個人。'],['sayLike','我擠出一句：「我喜歡妳。」'],['justAdmire','「你只是欣賞我而已。」',0,3.5]]},
   {title:'一片葉子',panels:[['bigSky','「天空大嗎？」「大。」'],['oneLeaf','「樹葉大嗎？」「不大。」'],['skyEye','「天空擋得住眼睛嗎？」「不。」'],['leafEye','一片小樹葉，就能。',0,3.5]]},
   {title:'種子',panels:[['goldMud','高僧：「金子和爛泥，哪個好？」'],['seekerGold','求道者：「當然是金子！」'],['monkCalm','高僧笑了：'],['sprout','「假如你是一顆種子呢？」',0,3.5]]},
   {title:'閉著眼',panels:[['beerMugs','眾人喝酒，歌女陪坐。'],['elderStiff','只有長者閉眼正襟危坐。'],['elderMad','他怒：「我看都沒看妳！」'],['singerSly','「閉著眼想的，才更厲害。」',0,3.5]]},
@@ -1714,7 +1724,7 @@ const CATMAP={
   '搶匪小偷':['金口難開','負數','可能看到了','換科目','業內人士','遙控器','一起找'],
   '職場校園':['送行宴','鏡子都敢照','不會再問我','自己寫','哪邊涼快','不在人事','一個人過','仙草蜜','飢童','不忍心','美紅敢','錯的先講','吸菸區','沉默','看辦公室','可以回家','倫理學','很會說謊','烤箱手套'],
   '時事諷刺':['民調','太晚了','有用','重燃希望','誰是白痴','塗成藍色','我們的願望','白羊吃草','會飛的車'],
-  '故事小品':['一片葉子','種子','不打你','慣性','颱風要來','收拾','放下','恆河','平安','等','釣','慢','午後']};
+  '故事小品':['手作禮物','只是欣賞','一片葉子','種子','不打你','慣性','颱風要來','收拾','放下','恆河','平安','等','釣','慢','午後']};
 STORIES.forEach(S=>{S.cats=CATS.filter(c=>(CATMAP[c]||[]).includes(S.title));if(!S.cats.length)S.cats=['日常冷笑話'];});
 let storyCat='all';
 const inCat=S=>storyCat==='all'||S.cats.includes(storyCat);
