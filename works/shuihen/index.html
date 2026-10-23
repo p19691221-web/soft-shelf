@@ -791,7 +791,13 @@ const DEED=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.fillRect(-.22,-.
 const DEED_CUT=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.lineWidth=.022;c.beginPath();for(const yy of [-.18,-.08,.02,.12]){c.moveTo(-.14,yy);c.lineTo(.14,yy);}c.stroke();c.beginPath();c.moveTo(-.1,.22);c.quadraticCurveTo(-.04,.16,0,.22);c.quadraticCurveTo(.04,.28,.1,.2);c.stroke();c.restore();};
 const ULET=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.lineWidth=.12;c.lineCap='butt';c.beginPath();c.moveTo(-.18,-.34);c.lineTo(-.18,.06);c.arc(0,.06,.18,Math.PI,0,true);c.lineTo(.18,-.34);c.stroke();c.restore();};
 const TOWERS=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);for(const [bx,h] of [[-.2,.5],[-.06,.7],[.08,.56],[.22,.44]])c.fillRect(bx-.06,.3-h,.12,h);c.restore();};
+const CAM2=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.fillRect(-.3,-.16,.6,.36);c.fillRect(-.12,-.24,.2,.1);c.fillRect(.16,-.22,.08,.06);c.restore();};
+const CAM2_CUT=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.lineWidth=.04;c.beginPath();c.arc(0,.02,.12,0,7);c.stroke();fillE(c,0,.02,.05,.05);c.restore();};
 function shapeById(id){
+  if(id==='coupleAsk')return pair('準新人',SMILE,SMILE,c=>{c.save();c.translate(-.6,-.52);c.scale(.6,.6);QMARK(c);c.restore();});
+  if(id==='camera')return {name:'相機',kind:'o',rot:0,core:[0,.1],box:[1,.9],draw(c){CAM2(c,0,.08,1.3);},cut(c){CAM2_CUT(c,0,.08,1.3);}};
+  if(id==='flash')return {name:'閃光',kind:'o',rot:0,core:[0,.1],box:[1,1],draw(c){CAM2(c,-.04,.2,.9);c.lineWidth=.04;c.lineCap='round';c.beginPath();for(let i=0;i<7;i++){const a=-Math.PI*(.1+i*.133);c.moveTo(.06+Math.cos(a)*.18,-.12+Math.sin(a)*.18);c.lineTo(.06+Math.cos(a)*.34,-.12+Math.sin(a)*.34);}c.stroke();},cut(c){CAM2_CUT(c,-.04,.2,.9);}};
+  if(id==='photoFrame')return {name:'婚紗照',kind:'o',rot:0,core:[0,.1],box:[1,1.05],draw(c){c.lineWidth=.06;c.strokeRect(-.4,-.4,.8,.84);PAWN(c,-.14,.14,.6);PAWN(c,.14,.14,.6);HEART(c,0,-.24,.08);},cut(c){}};
   if(id==='hkAsk')return {name:'兩座城',kind:'o',rot:0,core:[0,.1],box:[1.1,1],draw(c){TOWERS(c,-.28,.08,.75);TOWERS(c,.3,.12,.6);c.lineWidth=.04;c.lineCap='round';c.beginPath();c.moveTo(-.04,-.16);c.lineTo(.1,-.16);c.lineTo(.06,-.2);c.moveTo(.1,-.16);c.lineTo(.06,-.12);c.stroke();c.save();c.translate(-.6,-.62);c.scale(.6,.6);QMARK(c);c.restore();},cut(c){}};
   if(id==='ruleThink')return profileShape({id:'flat',fixed:1,name:'認真想規定的人',extra:c=>{c.save();c.translate(1.1,.42);c.scale(.75,.75);DEED(c,0,0,1);c.restore();},cutP:c=>{MOUTH(c);c.save();c.translate(1.1,.42);c.scale(.75,.75);DEED_CUT(c,0,0,1);c.restore();},scale:.78,shift:-.22,box:[1.45,1.15],core:[-.22,0]});
   if(id==='aliveWave')return {name:'還活著的人',kind:'o',rot:0,core:[0,.1],box:[1.05,1],draw(c){PAWN(c,-.06,.12,1.05);c.lineWidth=.07;c.lineCap='round';c.beginPath();c.moveTo(.12,-.02);c.lineTo(.3,-.3);c.stroke();c.lineWidth=.03;c.beginPath();c.arc(.34,-.34,.12,-1.2,.2);c.stroke();},cut(c){}};
@@ -1867,6 +1873,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'一拍即合',panels:[['coupleAsk','結婚為什麼要拍婚紗照？'],['camera','來，看這裡——'],['flash','喀嚓！'],['photoFrame','因為一拍即合。',0,3.5]]},
   {title:'活人',panels:[['hkAsk','香港人能埋在廣州嗎？'],['ruleThink','戶籍？法規？跨境規定？'],['profThink','想了半天……'],['aliveWave','他還活著，怎麼埋？',0,3.5]]},
   {title:'最笨的字母',panels:[['abcDumb','26 個字母，哪個最笨？'],['lettersNo','不是 X，也不是 Y。'],['bigU','是 U。'],['pointYou','U＝YOU——就是你！',0,3.5]]},
   {title:'緩兵之計',panels:[['stuAskT','「老師，什麼是緩兵之計？」'],['profThink','老師想了想……'],['profSmile','「改天再告訴你。」'],['calNext','改天，是哪天？',0,3.5]]},
@@ -2068,7 +2075,7 @@ const STORIES=[
 ];
 const CATS=['諧音梗','夫妻家庭','搶匪小偷','職場校園','時事諷刺','日常冷笑話','故事小品'];
 const CATMAP={
-  '諧音梗':['最笨的字母','麥生氣','新衣耶','警察','阿拉伯','好鴨','拭十箍','矮love游','站久會酸','導魚','菇毒','雞凍','肥而不溺','擺事可樂','沒龜','猴頭菇','火腿','恁母伊郎','菊花茶','比三小','西北雨','北極的牛','地下道','下酒菜','梗多','滑馬','沒關C','在下','目光','泡你','我的天','沒氣了','南方','最甜的蜜','小氣蝦','瓦斯怎麼叫','缺陷','冰心地瓜','不在人事','多大','雨多甜','還沒滾','蟻后','坐白宮','擲筊','一個人過','鳳梨酥','仙草蜜','一波三折','八天的','飢童','美紅敢','仰式','你哪位','哈囉 win','窗戶凍住了','左右腦','換科目','業內人士','找誰接','半手李','閉眼說瞎話','誰是京都人','金口難開','看辦公室','週一休息','看穿'],
+  '諧音梗':['一拍即合','最笨的字母','麥生氣','新衣耶','警察','阿拉伯','好鴨','拭十箍','矮love游','站久會酸','導魚','菇毒','雞凍','肥而不溺','擺事可樂','沒龜','猴頭菇','火腿','恁母伊郎','菊花茶','比三小','西北雨','北極的牛','地下道','下酒菜','梗多','滑馬','沒關C','在下','目光','泡你','我的天','沒氣了','南方','最甜的蜜','小氣蝦','瓦斯怎麼叫','缺陷','冰心地瓜','不在人事','多大','雨多甜','還沒滾','蟻后','坐白宮','擲筊','一個人過','鳳梨酥','仙草蜜','一波三折','八天的','飢童','美紅敢','仰式','你哪位','哈囉 win','窗戶凍住了','左右腦','換科目','業內人士','找誰接','半手李','閉眼說瞎話','誰是京都人','金口難開','看辦公室','週一休息','看穿'],
   '夫妻家庭':['拿掃把','湊滿一船','隔壁老王','臉色','好女子','著火了','我的天','算錯','仙女','誤點','玩夠沒','瓶蓋','最佳搭檔','帶過來的','明天減肥','我不知道','我知道','第一次','會下蛋嗎','南方','挑食','五個媽','雨多甜','還沒滾','看不到你','多生兩個','貓與虎','送回娘家','七十才開始','一模一樣','買菸','需要談談','不敢問','窗戶凍住了','一切都很好','沒安全感','所以要我留下','露台','四個孩子的爸','深夜講座','睜一隻眼','緩解疼痛','九十歲','撞到告訴我','很會說謊','很甜','兩根菸'],
   '搶匪小偷':['金口難開','負數','可能看到了','換科目','業內人士','遙控器','一起找'],
   '職場校園':['緩兵之計','呷好西瓜','有求必應','下一位','送行宴','鏡子都敢照','不會再問我','自己寫','哪邊涼快','不在人事','一個人過','仙草蜜','飢童','不忍心','美紅敢','錯的先講','吸菸區','沉默','看辦公室','可以回家','倫理學','很會說謊','烤箱手套'],
