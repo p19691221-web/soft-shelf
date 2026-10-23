@@ -721,7 +721,13 @@ const COW=(c,x,y,k,shiver)=>{c.save();c.translate(x,y);c.scale(k,k);fillE(c,0,0,
 const COW_CUT=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);fillE(c,-.1,-.02,.08,.06);fillE(c,.1,.04,.06,.05);fillE(c,.45,-.17,.022,.022);c.restore();};
 const SNOW=(c,x,y,r)=>{c.lineWidth=r*.3;c.lineCap='round';c.beginPath();for(let i=0;i<3;i++){const a=i*Math.PI/3;c.moveTo(x-Math.cos(a)*r,y-Math.sin(a)*r);c.lineTo(x+Math.cos(a)*r,y+Math.sin(a)*r);}c.stroke();};
 const OFFICER=(cut,ex)=>profileShape({id:'flat',fixed:1,name:'',extra:c=>{PEAKCAP(c);ex&&ex(c);},cutP:cut});
+const HELMET=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.beginPath();c.moveTo(-.2,.04);c.quadraticCurveTo(-.2,-.2,0,-.2);c.quadraticCurveTo(.2,-.2,.2,.04);c.closePath();c.fill();c.fillRect(-.25,.02,.5,.05);c.restore();};
+const SOLDIER=(c,x,y,k)=>{PAWN(c,x,y,k);HELMET(c,x,y-.33*k,k*.85);};
 function shapeById(id){
+  if(id==='threeSoldiers')return {name:'三個士兵',kind:'o',rot:0,core:[0,.1],box:[1.15,.95],draw(c){for(const x of [-.38,0,.38]){PAWN(c,x,.1,.75);HELMET(c,x,-.13,.6);}},cut(c){}};
+  if(id==='armSling')return {name:'受傷的漢森',kind:'o',rot:0,core:[0,.1],box:[1.05,1],draw(c){SOLDIER(c,-.12,.1,1.05);c.save();c.translate(-.5,-.46);c.scale(.8,.8);EXCL(c);c.restore();DROP(c,.2,-.4,.045);DROP(c,.26,-.24,.04);},cut(c){c.lineWidth=.04;c.lineCap='round';c.beginPath();c.moveTo(-.3,.02);c.lineTo(-.22,.1);c.moveTo(-.22,.02);c.lineTo(-.3,.1);c.stroke();}};
+  if(id==='wittShrug')return {name:'滿不在乎的維特',kind:'o',rot:0,core:[0,.1],box:[1.05,1],draw(c){SOLDIER(c,0,.1,1.1);c.lineWidth=.05;c.lineCap='round';c.beginPath();c.moveTo(-.22,-.02);c.lineTo(-.36,-.16);c.lineTo(-.42,-.06);c.moveTo(.22,-.02);c.lineTo(.36,-.16);c.lineTo(.42,-.06);c.stroke();},cut(c){}};
+  if(id==='helmetOnly')return {name:'地上的鋼盔',kind:'o',rot:0,core:[0,.1],box:[1,.8],draw(c){HELMET(c,0,.12,1.5);c.lineWidth=.025;c.lineCap='round';c.beginPath();c.moveTo(-.46,.26);c.lineTo(.46,.26);c.stroke();},cut(c){}};
   if(id==='officersTalk')return duo('兩國軍官',OFFICER(MOUTH),OFFICER(SMILE));
   if(id==='swissCalm')return profileShape({id:'flat',fixed:1,name:'瑞士軍官',extra:c=>{PEAKCAP(c);for(let r=0;r<2;r++)for(let i=0;i<4;i++)PAWN(c,1.08+i*.15,.62+r*.3,.32);},cutP:SMILE,scale:.78,shift:-.24,box:[1.5,1.15],core:[-.24,.05]});
   if(id==='germanArmy')return profileShape({id:'flat',fixed:1,name:'德國軍官',extra:c=>{PEAKCAP(c);for(let r=0;r<3;r++)for(let i=0;i<5;i++)PAWN(c,1.04+i*.12,.42+r*.26,.26);},cutP:MOUTH,scale:.74,shift:-.28,box:[1.6,1.15],core:[-.28,.05]});
@@ -1640,6 +1646,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'毫無怨言',panels:[['threeSoldiers','三個人一起上了前線。'],['armSling','漢森：「胳膊被打斷了！」'],['wittShrug','「嚷什麼？看看科尼希。」'],['helmetOnly','「他頭都沒了，也沒抱怨。」',0,3.5]]},
   {title:'每人兩槍',panels:[['officersTalk','「你們有多少人能作戰？」'],['swissCalm','瑞士軍官：「五十萬。」'],['germanArmy','「我派一百萬人過去呢？」'],['twoShots','「那每人打兩槍。」',0,3.5]]},
   {title:'北極的牛',panels:[['cowBJ','牛牽到北京，還是頭牛。'],['cowLead','那牽到北極呢？'],['cowCold','牛……被冷死……'],['cowIce','New Balance！',0,3.5]]},
   {title:'定定神',panels:[['twoCars','農夫和律師撞車了。'],['farmerBottle','「嚇到了吧？喝口酒定神。」'],['lawyerDrink','「臉還很白，再喝幾口！」'],['farmerWait','「我不喝，我在等警察。」',0,3.5]]},
