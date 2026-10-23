@@ -726,6 +726,10 @@ const SOLDIER=(c,x,y,k)=>{PAWN(c,x,y,k);HELMET(c,x,y-.33*k,k*.85);};
 const BRIDGE=(c,y)=>{c.fillRect(-.5,y,1,.06);c.lineWidth=.05;c.beginPath();c.moveTo(-.4,y+.3);c.quadraticCurveTo(0,y-.02,.4,y+.3);c.stroke();c.fillRect(-.44,y,.05,.32);c.fillRect(.39,y,.05,.32);};
 const SIGN=(c,x,y,w,h)=>{c.fillRect(x-.015,y,.03,.3);c.fillRect(x-w/2,y-h,w,h);};
 function shapeById(id){
+  if(id==='darkSky')return {name:'天黑黑',kind:'o',rot:0,core:[0,.1],box:[1.05,.95],draw(c){CLOUD(c,-.06,-.28,1.4);c.save();c.translate(-.7,.06);c.scale(.8,.8);QMARK(c);c.restore();},cut(c){}};
+  if(id==='animals1')return {name:'象馬鹿',kind:'o',rot:0,core:[0,0],box:[1.05,1.1],draw(c){TXT(c,'象',-.22,-.22,42);TXT(c,'馬',.22,-.22,42);TXT(c,'鹿',0,.24,42);},cut(c){}};
+  if(id==='animals2')return {name:'獅豹虎',kind:'o',rot:0,core:[0,0],box:[1.05,1.1],draw(c){TXT(c,'獅',-.22,-.22,42);TXT(c,'豹',.22,-.22,42);TXT(c,'虎',0,.24,42);},cut(c){}};
+  if(id==='bigRain')return {name:'西北雨',kind:'o',rot:0,core:[0,.1],box:[1.05,1.05],draw(c){CLOUD(c,0,-.3,1.8);c.lineWidth=.035;c.lineCap='round';c.beginPath();for(let i=0;i<7;i++){const x=-.36+i*.12,y=-.02+(i%2)*.1;c.moveTo(x,y);c.lineTo(x-.06,y+.24);}c.stroke();c.beginPath();c.moveTo(.06,-.16);c.lineTo(-.02,0);c.lineTo(.06,.0);c.lineTo(-.04,.18);c.stroke();},cut(c){}};
   if(id==='bridgeSign')return {name:'掛了牌子的橋',kind:'o',rot:0,core:[0,.1],box:[1.05,.95],draw(c){BRIDGE(c,.06);WAVES(c,.44);SIGN(c,.18,-.24,.3,.18);},cut(c){c.lineWidth=.025;c.lineCap='round';c.beginPath();c.moveTo(.08,-.36);c.lineTo(.28,-.28);c.moveTo(.28,-.36);c.lineTo(.08,-.28);c.stroke();}};
   if(id==='colonelSees')return profileShape({id:'flat',fixed:1,name:'拿望遠鏡的上校',extra:c=>{PEAKCAP(c);BINO_P(c);},cutP:MOUTH,scale:.85,shift:-.1,box:[1.3,1.1],core:[-.1,0]});
   if(id==='colonelMad')return profileShape({id:'flat',fixed:1,name:'生氣的上校',extra:c=>{PEAKCAP(c);ANGER(c);},cutP:MOUTH,box:[1.3,1.15]});
@@ -1652,6 +1656,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'西北雨',panels:[['darkSky','天黑黑，猜六種動物。'],['animals1','象、馬、鹿……'],['animals2','獅、豹、虎……'],['bigRain','台語唸：像欲落西北雨！',0,3.5]]},
   {title:'游泳過河',panels:[['bridgeSign','演習牌子：「此橋已炸毀。」'],['colonelSees','上校卻看到士兵照樣過橋。'],['colonelMad','他氣沖沖趕到橋邊——'],['swimSign','牌子寫：「我們在游泳。」',0,3.5]]},
   {title:'毫無怨言',panels:[['threeSoldiers','三個人一起上了前線。'],['armSling','漢森：「胳膊被打斷了！」'],['wittShrug','「嚷什麼？看看科尼希。」'],['helmetOnly','「他頭都沒了，也沒抱怨。」',0,3.5]]},
   {title:'每人兩槍',panels:[['officersTalk','「你們有多少人能作戰？」'],['swissCalm','瑞士軍官：「五十萬。」'],['germanArmy','「我派一百萬人過去呢？」'],['twoShots','「那每人打兩槍。」',0,3.5]]},
@@ -1816,7 +1821,7 @@ const STORIES=[
 ];
 const CATS=['諧音梗','夫妻家庭','搶匪小偷','職場校園','時事諷刺','日常冷笑話','故事小品'];
 const CATMAP={
-  '諧音梗':['北極的牛','地下道','下酒菜','梗多','滑馬','沒關C','在下','目光','泡你','我的天','沒氣了','南方','最甜的蜜','小氣蝦','瓦斯怎麼叫','缺陷','冰心地瓜','不在人事','多大','雨多甜','還沒滾','蟻后','坐白宮','擲筊','一個人過','鳳梨酥','仙草蜜','一波三折','八天的','飢童','美紅敢','仰式','你哪位','哈囉 win','窗戶凍住了','左右腦','換科目','業內人士','找誰接','半手李','閉眼說瞎話','誰是京都人','金口難開','看辦公室','週一休息','看穿'],
+  '諧音梗':['西北雨','北極的牛','地下道','下酒菜','梗多','滑馬','沒關C','在下','目光','泡你','我的天','沒氣了','南方','最甜的蜜','小氣蝦','瓦斯怎麼叫','缺陷','冰心地瓜','不在人事','多大','雨多甜','還沒滾','蟻后','坐白宮','擲筊','一個人過','鳳梨酥','仙草蜜','一波三折','八天的','飢童','美紅敢','仰式','你哪位','哈囉 win','窗戶凍住了','左右腦','換科目','業內人士','找誰接','半手李','閉眼說瞎話','誰是京都人','金口難開','看辦公室','週一休息','看穿'],
   '夫妻家庭':['臉色','好女子','著火了','我的天','算錯','仙女','誤點','玩夠沒','瓶蓋','最佳搭檔','帶過來的','明天減肥','我不知道','我知道','第一次','會下蛋嗎','南方','挑食','五個媽','雨多甜','還沒滾','看不到你','多生兩個','貓與虎','送回娘家','七十才開始','一模一樣','買菸','需要談談','不敢問','窗戶凍住了','一切都很好','沒安全感','所以要我留下','露台','四個孩子的爸','深夜講座','睜一隻眼','緩解疼痛','九十歲','撞到告訴我','很會說謊','很甜','兩根菸'],
   '搶匪小偷':['金口難開','負數','可能看到了','換科目','業內人士','遙控器','一起找'],
   '職場校園':['下一位','送行宴','鏡子都敢照','不會再問我','自己寫','哪邊涼快','不在人事','一個人過','仙草蜜','飢童','不忍心','美紅敢','錯的先講','吸菸區','沉默','看辦公室','可以回家','倫理學','很會說謊','烤箱手套'],
