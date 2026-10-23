@@ -798,7 +798,13 @@ const CHAIR=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.fillRect(-.2,0,
 const ONEWAY=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.fillRect(-.015,-.1,.03,.5);c.fillRect(-.24,-.26,.48,.18);c.restore();};
 const ONEWAY_CUT=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.lineWidth=.035;c.lineCap='round';c.beginPath();c.moveTo(-.16,-.17);c.lineTo(.14,-.17);c.moveTo(.08,-.22);c.lineTo(.15,-.17);c.lineTo(.08,-.12);c.stroke();c.restore();};
 const ROAD=c=>{c.lineWidth=.03;c.beginPath();c.moveTo(-.52,.44);c.lineTo(.52,.44);c.stroke();c.lineWidth=.025;c.beginPath();for(const x of [-.4,-.1,.2]){c.moveTo(x,.36);c.lineTo(x+.14,.36);}c.stroke();};
+const FISHB=(c,x,y,k,flip)=>{c.save();c.translate(x,y);c.scale(k,flip?-k:k);fillE(c,0,0,.26,.13);fillP(c,[[-.2,0],[-.38,-.13],[-.38,.13]]);fillP(c,[[-.06,-.11],[.06,-.11],[0,-.22]]);c.restore();};
+const FISHB_EYE=(c,x,y,k,flip,dead)=>{c.save();c.translate(x,y);c.scale(k,flip?-k:k);if(dead){c.lineWidth=.025;c.beginPath();c.moveTo(.1,-.06);c.lineTo(.18,.0);c.moveTo(.18,-.06);c.lineTo(.1,.0);c.stroke();}else fillE(c,.14,-.03,.03,.03);c.restore();};
 function shapeById(id){
+  if(id==='fishSwim')return {name:'游著的魚',kind:'o',rot:0,core:[0,.1],box:[1.05,1],draw(c){FISHB(c,0,.04,1.4);WAVES(c,.42);c.save();c.translate(-.56,-.42);c.scale(.75,.75);QMARK(c);c.restore();},cut(c){FISHB_EYE(c,0,.04,1.4);}};
+  if(id==='fishTilt')return {name:'翻身的魚',kind:'o',rot:0,core:[0,.1],box:[1.05,1],draw(c){c.save();c.translate(0,.04);c.rotate(Math.PI/2);FISHB(c,0,0,1.3);c.restore();c.lineWidth=.03;c.lineCap='round';c.beginPath();c.arc(0,.04,.48,-Math.PI*.9,-Math.PI*.6);c.stroke();},cut(c){c.save();c.translate(0,.04);c.rotate(Math.PI/2);FISHB_EYE(c,0,0,1.3);c.restore();}};
+  if(id==='fishUp')return {name:'肚子朝上',kind:'o',rot:0,core:[0,.1],box:[1.05,1],draw(c){FISHB(c,0,.0,1.3,1);WAVES(c,.34);},cut(c){FISHB_EYE(c,0,.0,1.3,1);}};
+  if(id==='fishDead')return {name:'死魚',kind:'o',rot:0,core:[0,.1],box:[1.05,1],draw(c){FISHB(c,0,.0,1.3,1);WAVES(c,.34);},cut(c){FISHB_EYE(c,0,.0,1.3,1,1);}};
   if(id==='mushAsk2')return {name:'一朵香菇',kind:'o',rot:0,core:[0,.1],box:[1,1],draw(c){MUSH(c,-.06,.12,1.25);c.save();c.translate(-.6,-.56);c.scale(.75,.75);QMARK(c);c.restore();},cut(c){MUSH_CUT(c,-.06,.12,1.25);}};
   if(id==='oneWay')return {name:'單行道',kind:'o',rot:0,core:[0,.1],box:[1.05,1],draw(c){ONEWAY(c,0,0,1.4);},cut(c){ONEWAY_CUT(c,0,0,1.4);}};
   if(id==='mushRoad')return {name:'路上一朵菇',kind:'o',rot:0,core:[0,.1],box:[1.1,1],draw(c){ONEWAY(c,-.3,-.02,.9);MUSH(c,.26,.2,.55);ROAD(c);},cut(c){ONEWAY_CUT(c,-.3,-.02,.9);MUSH_CUT(c,.26,.2,.55);}};
@@ -1890,6 +1896,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'背朝下',panels:[['fishSwim','背朝下的魚，是什麼魚？'],['fishTilt','翻過來——'],['fishUp','肚子朝上，浮在水面。'],['fishDead','死魚。',0,3.5]]},
   {title:'菇單',panels:[['mushAsk2','香菇為何不種在單行道？'],['oneWay','單行道……'],['mushRoad','只放得下一朵菇。'],['mushLonely','怕菇（孤）單。',0,3.5]]},
   {title:'沒人理',panels:[['longHair','邊緣人為什麼不剪頭髮？'],['barber','走進理髮店——'],['waitAlone','等了一整天……'],['noOneLi','因為沒人要「理」他。',0,3.5]]},
   {title:'一個人',panels:[['friendVal','「情人節還是一個人嗎？」'],['meFurious','我勃然大怒：'],['meShout','「廢話！」'],['meDog','「難道我會變成一條狗嗎？」',0,3.5]]},
