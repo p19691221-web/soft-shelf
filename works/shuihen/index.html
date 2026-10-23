@@ -746,7 +746,12 @@ const SHOUT_R=(c,x,y)=>{c.lineWidth=.035;c.lineCap='round';c.beginPath();for(con
 const BAT=(c,x,y,k,a)=>{c.save();c.translate(x,y);c.rotate(a);c.scale(k,k);c.beginPath();c.moveTo(-.02,.3);c.lineTo(.02,.3);c.lineTo(.05,-.26);c.quadraticCurveTo(0,-.34,-.05,-.26);c.closePath();c.fill();c.restore();};
 const FLAME=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.beginPath();c.moveTo(0,-.42);c.quadraticCurveTo(.1,-.24,.06,-.16);c.quadraticCurveTo(.14,-.22,.16,-.3);c.quadraticCurveTo(.3,-.06,.24,.1);c.quadraticCurveTo(.18,.26,0,.26);c.quadraticCurveTo(-.2,.26,-.24,.08);c.quadraticCurveTo(-.28,-.1,-.12,-.24);c.quadraticCurveTo(-.12,-.12,-.06,-.1);c.quadraticCurveTo(-.1,-.3,0,-.42);c.closePath();c.fill();c.restore();};
 const HAM=(c,x,y,k,a)=>{c.save();c.translate(x,y);c.rotate(a||0);c.scale(k,k);fillE(c,0,.04,.1,.2);c.beginPath();c.moveTo(-.04,-.14);c.lineTo(.04,-.14);c.lineTo(.03,-.3);c.lineTo(-.03,-.3);c.closePath();c.fill();fillE(c,-.04,-.31,.035,.03);fillE(c,.04,-.31,.035,.03);c.restore();};
+const HLET=(c,x,y,k,a)=>{c.save();c.translate(x,y);c.rotate(a||0);c.scale(k,k);c.fillRect(-.24,-.34,.11,.68);c.fillRect(.13,-.34,.11,.68);c.fillRect(-.14,-.05,.28,.1);c.restore();};
 function shapeById(id){
+  if(id==='letterAsk')return {name:'字母們',kind:'o',rot:0,core:[0,0],box:[1.05,.95],draw(c){TXT(c,'A',-.3,.06,40);TXT(c,'B',0,.06,40);TXT(c,'C',.3,.06,40);c.save();c.translate(-.6,-.62);c.scale(.7,.7);QMARK(c);c.restore();},cut(c){}};
+  if(id==='letterH')return {name:'H',kind:'o',rot:0,core:[0,0],box:[.9,1],draw(c){HLET(c,0,.04,1.1,0);},cut(c){}};
+  if(id==='hTilt')return {name:'倒下中的H',kind:'o',rot:0,core:[0,0],box:[1,1],draw(c){HLET(c,0,.08,1.05,.75);c.lineWidth=.03;c.lineCap='round';c.beginPath();c.arc(0,.08,.5,-Math.PI*.9,-Math.PI*.6);c.stroke();},cut(c){}};
+  if(id==='hGong')return {name:'工',kind:'o',rot:0,core:[0,0],box:[1,.9],draw(c){HLET(c,0,.04,1.15,Math.PI/2);},cut(c){}};
   if(id==='flameAsk')return {name:'一團火',kind:'o',rot:0,core:[0,.1],box:[1,1],draw(c){FLAME(c,-.06,.12,1.2);c.save();c.translate(-.56,-.56);c.scale(.8,.8);QMARK(c);c.restore();},cut(c){fillE(c,-.12,.12,.03,.04);fillE(c,0,.12,.03,.04);}};
   if(id==='flameStuck')return {name:'走不動的火',kind:'o',rot:0,core:[0,.1],box:[1,1],draw(c){FLAME(c,-.06,.0,1.05);DROP(c,.3,-.3,.045);c.lineWidth=.03;c.beginPath();c.moveTo(-.4,.44);c.lineTo(.3,.44);c.stroke();},cut(c){fillE(c,-.12,.0,.03,.04);fillE(c,0,.0,.03,.04);}};
   if(id==='twoHams')return {name:'兩支火腿',kind:'o',rot:0,core:[0,.1],box:[1,1],draw(c){HAM(c,-.18,.06,1.4,.25);HAM(c,.2,.06,1.4,-.25);},cut(c){c.lineWidth=.02;c.beginPath();c.moveTo(-.24,.0);c.lineTo(-.14,.16);c.moveTo(.26,.0);c.lineTo(.16,.16);c.stroke();}};
@@ -1726,6 +1731,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'躺下的H',panels:[['letterAsk','哪個字母躺下變漢字？'],['letterH','H。'],['hTilt','躺下去——'],['hGong','「工」！',0,3.5]]},
   {title:'火腿',panels:[['flameAsk','火要怎麼走路？'],['flameStuck','沒有腳，走不動……'],['twoHams','給它兩支——'],['hamWalk','火腿！',0,3.5]]},
   {title:'恁母伊郎',panels:[['tvBaseball','小明在看棒球新聞。'],['dadAsk','爸爸進門：「鈴木一朗呢？」'],['kidRetire','「退休了啊！」'],['dadMom','「我是問恁母伊郎咧！」',0,3.5]]},
   {title:'有求必應',panels:[['dormDark','學校停電，男生宿舍喊：'],['chantPower','「我們要來電！」來了。'],['chantLate','「我們要延時！」准了。'],['chantGirl','「女朋友！我們要女朋友！」',0,3.5]]},
