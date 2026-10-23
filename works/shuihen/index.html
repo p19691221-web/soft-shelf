@@ -790,7 +790,11 @@ const SHIRT=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);fillP(c,[[-.1,-.2
 const DEED=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.fillRect(-.22,-.3,.44,.6);c.restore();};
 const DEED_CUT=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.lineWidth=.022;c.beginPath();for(const yy of [-.18,-.08,.02,.12]){c.moveTo(-.14,yy);c.lineTo(.14,yy);}c.stroke();c.beginPath();c.moveTo(-.1,.22);c.quadraticCurveTo(-.04,.16,0,.22);c.quadraticCurveTo(.04,.28,.1,.2);c.stroke();c.restore();};
 const ULET=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.lineWidth=.12;c.lineCap='butt';c.beginPath();c.moveTo(-.18,-.34);c.lineTo(-.18,.06);c.arc(0,.06,.18,Math.PI,0,true);c.lineTo(.18,-.34);c.stroke();c.restore();};
+const TOWERS=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);for(const [bx,h] of [[-.2,.5],[-.06,.7],[.08,.56],[.22,.44]])c.fillRect(bx-.06,.3-h,.12,h);c.restore();};
 function shapeById(id){
+  if(id==='hkAsk')return {name:'兩座城',kind:'o',rot:0,core:[0,.1],box:[1.1,1],draw(c){TOWERS(c,-.28,.08,.75);TOWERS(c,.3,.12,.6);c.lineWidth=.04;c.lineCap='round';c.beginPath();c.moveTo(-.04,-.16);c.lineTo(.1,-.16);c.lineTo(.06,-.2);c.moveTo(.1,-.16);c.lineTo(.06,-.12);c.stroke();c.save();c.translate(-.6,-.62);c.scale(.6,.6);QMARK(c);c.restore();},cut(c){}};
+  if(id==='ruleThink')return profileShape({id:'flat',fixed:1,name:'認真想規定的人',extra:c=>{c.save();c.translate(1.1,.42);c.scale(.75,.75);DEED(c,0,0,1);c.restore();},cutP:c=>{MOUTH(c);c.save();c.translate(1.1,.42);c.scale(.75,.75);DEED_CUT(c,0,0,1);c.restore();},scale:.78,shift:-.22,box:[1.45,1.15],core:[-.22,0]});
+  if(id==='aliveWave')return {name:'還活著的人',kind:'o',rot:0,core:[0,.1],box:[1.05,1],draw(c){PAWN(c,-.06,.12,1.05);c.lineWidth=.07;c.lineCap='round';c.beginPath();c.moveTo(.12,-.02);c.lineTo(.3,-.3);c.stroke();c.lineWidth=.03;c.beginPath();c.arc(.34,-.34,.12,-1.2,.2);c.stroke();},cut(c){}};
   if(id==='abcDumb')return {name:'字母們',kind:'o',rot:0,core:[0,0],box:[1.05,.95],draw(c){TXT(c,'A',-.3,.06,40);TXT(c,'B',0,.06,40);TXT(c,'C',.3,.06,40);c.save();c.translate(-.56,-.5);c.scale(.7,.7);QMARK(c);c.restore();},cut(c){}};
   if(id==='lettersNo')return {name:'不是它們',kind:'o',rot:0,core:[0,0],box:[1.05,.95],draw(c){c.lineWidth=.08;c.lineCap='butt';c.beginPath();c.moveTo(-.38,-.06);c.lineTo(-.1,.34);c.moveTo(-.1,-.06);c.lineTo(-.38,.34);c.moveTo(.1,-.06);c.lineTo(.24,.14);c.lineTo(.38,-.06);c.moveTo(.24,.14);c.lineTo(.24,.34);c.stroke();for(const x of [-.24,.24]){c.lineWidth=.04;c.lineCap='round';c.beginPath();c.moveTo(x-.08,-.3);c.lineTo(x+.08,-.18);c.moveTo(x+.08,-.3);c.lineTo(x-.08,-.18);c.stroke();}},cut(c){}};
   if(id==='bigU')return {name:'U',kind:'o',rot:0,core:[0,0],box:[.9,1],draw(c){ULET(c,0,.04,1.3);},cut(c){}};
@@ -1863,6 +1867,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'活人',panels:[['hkAsk','香港人能埋在廣州嗎？'],['ruleThink','戶籍？法規？跨境規定？'],['profThink','想了半天……'],['aliveWave','他還活著，怎麼埋？',0,3.5]]},
   {title:'最笨的字母',panels:[['abcDumb','26 個字母，哪個最笨？'],['lettersNo','不是 X，也不是 Y。'],['bigU','是 U。'],['pointYou','U＝YOU——就是你！',0,3.5]]},
   {title:'緩兵之計',panels:[['stuAskT','「老師，什麼是緩兵之計？」'],['profThink','老師想了想……'],['profSmile','「改天再告訴你。」'],['calNext','改天，是哪天？',0,3.5]]},
   {title:'麥生氣',panels:[['angryGuy','脾氣差的人要簽什麼約？'],['deedPen','一張契約……'],['signDeed','賣身契。'],['calmGuy','（台語）麥生氣！',0,3.5]]},
