@@ -714,7 +714,17 @@ const STUD=cut=>profileShape({id:'flat',fixed:1,name:'',cutP:cut});
 const DROP=(c,x,y,r)=>{c.beginPath();c.moveTo(x,y-r*1.6);c.quadraticCurveTo(x+r*1.2,y+r*.4,x,y+r);c.quadraticCurveTo(x-r*1.2,y+r*.4,x,y-r*1.6);c.fill();};
 const BOT=(c,x,y,k,a)=>{c.save();c.translate(x,y);c.rotate(a||0);c.scale(k,k);c.fillRect(-.07,-.08,.14,.3);fillE(c,0,-.08,.07,.04);c.fillRect(-.03,-.22,.06,.14);c.restore();};
 const SIREN=(c,x,y)=>{c.fillRect(x-.13,y+.08,.26,.06);c.beginPath();c.moveTo(x-.1,y+.08);c.lineTo(x-.1,y-.02);c.quadraticCurveTo(x,y-.16,x+.1,y-.02);c.lineTo(x+.1,y+.08);c.closePath();c.fill();c.lineWidth=.03;c.lineCap='round';c.beginPath();for(const [dx,dy,ex,ey] of [[-.16,-.06,-.26,-.12],[0,-.2,0,-.3],[.16,-.06,.26,-.12]]){c.moveTo(x+dx,y+dy);c.lineTo(x+ex,y+ey);}c.stroke();};
+const COW=(c,x,y,k,shiver)=>{c.save();c.translate(x,y);c.scale(k,k);fillE(c,0,0,.34,.17);fillP(c,[[.24,-.1],[.34,-.2],[.4,-.04],[.3,.06]]);fillE(c,.44,-.14,.12,.1);fillE(c,.54,-.08,.07,.06);
+  c.lineWidth=.035;c.lineCap='round';c.beginPath();c.moveTo(.38,-.22);c.quadraticCurveTo(.34,-.32,.28,-.32);c.moveTo(.46,-.23);c.quadraticCurveTo(.48,-.34,.42,-.36);c.stroke();
+  c.lineWidth=.06;c.beginPath();for(const lx of [-.24,-.13,.14,.25]){c.moveTo(lx,.1);if(shiver){c.lineTo(lx-.03,.22);c.lineTo(lx+.03,.3);c.lineTo(lx,.4);}else c.lineTo(lx,.4);}c.stroke();
+  c.lineWidth=.03;c.beginPath();c.moveTo(-.33,-.04);c.quadraticCurveTo(-.44,.04,-.42,.22);c.stroke();c.restore();};
+const COW_CUT=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);fillE(c,-.1,-.02,.08,.06);fillE(c,.1,.04,.06,.05);fillE(c,.45,-.17,.022,.022);c.restore();};
+const SNOW=(c,x,y,r)=>{c.lineWidth=r*.3;c.lineCap='round';c.beginPath();for(let i=0;i<3;i++){const a=i*Math.PI/3;c.moveTo(x-Math.cos(a)*r,y-Math.sin(a)*r);c.lineTo(x+Math.cos(a)*r,y+Math.sin(a)*r);}c.stroke();};
 function shapeById(id){
+  if(id==='cowBJ')return {name:'一頭牛',kind:'o',rot:0,core:[0,.1],box:[1.05,.85],draw(c){COW(c,-.1,.04,1);},cut(c){COW_CUT(c,-.1,.04,1);}};
+  if(id==='cowLead')return {name:'牽牛',kind:'o',rot:0,core:[0,.1],box:[1.15,1],draw(c){PAWN(c,.48,.04,.8);COW(c,-.26,.14,.8);c.lineWidth=.025;c.beginPath();c.moveTo(.14,.0);c.quadraticCurveTo(.25,.14,.36,.02);c.stroke();for(const [x,y,r] of [[-.42,-.36,.09],[-.06,-.44,.08],[.24,-.36,.07]])SNOW(c,x,y,r);},cut(c){COW_CUT(c,-.26,.14,.8);}};
+  if(id==='cowCold')return {name:'冷到發抖的牛',kind:'o',rot:0,core:[0,.1],box:[1.1,1],draw(c){COW(c,-.04,.1,1,1);for(const [x,y,r] of [[-.38,-.38,.09],[-.02,-.46,.08],[.36,-.42,.08],[-.52,-.1,.07]])SNOW(c,x,y,r);DROP(c,.62,.02,.04);},cut(c){COW_CUT(c,-.04,.1,1);}};
+  if(id==='cowIce')return {name:'結冰的牛',kind:'o',rot:0,core:[0,.1],box:[1.1,1],draw(c){c.lineWidth=.05;c.lineJoin='round';c.strokeRect(-.5,-.4,1,.84);COW(c,-.04,.06,.8);c.lineWidth=.025;c.beginPath();c.moveTo(-.4,-.3);c.lineTo(-.3,-.36);c.moveTo(.28,.34);c.lineTo(.4,.28);c.stroke();},cut(c){COW_CUT(c,-.04,.06,.8);}};
   if(id==='twoCars')return {name:'兩車相撞',kind:'o',rot:0,core:[0,.05],box:[1.1,.85],draw(c){c.save();c.translate(-.29,.12);c.scale(.6,.6);carBody(c);c.restore();c.save();c.translate(.29,.12);c.scale(-.6,.6);carBody(c);c.restore();
     c.beginPath();for(let k=0;k<16;k++){const a=k/16*Math.PI*2,r=k%2?.06:.16;c.lineTo(Math.cos(a)*r,-.26+Math.sin(a)*r);}c.closePath();c.fill();},cut(c){c.save();c.translate(-.29,.12);c.scale(.6,.6);carCut(c);c.restore();c.save();c.translate(.29,.12);c.scale(-.6,.6);carCut(c);c.restore();}};
   if(id==='farmerBottle')return profileShape({id:'douli',fixed:1,name:'遞酒的農夫',extra:c=>{BOT(c,1.12,.66,1.1,.25);},cutP:SMILE,scale:.8,shift:-.18,box:[1.35,1.2],core:[-.18,.05]});
@@ -1625,6 +1635,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'北極的牛',panels:[['cowBJ','牛牽到北京，還是頭牛。'],['cowLead','那牽到北極呢？'],['cowCold','牛……被冷死……'],['cowIce','New Balance！',0,3.5]]},
   {title:'定定神',panels:[['twoCars','農夫和律師撞車了。'],['farmerBottle','「嚇到了吧？喝口酒定神。」'],['lawyerDrink','「臉還很白，再喝幾口！」'],['farmerWait','「我不喝，我在等警察。」',0,3.5]]},
   {title:'地下道',panels:[['bigSmall','哥哥嚇弟弟，會變成什麼？'],['bigScare','「哇！」'],['smallShock','弟……嚇到……'],['underpass','地下道。',0,3.5]]},
   {title:'下一位',panels:[['oralExam','口試三題，他全答不出來。'],['lastQ','「最後一題：誰發現美洲？」'],['profYell','教授氣到大喊：「哥倫布！」'],['studLeave','「咦，不是在叫下一位嗎？」',0,3.5]]},
@@ -1785,7 +1796,7 @@ const STORIES=[
 ];
 const CATS=['諧音梗','夫妻家庭','搶匪小偷','職場校園','時事諷刺','日常冷笑話','故事小品'];
 const CATMAP={
-  '諧音梗':['地下道','下酒菜','梗多','滑馬','沒關C','在下','目光','泡你','我的天','沒氣了','南方','最甜的蜜','小氣蝦','瓦斯怎麼叫','缺陷','冰心地瓜','不在人事','多大','雨多甜','還沒滾','蟻后','坐白宮','擲筊','一個人過','鳳梨酥','仙草蜜','一波三折','八天的','飢童','美紅敢','仰式','你哪位','哈囉 win','窗戶凍住了','左右腦','換科目','業內人士','找誰接','半手李','閉眼說瞎話','誰是京都人','金口難開','看辦公室','週一休息','看穿'],
+  '諧音梗':['北極的牛','地下道','下酒菜','梗多','滑馬','沒關C','在下','目光','泡你','我的天','沒氣了','南方','最甜的蜜','小氣蝦','瓦斯怎麼叫','缺陷','冰心地瓜','不在人事','多大','雨多甜','還沒滾','蟻后','坐白宮','擲筊','一個人過','鳳梨酥','仙草蜜','一波三折','八天的','飢童','美紅敢','仰式','你哪位','哈囉 win','窗戶凍住了','左右腦','換科目','業內人士','找誰接','半手李','閉眼說瞎話','誰是京都人','金口難開','看辦公室','週一休息','看穿'],
   '夫妻家庭':['臉色','好女子','著火了','我的天','算錯','仙女','誤點','玩夠沒','瓶蓋','最佳搭檔','帶過來的','明天減肥','我不知道','我知道','第一次','會下蛋嗎','南方','挑食','五個媽','雨多甜','還沒滾','看不到你','多生兩個','貓與虎','送回娘家','七十才開始','一模一樣','買菸','需要談談','不敢問','窗戶凍住了','一切都很好','沒安全感','所以要我留下','露台','四個孩子的爸','深夜講座','睜一隻眼','緩解疼痛','九十歲','撞到告訴我','很會說謊','很甜','兩根菸'],
   '搶匪小偷':['金口難開','負數','可能看到了','換科目','業內人士','遙控器','一起找'],
   '職場校園':['下一位','送行宴','鏡子都敢照','不會再問我','自己寫','哪邊涼快','不在人事','一個人過','仙草蜜','飢童','不忍心','美紅敢','錯的先講','吸菸區','沉默','看辦公室','可以回家','倫理學','很會說謊','烤箱手套'],
