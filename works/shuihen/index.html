@@ -755,7 +755,13 @@ const SHROOM=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);fillE(c,0,0,.3,.
 const TURT=(c,x,y,k,a)=>{c.save();c.translate(x,y);c.rotate(a||0);c.scale(k,k);c.beginPath();c.moveTo(-.22,.04);c.quadraticCurveTo(-.2,-.18,0,-.18);c.quadraticCurveTo(.2,-.18,.22,.04);c.closePath();c.fill();fillE(c,.28,-.02,.07,.055);c.lineWidth=.05;c.lineCap='round';c.beginPath();for(const lx of [-.14,.12]){c.moveTo(lx,.04);c.lineTo(lx,.11);}c.stroke();c.restore();};
 const TURT_CUT=(c,x,y,k,a)=>{c.save();c.translate(x,y);c.rotate(a||0);c.scale(k,k);c.lineWidth=.02;c.beginPath();c.moveTo(-.12,-.06);c.lineTo(0,-.12);c.lineTo(.12,-.06);c.moveTo(0,-.12);c.lineTo(0,0);c.stroke();fillE(c,.3,-.04,.012,.012);c.restore();};
 const CLIFF=c=>{fillP(c,[[-.5,-.02],[.06,-.02],[.1,.08],[.04,.2],[.12,.32],[.06,.46],[-.5,.46]]);};
+const PEN2=(c,x,y,k,a)=>{c.save();c.translate(x,y);c.rotate(a);c.scale(k,k);c.fillRect(-.035,-.4,.07,.62);fillP(c,[[-.035,.22],[.035,.22],[0,.34]]);c.fillRect(-.045,-.42,.09,.08);c.restore();};
+const HAND=(c,x,y,k,flip)=>{c.save();c.translate(x,y);c.scale(flip?-k:k,k);fillE(c,0,.08,.16,.18);for(let i=0;i<4;i++)c.fillRect(-.13+i*.075,-.26,.055,.28);fillE(c,.18,.0,.05,.12,-.5);c.restore();};
 function shapeById(id){
+  if(id==='askHand')return profileShape({id:'flat',fixed:1,name:'問問題的人',extra:QMARK,cutP:MOUTH,scale:.78,shift:-.2,box:[1.5,1.15],core:[-.2,0]});
+  if(id==='leftRight')return {name:'左手右手',kind:'o',rot:0,core:[0,.1],box:[1.05,.95],draw(c){HAND(c,-.24,.06,1,1);HAND(c,.24,.06,1,0);},cut(c){TXT(c,'左',-.24,.14,22);TXT(c,'右',.24,.14,22);}};
+  if(id==='thinkHand')return profileShape({id:'flat',fixed:1,name:'想了一下',extra:c=>{for(const x of [1.02,1.18,1.34])fillE(c,x,.3,.065,.065);},cutP:EYE_SHUT,scale:.85,shift:-.14,box:[1.4,1.1],core:[-.14,0]});
+  if(id==='bigPen')return {name:'一支筆',kind:'o',rot:0,core:[0,.1],box:[.9,1.05],draw(c){PEN2(c,0,0,1.3,.45);c.lineWidth=.035;c.lineCap='round';c.beginPath();c.moveTo(-.36,.42);c.quadraticCurveTo(-.26,.32,-.18,.42);c.quadraticCurveTo(-.1,.5,-.02,.4);c.stroke();},cut(c){}};
   if(id==='turtleEdge')return {name:'懸崖邊的烏龜',kind:'o',rot:0,core:[0,.1],box:[1.05,1],draw(c){CLIFF(c);TURT(c,-.16,-.16,.85);c.save();c.translate(-.52,-.5);c.scale(.7,.7);QMARK(c);c.restore();},cut(c){TURT_CUT(c,-.16,-.16,.85);}};
   if(id==='turtleFall')return {name:'掉下去的烏龜',kind:'o',rot:0,core:[0,.1],box:[1.25,1],draw(c){CLIFF(c);TURT(c,.44,.2,.75,2.4);c.lineWidth=.03;c.lineCap='round';c.beginPath();for(const x of [.36,.46,.56]){c.moveTo(x,-.12);c.lineTo(x,-.26);}c.stroke();},cut(c){TURT_CUT(c,.44,.2,.75,2.4);}};
   if(id==='cliffEmpty')return {name:'沒龜了',kind:'o',rot:0,core:[0,.1],box:[1.05,1],draw(c){CLIFF(c);c.lineWidth=.025;c.beginPath();c.moveTo(.3,.38);c.lineTo(.5,.38);c.stroke();},cut(c){}};
@@ -1747,6 +1753,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'用筆',panels:[['askHand','「你寫字用哪隻手？」'],['leftRight','「左手，還是右手？」'],['thinkHand','他想了一下……'],['bigPen','「用筆。」',0,3.5]]},
   {title:'沒龜',panels:[['turtleEdge','烏龜在懸崖邊，猜一花名。'],['turtleFall','一不小心——'],['cliffEmpty','沒龜了。'],['roseBig','玫瑰（沒龜）！',0,3.5]]},
   {title:'猴頭菇',panels:[['monkeyHoop','孫悟空頭上的金箍叫什麼？'],['hoopOnly','就是猴頭上的箍。'],['monkeyHead','唸快一點——'],['lionMane','猴頭箍（菇）！',0,3.5]]},
   {title:'躺下的H',panels:[['letterAsk','哪個字母躺下變漢字？'],['letterH','H。'],['hTilt','躺下去——'],['hGong','「工」！',0,3.5]]},
