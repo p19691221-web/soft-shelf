@@ -712,7 +712,14 @@ function duo(name,A,B,mid,bAway){return {name,kind:'o',rot:0,core:[-.22,.42],box
 const PROF=cut=>profileShape({id:'beard',fixed:1,name:'',cutP:c=>{GLASSES_CUT(c);cut&&cut(c);}});
 const STUD=cut=>profileShape({id:'flat',fixed:1,name:'',cutP:cut});
 const DROP=(c,x,y,r)=>{c.beginPath();c.moveTo(x,y-r*1.6);c.quadraticCurveTo(x+r*1.2,y+r*.4,x,y+r);c.quadraticCurveTo(x-r*1.2,y+r*.4,x,y-r*1.6);c.fill();};
+const BOT=(c,x,y,k,a)=>{c.save();c.translate(x,y);c.rotate(a||0);c.scale(k,k);c.fillRect(-.07,-.08,.14,.3);fillE(c,0,-.08,.07,.04);c.fillRect(-.03,-.22,.06,.14);c.restore();};
+const SIREN=(c,x,y)=>{c.fillRect(x-.13,y+.08,.26,.06);c.beginPath();c.moveTo(x-.1,y+.08);c.lineTo(x-.1,y-.02);c.quadraticCurveTo(x,y-.16,x+.1,y-.02);c.lineTo(x+.1,y+.08);c.closePath();c.fill();c.lineWidth=.03;c.lineCap='round';c.beginPath();for(const [dx,dy,ex,ey] of [[-.16,-.06,-.26,-.12],[0,-.2,0,-.3],[.16,-.06,.26,-.12]]){c.moveTo(x+dx,y+dy);c.lineTo(x+ex,y+ey);}c.stroke();};
 function shapeById(id){
+  if(id==='twoCars')return {name:'兩車相撞',kind:'o',rot:0,core:[0,.05],box:[1.1,.85],draw(c){c.save();c.translate(-.29,.12);c.scale(.6,.6);carBody(c);c.restore();c.save();c.translate(.29,.12);c.scale(-.6,.6);carBody(c);c.restore();
+    c.beginPath();for(let k=0;k<16;k++){const a=k/16*Math.PI*2,r=k%2?.06:.16;c.lineTo(Math.cos(a)*r,-.26+Math.sin(a)*r);}c.closePath();c.fill();},cut(c){c.save();c.translate(-.29,.12);c.scale(.6,.6);carCut(c);c.restore();c.save();c.translate(.29,.12);c.scale(-.6,.6);carCut(c);c.restore();}};
+  if(id==='farmerBottle')return profileShape({id:'douli',fixed:1,name:'遞酒的農夫',extra:c=>{BOT(c,1.12,.66,1.1,.25);},cutP:SMILE,scale:.8,shift:-.18,box:[1.35,1.2],core:[-.18,.05]});
+  if(id==='lawyerDrink')return profileShape({id:'flat',fixed:1,name:'喝酒的律師',extra:c=>{TIE(c);BOT(c,1.16,.5,1.35,-1.9);},cutP:c=>{EYE_SHUT(c);},scale:.8,shift:-.18,box:[1.35,1.3],core:[-.18,.1]});
+  if(id==='farmerWait')return profileShape({id:'douli',fixed:1,name:'等警察的農夫',extra:c=>{c.save();c.translate(1.26,.22);c.scale(1.6,1.6);SIREN(c,0,0);c.restore();},cutP:SMILE,scale:.8,shift:-.2,box:[1.5,1.25],core:[-.2,.05]});
   if(id==='bigSmall')return {name:'哥哥和弟弟',kind:'o',rot:0,core:[0,.1],box:[1.05,.95],draw(c){PAWN(c,-.2,.04,1.1);PAWN(c,.24,.16,.7);},cut(c){}};
   if(id==='bigScare')return {name:'哥哥嚇弟弟',kind:'o',rot:0,core:[0,.1],box:[1.1,.95],draw(c){PAWN(c,-.28,.04,1.1);c.lineWidth=.035;c.lineCap='round';c.beginPath();for(const [x1,y1,x2,y2] of [[-.08,-.32,.04,-.4],[-.06,-.22,.1,-.22],[-.08,-.12,.04,-.04]]){c.moveTo(x1,y1);c.lineTo(x2,y2);}c.stroke();PAWN(c,.3,.16,.7);},cut(c){}};
   if(id==='smallShock')return {name:'嚇到的弟弟',kind:'o',rot:0,core:[0,.1],box:[1,1],draw(c){PAWN(c,-.06,.08,1.05);c.save();c.translate(-.7,-.6);c.scale(.8,.8);EXCL(c);c.restore();DROP(c,-.34,-.36,.05);DROP(c,-.4,-.2,.04);},cut(c){}};
@@ -1618,6 +1625,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'定定神',panels:[['twoCars','農夫和律師撞車了。'],['farmerBottle','「嚇到了吧？喝口酒定神。」'],['lawyerDrink','「臉還很白，再喝幾口！」'],['farmerWait','「我不喝，我在等警察。」',0,3.5]]},
   {title:'地下道',panels:[['bigSmall','哥哥嚇弟弟，會變成什麼？'],['bigScare','「哇！」'],['smallShock','弟……嚇到……'],['underpass','地下道。',0,3.5]]},
   {title:'下一位',panels:[['oralExam','口試三題，他全答不出來。'],['lastQ','「最後一題：誰發現美洲？」'],['profYell','教授氣到大喊：「哥倫布！」'],['studLeave','「咦，不是在叫下一位嗎？」',0,3.5]]},
   {title:'下酒菜',panels:[['chiveAsk','韭菜最討厭什麼人？'],['drinker','喝酒的人。'],['scareChive','因為他們最愛——'],['chiveShock','嚇韭菜（下酒菜）！',0,3.5]]},
