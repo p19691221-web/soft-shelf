@@ -782,7 +782,15 @@ const KNOCK=(c,x,y)=>{c.lineWidth=.03;c.lineCap='round';c.beginPath();for(const 
 const STALL=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);fillP(c,[[-.36,-.2],[.36,-.2],[.42,-.06],[-.42,-.06]]);c.fillRect(-.34,-.06,.04,.42);c.fillRect(.3,-.06,.04,.42);c.fillRect(-.36,.12,.72,.06);for(const x of [-.2,0,.2])fillE(c,x,.06,.07,.06);c.restore();};
 const STALL_CUT=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.lineWidth=.02;c.beginPath();for(const sx of [-.2,0,.2]){c.moveTo(sx-.06,-.18);c.lineTo(sx+.02,-.08);}c.stroke();c.restore();};
 const LAMP2=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);fillE(c,0,.04,.24,.1);c.beginPath();c.moveTo(.2,.0);c.quadraticCurveTo(.36,-.02,.46,-.12);c.lineTo(.44,-.06);c.quadraticCurveTo(.34,.06,.2,.08);c.fill();c.lineWidth=.04;c.beginPath();c.arc(-.28,.04,.07,Math.PI*.5,Math.PI*1.5);c.stroke();fillE(c,0,-.08,.08,.05);fillE(c,0,-.14,.03,.03);c.fillRect(-.12,.12,.24,.05);c.restore();};
+const CARD2=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.fillRect(-.26,-.18,.52,.36);c.restore();};
+const CARD2_CUT=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);HEART(c,-.12,-.02,.07);c.lineWidth=.022;c.beginPath();c.moveTo(.0,-.06);c.lineTo(.18,-.06);c.moveTo(.0,.04);c.lineTo(.18,.04);c.stroke();c.restore();};
+const MELON=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.beginPath();c.moveTo(-.3,0);c.lineTo(.3,0);c.arc(0,0,.3,0,Math.PI);c.closePath();c.fill();c.restore();};
+const MELON_CUT=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);for(const [sx,sy] of [[-.14,.08],[0,.12],[.14,.08],[-.06,.18],[.07,.19]])fillE(c,sx,sy,.022,.032);c.restore();};
 function shapeById(id){
+  if(id==='cardTask')return {name:'一疊賀卡',kind:'o',rot:0,core:[0,.1],box:[1.05,1],draw(c){CARD2(c,-.04,.1,1.35);},cut(c){CARD2_CUT(c,-.04,.1,1.35);}};
+  if(id==='kidsSigh')return {name:'嫌麻煩的學生',kind:'o',rot:0,core:[0,.1],box:[1.1,1],draw(c){for(const x of [-.34,0,.34])PAWN(c,x,.14,.7);c.lineWidth=.03;c.lineCap='round';c.beginPath();for(const x of [-.2,.14]){c.moveTo(x,-.3);c.quadraticCurveTo(x+.06,-.38,x+.12,-.3);}c.stroke();},cut(c){}};
+  if(id==='kidWrite')return {name:'搶著寫卡片',kind:'o',rot:0,core:[0,.1],box:[1.1,1],draw(c){PAWN(c,-.32,.1,.85);CARD2(c,.22,.22,.9);MELON(c,.24,-.26,.7);PEN2(c,.0,.0,.5,.6);},cut(c){CARD2_CUT(c,.22,.22,.9);MELON_CUT(c,.24,-.26,.7);}};
+  if(id==='kidCalled')return {name:'被約談',kind:'o',rot:0,core:[0,.1],box:[1.1,1],draw(c){PAWN(c,-.3,.04,1.05);c.save();c.translate(-.4,-.4);c.scale(.6,.6);ANGER(c);c.restore();PAWN(c,.3,.2,.6);DROP(c,.46,-.06,.04);},cut(c){}};
   if(id==='teaAsk')return {name:'一杯茶',kind:'o',rot:0,core:[0,.1],box:[1,1],draw(c){TCUP(c,-.04,.14,1.2);STEAM(c,-.04,-.08);c.save();c.translate(-1.2,-.5);c.scale(.75,.75);QMARK(c);c.restore();},cut(c){}};
   if(id==='teaTwo')return {name:'各種茶',kind:'o',rot:0,core:[0,.1],box:[1.1,1],draw(c){TCUP(c,-.3,.16,.6);TCUP(c,.3,.16,.6);STEAM(c,-.3,.04);STEAM(c,.3,.04);},cut(c){}};
   if(id==='copCap')return profileShape({id:'flat',fixed:1,name:'警察',extra:c=>{PEAKCAP(c);c.save();c.translate(1.24,.34);c.scale(1.7,1.7);SIREN(c,0,0);c.restore();},cutP:MOUTH,scale:.8,shift:-.2,box:[1.4,1.15],core:[-.2,0]});
@@ -1835,6 +1843,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'呷好西瓜',panels:[['cardTask','學校要大家寫敬老賀卡。'],['kidsSigh','同學都嫌麻煩。'],['kidWrite','（台語）祝你呷好西瓜！'],['kidCalled','然後他就被約談了。',0,3.5]]},
   {title:'警察',panels:[['teaAsk','什麼「茶」不能喝？'],['teaTwo','紅茶、綠茶都能喝……'],['copCap','有一種不行——'],['copNo','警察（茶）。',0,3.5]]},
   {title:'阿拉伯',panels:[['lampAsk','阿拉丁爸爸的哥哥叫什麼？'],['familyTree','爸爸的哥哥……'],['uncleBo','叫「伯」。'],['alaBo','所以是：阿拉伯！',0,3.5]]},
   {title:'市場不會來',panels:[['goMarket','人為什麼要去市場？'],['waitHome','在家等，等了一整天……'],['stallStay','市場一步也沒動。'],['walkThere','因為市場不會來。',0,3.5]]},
@@ -2033,7 +2042,7 @@ const CATMAP={
   '諧音梗':['警察','阿拉伯','好鴨','拭十箍','矮love游','站久會酸','導魚','菇毒','雞凍','肥而不溺','擺事可樂','沒龜','猴頭菇','火腿','恁母伊郎','菊花茶','比三小','西北雨','北極的牛','地下道','下酒菜','梗多','滑馬','沒關C','在下','目光','泡你','我的天','沒氣了','南方','最甜的蜜','小氣蝦','瓦斯怎麼叫','缺陷','冰心地瓜','不在人事','多大','雨多甜','還沒滾','蟻后','坐白宮','擲筊','一個人過','鳳梨酥','仙草蜜','一波三折','八天的','飢童','美紅敢','仰式','你哪位','哈囉 win','窗戶凍住了','左右腦','換科目','業內人士','找誰接','半手李','閉眼說瞎話','誰是京都人','金口難開','看辦公室','週一休息','看穿'],
   '夫妻家庭':['拿掃把','湊滿一船','隔壁老王','臉色','好女子','著火了','我的天','算錯','仙女','誤點','玩夠沒','瓶蓋','最佳搭檔','帶過來的','明天減肥','我不知道','我知道','第一次','會下蛋嗎','南方','挑食','五個媽','雨多甜','還沒滾','看不到你','多生兩個','貓與虎','送回娘家','七十才開始','一模一樣','買菸','需要談談','不敢問','窗戶凍住了','一切都很好','沒安全感','所以要我留下','露台','四個孩子的爸','深夜講座','睜一隻眼','緩解疼痛','九十歲','撞到告訴我','很會說謊','很甜','兩根菸'],
   '搶匪小偷':['金口難開','負數','可能看到了','換科目','業內人士','遙控器','一起找'],
-  '職場校園':['有求必應','下一位','送行宴','鏡子都敢照','不會再問我','自己寫','哪邊涼快','不在人事','一個人過','仙草蜜','飢童','不忍心','美紅敢','錯的先講','吸菸區','沉默','看辦公室','可以回家','倫理學','很會說謊','烤箱手套'],
+  '職場校園':['呷好西瓜','有求必應','下一位','送行宴','鏡子都敢照','不會再問我','自己寫','哪邊涼快','不在人事','一個人過','仙草蜜','飢童','不忍心','美紅敢','錯的先講','吸菸區','沉默','看辦公室','可以回家','倫理學','很會說謊','烤箱手套'],
   '時事諷刺':['凱文呢','民調','太晚了','有用','重燃希望','誰是白痴','塗成藍色','我們的願望','白羊吃草','會飛的車'],
   '故事小品':['省道','背上的字','手作禮物','只是欣賞','一片葉子','種子','不打你','慣性','颱風要來','收拾','放下','恆河','平安','等','釣','慢','午後']};
 STORIES.forEach(S=>{S.cats=CATS.filter(c=>(CATMAP[c]||[]).includes(S.title));if(!S.cats.length)S.cats=['日常冷笑話'];});
