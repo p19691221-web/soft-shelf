@@ -800,7 +800,14 @@ const ONEWAY_CUT=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.lineWidth=
 const ROAD=c=>{c.lineWidth=.03;c.beginPath();c.moveTo(-.52,.44);c.lineTo(.52,.44);c.stroke();c.lineWidth=.025;c.beginPath();for(const x of [-.4,-.1,.2]){c.moveTo(x,.36);c.lineTo(x+.14,.36);}c.stroke();};
 const FISHB=(c,x,y,k,flip)=>{c.save();c.translate(x,y);c.scale(k,flip?-k:k);fillE(c,0,0,.26,.13);fillP(c,[[-.2,0],[-.38,-.13],[-.38,.13]]);fillP(c,[[-.06,-.11],[.06,-.11],[0,-.22]]);c.restore();};
 const FISHB_EYE=(c,x,y,k,flip,dead)=>{c.save();c.translate(x,y);c.scale(k,flip?-k:k);if(dead){c.lineWidth=.025;c.beginPath();c.moveTo(.1,-.06);c.lineTo(.18,.0);c.moveTo(.18,-.06);c.lineTo(.1,.0);c.stroke();}else fillE(c,.14,-.03,.03,.03);c.restore();};
+const TREE2=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.fillRect(-.05,0,.1,.4);fillE(c,0,-.14,.26,.2);fillE(c,-.16,-.04,.14,.12);fillE(c,.16,-.04,.14,.12);fillE(c,0,-.3,.16,.12);c.restore();};
+const TLIGHT=(c,x,y,k,a)=>{c.save();c.translate(x,y);c.rotate(a||0);c.scale(k,k);c.fillRect(-.03,-.1,.06,.5);c.fillRect(-.09,-.44,.18,.36);c.restore();};
+const TLIGHT_CUT=(c,x,y,k,a)=>{c.save();c.translate(x,y);c.rotate(a||0);c.scale(k,k);for(const yy of [-.37,-.26,-.15])fillE(c,0,yy,.045,.045);c.restore();};
 function shapeById(id){
+  if(id==='treeStand')return {name:'行道樹',kind:'o',rot:0,core:[0,.1],box:[1,1],draw(c){TREE2(c,-.04,.04,1.3);},cut(c){}};
+  if(id==='treeTrim')return {name:'修剪',kind:'o',rot:0,core:[0,.1],box:[1.05,1],draw(c){TREE2(c,-.18,.06,1.1);SCIS(c,.32,-.22,.8);},cut(c){}};
+  if(id==='lightFall')return {name:'倒下的紅綠燈',kind:'o',rot:0,core:[0,.1],box:[1.05,1],draw(c){TLIGHT(c,.0,.24,1.1,1.25);c.lineWidth=.03;c.beginPath();c.moveTo(-.5,.44);c.lineTo(.5,.44);c.stroke();c.save();c.translate(-.56,-.46);c.scale(.75,.75);EXCL(c);c.restore();},cut(c){TLIGHT_CUT(c,.0,.24,1.1,1.25);}};
+  if(id==='lightsCut')return {name:'紅綠燈全砍光',kind:'o',rot:0,core:[0,.1],box:[1.1,1],draw(c){for(const x of [-.34,0,.34])c.fillRect(x-.04,.3,.08,.12);c.lineWidth=.03;c.beginPath();c.moveTo(-.52,.44);c.lineTo(.52,.44);c.stroke();c.save();c.translate(-.6,-.4);c.scale(.7,.7);QMARK(c);c.restore();},cut(c){}};
   if(id==='fishSwim')return {name:'游著的魚',kind:'o',rot:0,core:[0,.1],box:[1.05,1],draw(c){FISHB(c,0,.04,1.4);WAVES(c,.42);c.save();c.translate(-.56,-.42);c.scale(.75,.75);QMARK(c);c.restore();},cut(c){FISHB_EYE(c,0,.04,1.4);}};
   if(id==='fishTilt')return {name:'翻身的魚',kind:'o',rot:0,core:[0,.1],box:[1.05,1],draw(c){c.save();c.translate(0,.04);c.rotate(Math.PI/2);FISHB(c,0,0,1.3);c.restore();c.lineWidth=.03;c.lineCap='round';c.beginPath();c.arc(0,.04,.48,-Math.PI*.9,-Math.PI*.6);c.stroke();},cut(c){c.save();c.translate(0,.04);c.rotate(Math.PI/2);FISHB_EYE(c,0,0,1.3);c.restore();}};
   if(id==='fishUp')return {name:'肚子朝上',kind:'o',rot:0,core:[0,.1],box:[1.05,1],draw(c){FISHB(c,0,.0,1.3,1);WAVES(c,.34);},cut(c){FISHB_EYE(c,0,.0,1.3,1);}};
@@ -1896,6 +1903,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'砍光',panels:[['treeStand','甲：「不要亂砍樹。」'],['treeTrim','乙：「該先修剪才對。」'],['lightFall','丙：「紅綠燈倒了——」'],['lightsCut','「我建議把紅綠燈全砍光。」',0,3.5]]},
   {title:'背朝下',panels:[['fishSwim','背朝下的魚，是什麼魚？'],['fishTilt','翻過來——'],['fishUp','肚子朝上，浮在水面。'],['fishDead','死魚。',0,3.5]]},
   {title:'菇單',panels:[['mushAsk2','香菇為何不種在單行道？'],['oneWay','單行道……'],['mushRoad','只放得下一朵菇。'],['mushLonely','怕菇（孤）單。',0,3.5]]},
   {title:'沒人理',panels:[['longHair','邊緣人為什麼不剪頭髮？'],['barber','走進理髮店——'],['waitAlone','等了一整天……'],['noOneLi','因為沒人要「理」他。',0,3.5]]},
@@ -2106,7 +2114,7 @@ const CATMAP={
   '夫妻家庭':['拿掃把','湊滿一船','隔壁老王','臉色','好女子','著火了','我的天','算錯','仙女','誤點','玩夠沒','瓶蓋','最佳搭檔','帶過來的','明天減肥','我不知道','我知道','第一次','會下蛋嗎','南方','挑食','五個媽','雨多甜','還沒滾','看不到你','多生兩個','貓與虎','送回娘家','七十才開始','一模一樣','買菸','需要談談','不敢問','窗戶凍住了','一切都很好','沒安全感','所以要我留下','露台','四個孩子的爸','深夜講座','睜一隻眼','緩解疼痛','九十歲','撞到告訴我','很會說謊','很甜','兩根菸'],
   '搶匪小偷':['金口難開','負數','可能看到了','換科目','業內人士','遙控器','一起找'],
   '職場校園':['緩兵之計','呷好西瓜','有求必應','下一位','送行宴','鏡子都敢照','不會再問我','自己寫','哪邊涼快','不在人事','一個人過','仙草蜜','飢童','不忍心','美紅敢','錯的先講','吸菸區','沉默','看辦公室','可以回家','倫理學','很會說謊','烤箱手套'],
-  '時事諷刺':['凱文呢','民調','太晚了','有用','重燃希望','誰是白痴','塗成藍色','我們的願望','白羊吃草','會飛的車'],
+  '時事諷刺':['砍光','凱文呢','民調','太晚了','有用','重燃希望','誰是白痴','塗成藍色','我們的願望','白羊吃草','會飛的車'],
   '故事小品':['省道','背上的字','手作禮物','只是欣賞','一片葉子','種子','不打你','慣性','颱風要來','收拾','放下','恆河','平安','等','釣','慢','午後']};
 STORIES.forEach(S=>{S.cats=CATS.filter(c=>(CATMAP[c]||[]).includes(S.title));if(!S.cats.length)S.cats=['日常冷笑話'];});
 let storyCat='all';
