@@ -734,7 +734,12 @@ const COFFIN=(c,x,y,w,h)=>{c.fillRect(x-w/2,y,w,h);};
 const KIDUP=(c,x,y,k)=>{PAWN(c,x,y,k);c.lineWidth=.06*k;c.lineCap='round';c.beginPath();c.moveTo(x+.12*k,y-.12*k);c.lineTo(x+.2*k,y-.52*k);c.stroke();};
 const DESK=(c,x,y,k)=>{c.fillRect(x-.2*k,y,.4*k,.05*k);c.fillRect(x-.17*k,y,.04*k,.26*k);c.fillRect(x+.13*k,y,.04*k,.26*k);};
 const SHIP=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);fillP(c,[[-.46,0],[.46,0],[.36,.16],[-.36,.16]]);c.fillRect(-.3,-.12,.5,.12);c.fillRect(-.06,-.24,.08,.12);c.restore();};
+const BAGSTACK=(c,x,y,k)=>{for(let r=0;r<3;r++)for(let i=0;i<3-r;i++){const bx=x+(i-(2-r)/2)*.2*k,by=y-r*.17*k;c.fillRect(bx-.08*k,by-.07*k,.16*k,.14*k);}};
 function shapeById(id){
+  if(id==='fightCall')return duo('吵架的甲乙',STUD(MOUTH),STUD(MOUTH),c=>{c.lineWidth=.035;c.lineCap='round';c.beginPath();c.moveTo(-.06,-.3);c.lineTo(.0,-.18);c.lineTo(-.04,-.14);c.lineTo(.04,-.02);c.stroke();});
+  if(id==='aPhone')return profileShape({id:'flat',fixed:1,name:'打電話找人的甲',extra:c=>{c.save();c.translate(1.08,.42);c.scale(.36,.36);c.rotate(.2);PHONE(c);c.restore();},cutP:SMILE,scale:.8,shift:-.18,box:[1.35,1.15],core:[-.18,.05]});
+  if(id==='gangGate')return {name:'大門口的少年',kind:'o',rot:0,core:[0,.1],box:[1.1,.95],draw(c){c.fillRect(-.5,-.42,.06,.84);c.fillRect(.44,-.42,.06,.84);c.fillRect(-.5,-.42,1,.06);for(const x of [-.26,0,.26]){PAWN(c,x,.16,.5);fillE(c,x-.04,-.04,.07,.035,-.4);}},cut(c){}};
+  if(id==='mealBags')return {name:'一百份套餐',kind:'o',rot:0,core:[0,.1],box:[1.1,.95],draw(c){PAWN(c,-.34,.1,.8);BAGSTACK(c,.18,.3,1);TXT(c,'100',.18,-.3,34);},cut(c){}};
   if(id==='vowCouple')return pair('發誓的新郎',MOUTH,SMILE,c=>{HEART(c,0,-.34,.09);});
   if(id==='cheatLater')return duo('偷吃的他',STUD(SMILE),profileShape({id:'long',fixed:1,name:'',cutP:SMILE}),c=>{HEART(c,0,-.34,.07);});
   if(id==='stormPray')return {name:'暴風雨中的船',kind:'o',rot:0,core:[0,.1],box:[1.1,1],draw(c){CLOUD(c,-.12,-.44,1.3);c.lineWidth=.035;c.lineCap='round';c.beginPath();c.moveTo(.36,-.3);c.lineTo(.28,-.18);c.lineTo(.36,-.18);c.lineTo(.26,-.04);c.stroke();SHIP(c,0,.18,.95);for(const x of [-.24,-.08,.08])PAWN(c,x,.0,.32);WAVES(c,.44);},cut(c){c.lineWidth=.02;c.beginPath();for(const x of [-.24,-.1,.04,.18])c.moveTo(x+.03,.27),c.arc(x,.27,.03,0,7);c.stroke();}};
@@ -1690,6 +1695,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'一百份套餐',panels:[['fightCall','「我打電話找人，你等著！」'],['aPhone','「三十分鐘後，大門見！」'],['gangGate','門口站著幾個染髮少年……'],['mealBags','「您點的一百份套餐到了。」',0,3.5]]},
   {title:'湊滿一船',panels:[['vowCouple','「若不忠，甘受上帝懲罰。」'],['cheatLater','婚後他偷吃，卻一直沒事。'],['stormPray','「看在乘客份上饒了我！」'],['fullShip','「湊滿一船容易嗎？」',0,3.5]]},
   {title:'凱文呢',panels:[['presClass','總統來訪，凱文舉手發問。'],['lunchBell','這時，午飯鐘突然響了。'],['johnsonAsk','飯後換約翰遜問：'],['emptyDesk','「鐘怎麼早響？凱文人呢？」',0,3.5]]},
   {title:'黏在蓋子上',panels:[['grandmaGone','奶奶過世了，小明很傷心。'],['dreamGrandma','他夢見奶奶在眼前消失。'],['coffinEmpty','打開棺材，奶奶不見了！'],['stuckLid','原來她黏在蓋子上。',0,3.5]]},
