@@ -770,7 +770,12 @@ const MUSH_CUT=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);fillE(c,-.12,-
 const FISH2=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);fillE(c,0,0,.2,.1);fillP(c,[[-.16,0],[-.3,-.1],[-.3,.1]]);c.restore();};
 const FISH2_EYE=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);fillE(c,.1,-.02,.022,.022);c.restore();};
 const FLAG2=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.fillRect(-.015,-.36,.03,.36);fillP(c,[[.015,-.36],[.22,-.3],[.015,-.22]]);c.restore();};
+const RANGLE=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.lineWidth=.08;c.lineCap='round';c.lineJoin='miter';c.beginPath();c.moveTo(-.2,-.3);c.lineTo(-.2,.2);c.lineTo(.3,.2);c.stroke();c.lineWidth=.035;c.beginPath();c.moveTo(-.2,.08);c.lineTo(-.08,.08);c.lineTo(-.08,.2);c.stroke();c.restore();};
 function shapeById(id){
+  if(id==='hotCup90')return {name:'90度的水',kind:'o',rot:0,core:[0,.1],box:[1,1.05],draw(c){fillP(c,[[-.2,-.1],[.2,-.1],[.15,.42],[-.15,.42]]);STEAM(c,0,-.18);},cut(c){c.lineWidth=.02;c.beginPath();c.moveTo(-.17,.06);c.lineTo(.17,.06);c.stroke();}};
+  if(id==='cantDrink')return profileShape({id:'flat',fixed:1,name:'不能喝的人',extra:QMARK,cutP:MOUTH,scale:.8,shift:-.2,box:[1.5,1.15],core:[-.2,0]});
+  if(id==='rightAngle')return {name:'直角',kind:'o',rot:0,core:[0,.1],box:[1,1],draw(c){RANGLE(c,-.02,.06,1.4);},cut(c){}};
+  if(id==='throatStuck')return profileShape({id:'flat',fixed:1,name:'卡住的人',extra:c=>{RANGLE(c,1.22,.7,1.05);},cutP:c=>{MOUTH(c);EYE_SHUT(c);},scale:.75,shift:-.24,box:[1.5,1.15],core:[-.24,0]});
   if(id==='fishSchool')return {name:'一群魚',kind:'o',rot:0,core:[0,.1],box:[1.1,1],draw(c){for(const [x,y] of [[.24,-.22],[-.16,-.3],[.08,.04],[-.26,.08],[.28,.3],[-.1,.34]])FISH2(c,x,y,.6);c.save();c.translate(-.56,-.5);c.scale(.7,.7);QMARK(c);c.restore();},cut(c){for(const [x,y] of [[.24,-.22],[-.16,-.3],[.08,.04],[-.26,.08],[.28,.3],[-.1,.34]])FISH2_EYE(c,x,y,.6);}};
   if(id==='fishLead')return {name:'帶頭的魚',kind:'o',rot:0,core:[0,.1],box:[1.1,1],draw(c){FISH2(c,.32,0,1);for(const [x,y] of [[-.04,-.2],[-.06,.2],[-.3,0],[-.32,-.34],[-.32,.34]])FISH2(c,x,y,.55);},cut(c){FISH2_EYE(c,.32,0,1);}};
   if(id==='fishFlag')return {name:'舉旗子的魚',kind:'o',rot:0,core:[0,.1],box:[1.1,1.05],draw(c){FISH2(c,.12,.16,1.3);FLAG2(c,.32,.06,1.1);},cut(c){FISH2_EYE(c,.12,.16,1.3);}};
@@ -1787,6 +1792,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'直角',panels:[['hotCup90','為什麼 90 度的水不能喝？'],['cantDrink','不是因為燙。'],['rightAngle','因為 90 度是直角——'],['throatStuck','會卡喉嚨。',0,3.5]]},
   {title:'導魚',panels:[['fishSchool','魚群裡帶頭的，叫什麼？'],['fishLead','游在最前面的那隻。'],['fishFlag','牠還舉著小旗子……'],['fishTour','導遊（導魚）！',0,3.5]]},
   {title:'菇毒',panels:[['mushAsk','吃蘑菇中的毒，叫什麼毒？'],['eatMush','一口吃下去……'],['mushSick','頭暈眼花。'],['aloneMush','孤獨（菇毒）。',0,3.5]]},
   {title:'雞凍',panels:[['henDuck','雞和鴨被關進冰箱。'],['inFridge','砰。'],['henDead','雞死了，鴨卻沒事？'],['duckCalm','因為雞太激動（雞凍）了。',0,3.5]]},
