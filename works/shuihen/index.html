@@ -773,7 +773,14 @@ const FLAG2=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.fillRect(-.015,
 const RANGLE=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.lineWidth=.08;c.lineCap='round';c.lineJoin='miter';c.beginPath();c.moveTo(-.2,-.3);c.lineTo(-.2,.2);c.lineTo(.3,.2);c.stroke();c.lineWidth=.035;c.beginPath();c.moveTo(-.2,.08);c.lineTo(-.08,.08);c.lineTo(-.08,.2);c.stroke();c.restore();};
 const PINE2=(c,x,y,k,a)=>{c.save();c.translate(x,y);c.rotate(a||0);c.scale(k,k);fillE(c,0,.1,.17,.24);fillP(c,[[-.1,-.12],[-.16,-.36],[-.04,-.2],[0,-.44],[.04,-.2],[.16,-.36],[.1,-.12]]);c.restore();};
 const PINE2_CUT=(c,x,y,k,a)=>{c.save();c.translate(x,y);c.rotate(a||0);c.scale(k,k);c.lineWidth=.018;c.beginPath();for(const d of [-.12,0,.12]){c.moveTo(-.14,.0+d);c.lineTo(.14,.14+d);c.moveTo(.14,.0+d);c.lineTo(-.14,.14+d);}c.stroke();c.restore();};
+const COIN10=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);fillE(c,0,0,.3,.3);c.restore();};
+const COIN10_CUT=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.lineWidth=.03;c.beginPath();c.arc(0,0,.24,0,7);c.stroke();c.restore();TXT(c,'10',x,y+.01*k,Math.round(30*k));};
+const RAG=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.beginPath();c.moveTo(-.2,-.08);c.quadraticCurveTo(-.1,-.16,0,-.1);c.quadraticCurveTo(.1,-.04,.2,-.12);c.lineTo(.22,.1);c.quadraticCurveTo(.1,.18,0,.1);c.quadraticCurveTo(-.1,.04,-.2,.12);c.closePath();c.fill();c.restore();};
 function shapeById(id){
+  if(id==='coin10Ask')return {name:'一個十元',kind:'o',rot:0,core:[0,.1],box:[1,1],draw(c){COIN10(c,-.04,.12,1.1);c.save();c.translate(-.56,-.48);c.scale(.75,.75);QMARK(c);c.restore();},cut(c){COIN10_CUT(c,-.04,.12,1.1);}};
+  if(id==='coinRag')return {name:'拿抹布',kind:'o',rot:0,core:[0,.1],box:[1.05,1],draw(c){COIN10(c,-.2,.18,.95);RAG(c,.26,-.22,1.1);},cut(c){COIN10_CUT(c,-.2,.18,.95);}};
+  if(id==='coinWipe')return {name:'擦一下',kind:'o',rot:0,core:[0,.1],box:[1.05,1],draw(c){COIN10(c,-.04,.2,1);RAG(c,-.02,-.3,.9);c.lineWidth=.03;c.lineCap='round';c.beginPath();for(const y of [-.36,-.26]){c.moveTo(-.4,y);c.lineTo(-.28,y);c.moveTo(.26,y);c.lineTo(.38,y);}c.stroke();},cut(c){COIN10_CUT(c,-.04,.2,1);}};
+  if(id==='coin70')return {name:'七十箍',kind:'o',rot:0,core:[0,.1],box:[1.05,1],draw(c){COIN10(c,-.04,.08,1.2);for(const [x,y] of [[-.46,-.36],[.4,-.4],[.44,.36]]){c.lineWidth=.03;c.lineCap='round';c.beginPath();c.moveTo(x-.06,y);c.lineTo(x+.06,y);c.moveTo(x,y-.06);c.lineTo(x,y+.06);c.stroke();}},cut(c){COIN10_CUT(c,-.04,.08,1.2);}};
   if(id==='tallShort')return {name:'高人和矮人',kind:'o',rot:0,core:[0,.1],box:[1.05,1],draw(c){PAWN(c,-.24,.04,1.25);PAWN(c,.26,.22,.65);},cut(c){}};
   if(id==='shortSwim')return {name:'游泳的矮人',kind:'o',rot:0,core:[0,.1],box:[1.05,1],draw(c){fillE(c,-.1,-.08,.11,.11);c.lineWidth=.06;c.lineCap='round';c.beginPath();c.moveTo(-.2,.04);c.quadraticCurveTo(-.36,-.24,-.24,-.32);c.moveTo(.0,.04);c.quadraticCurveTo(.18,-.16,.3,-.08);c.stroke();WAVES(c,.12);WAVES(c,.3);},cut(c){}};
   if(id==='aiLoveYou')return {name:'矮 love 游',kind:'o',rot:0,core:[0,0],box:[1.1,1.1],draw(c){TXT(c,'矮',-.22,-.18,44);TXT(c,'游',.2,-.18,44);HEART(c,0,.3,.16);},cut(c){}};
@@ -1802,6 +1809,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'拭十箍',panels:[['coin10Ask','十元怎麼變七十元？'],['coinRag','拿一條抹布。'],['coinWipe','在十元上拭一下——'],['coin70','台語：拭十箍＝七十箍！',0,3.5]]},
   {title:'矮love游',panels:[['tallShort','矮人和高人，誰愛游泳？'],['shortSwim','矮人。'],['aiLoveYou','矮 love 游——'],['iLoveU','I love you！',0,3.5]]},
   {title:'站久會酸',panels:[['twoPines','兩顆鳳梨，哪顆比較甜？'],['pineStand','站著的那顆，一直站……'],['pineTired','站久了——腳會酸。'],['pineLie','所以躺著的比較甜。',0,3.5]]},
   {title:'直角',panels:[['hotCup90','為什麼 90 度的水不能喝？'],['cantDrink','不是因為燙。'],['rightAngle','因為 90 度是直角——'],['throatStuck','會卡喉嚨。',0,3.5]]},
@@ -1991,7 +1999,7 @@ const STORIES=[
 ];
 const CATS=['諧音梗','夫妻家庭','搶匪小偷','職場校園','時事諷刺','日常冷笑話','故事小品'];
 const CATMAP={
-  '諧音梗':['矮love游','站久會酸','導魚','菇毒','雞凍','肥而不溺','擺事可樂','沒龜','猴頭菇','火腿','恁母伊郎','菊花茶','比三小','西北雨','北極的牛','地下道','下酒菜','梗多','滑馬','沒關C','在下','目光','泡你','我的天','沒氣了','南方','最甜的蜜','小氣蝦','瓦斯怎麼叫','缺陷','冰心地瓜','不在人事','多大','雨多甜','還沒滾','蟻后','坐白宮','擲筊','一個人過','鳳梨酥','仙草蜜','一波三折','八天的','飢童','美紅敢','仰式','你哪位','哈囉 win','窗戶凍住了','左右腦','換科目','業內人士','找誰接','半手李','閉眼說瞎話','誰是京都人','金口難開','看辦公室','週一休息','看穿'],
+  '諧音梗':['拭十箍','矮love游','站久會酸','導魚','菇毒','雞凍','肥而不溺','擺事可樂','沒龜','猴頭菇','火腿','恁母伊郎','菊花茶','比三小','西北雨','北極的牛','地下道','下酒菜','梗多','滑馬','沒關C','在下','目光','泡你','我的天','沒氣了','南方','最甜的蜜','小氣蝦','瓦斯怎麼叫','缺陷','冰心地瓜','不在人事','多大','雨多甜','還沒滾','蟻后','坐白宮','擲筊','一個人過','鳳梨酥','仙草蜜','一波三折','八天的','飢童','美紅敢','仰式','你哪位','哈囉 win','窗戶凍住了','左右腦','換科目','業內人士','找誰接','半手李','閉眼說瞎話','誰是京都人','金口難開','看辦公室','週一休息','看穿'],
   '夫妻家庭':['拿掃把','湊滿一船','隔壁老王','臉色','好女子','著火了','我的天','算錯','仙女','誤點','玩夠沒','瓶蓋','最佳搭檔','帶過來的','明天減肥','我不知道','我知道','第一次','會下蛋嗎','南方','挑食','五個媽','雨多甜','還沒滾','看不到你','多生兩個','貓與虎','送回娘家','七十才開始','一模一樣','買菸','需要談談','不敢問','窗戶凍住了','一切都很好','沒安全感','所以要我留下','露台','四個孩子的爸','深夜講座','睜一隻眼','緩解疼痛','九十歲','撞到告訴我','很會說謊','很甜','兩根菸'],
   '搶匪小偷':['金口難開','負數','可能看到了','換科目','業內人士','遙控器','一起找'],
   '職場校園':['有求必應','下一位','送行宴','鏡子都敢照','不會再問我','自己寫','哪邊涼快','不在人事','一個人過','仙草蜜','飢童','不忍心','美紅敢','錯的先講','吸菸區','沉默','看辦公室','可以回家','倫理學','很會說謊','烤箱手套'],
