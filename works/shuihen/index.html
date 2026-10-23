@@ -740,7 +740,14 @@ const STEAM=(c,x,y)=>{c.lineWidth=.025;c.lineCap='round';c.beginPath();for(const
 const MUM=(c,x,y,r)=>{for(let i=0;i<14;i++){const a=i*Math.PI*2/14;c.save();c.translate(x+Math.cos(a)*r*.55,y+Math.sin(a)*r*.55);c.rotate(a);fillE(c,0,0,r*.5,r*.12);c.restore();}fillE(c,x,y,r*.3,r*.3);};
 const BROOM=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.lineWidth=.045;c.lineCap='round';c.beginPath();c.moveTo(0,-.4);c.lineTo(0,.12);c.stroke();fillP(c,[[-.05,.1],[.05,.1],[.16,.4],[-.16,.4]]);c.restore();};
 const DOORWAY=(c,x,y,dark)=>{c.lineWidth=.06;c.strokeRect(x-.2,y-.44,.4,.88);if(dark)c.fillRect(x-.2,y-.44,.4,.88);};
+const DORM=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.fillRect(-.3,-.4,.6,.8);c.restore();};
+const DORM_WIN=(c,x,y,k,lit)=>{c.save();c.translate(x,y);c.scale(k,k);for(let r=0;r<4;r++)for(let i=0;i<3;i++){const wx=-.22+i*.17,wy=-.32+r*.18;if(lit)c.fillRect(wx,wy,.1,.1);else{c.lineWidth=.02;c.strokeRect(wx,wy,.1,.1);}}c.restore();};
+const SHOUT_R=(c,x,y)=>{c.lineWidth=.035;c.lineCap='round';c.beginPath();for(const [a,b,d,e] of [[0,-.1,.1,-.18],[.02,0,.14,0],[0,.1,.1,.18]]){c.moveTo(x+a,y+b);c.lineTo(x+d,y+e);}c.stroke();};
 function shapeById(id){
+  if(id==='dormDark')return {name:'停電的宿舍',kind:'o',rot:0,core:[0,.1],box:[1.05,1],draw(c){DORM(c,-.1,.1,1);fillE(c,.36,-.36,.1,.1);c.save();c.globalCompositeOperation='destination-out';fillE(c,.41,-.39,.08,.08);c.restore();},cut(c){DORM_WIN(c,-.1,.1,1,0);}};
+  if(id==='chantPower')return {name:'喊來電',kind:'o',rot:0,core:[0,.1],box:[1.05,1],draw(c){DORM(c,-.16,.1,1);SHOUT_R(c,.22,-.1);c.lineWidth=.035;c.beginPath();c.moveTo(.38,-.38);c.lineTo(.3,-.24);c.lineTo(.38,-.24);c.lineTo(.28,-.1);c.stroke();},cut(c){DORM_WIN(c,-.16,.1,1,1);}};
+  if(id==='chantLate')return {name:'喊延時',kind:'o',rot:0,core:[0,.1],box:[1.05,1],draw(c){DORM(c,-.16,.1,1);SHOUT_R(c,.22,-.1);fillE(c,.38,-.36,.11,.11);},cut(c){DORM_WIN(c,-.16,.1,1,1);c.lineWidth=.025;c.lineCap='round';c.beginPath();c.moveTo(.38,-.36);c.lineTo(.38,-.43);c.moveTo(.38,-.36);c.lineTo(.43,-.33);c.stroke();}};
+  if(id==='chantGirl')return {name:'喊女朋友',kind:'o',rot:0,core:[0,.1],box:[1.1,1],draw(c){DORM(c,-.2,.1,.95);SHOUT_R(c,.16,-.24);SHOUT_R(c,.16,.1);HEART(c,.4,-.08,.1);},cut(c){DORM_WIN(c,-.2,.1,.95,1);}};
   if(id==='momAsk')return {name:'媽媽叫他拿掃把',kind:'o',rot:0,core:[0,.1],box:[1.05,.95],draw(c){GRANNY(c,-.2,.02,1.05);PAWN(c,.28,.18,.7);},cut(c){}};
   if(id==='darkDoor')return {name:'黑漆漆的門外',kind:'o',rot:0,core:[0,.1],box:[1.05,1],draw(c){DOORWAY(c,.18,0,1);PAWN(c,-.3,.16,.75);DROP(c,-.06,-.3,.05);DROP(c,-.12,-.42,.04);},cut(c){}};
   if(id==='momSure')return {name:'媽媽說有菩薩',kind:'o',rot:0,core:[0,.1],box:[1.05,.95],draw(c){GRANNY(c,-.24,.02,1.05);PAWN(c,.24,.18,.7);c.lineWidth=.03;c.lineCap='round';c.beginPath();for(const [x1,y1,x2,y2] of [[-.1,-.5,-.04,-.6],[0,-.46,.1,-.5],[-.2,-.52,-.2,-.64]]){c.moveTo(x1,y1);c.lineTo(x2,y2);}c.stroke();},cut(c){}};
@@ -1708,6 +1715,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'有求必應',panels:[['dormDark','學校停電，男生宿舍喊：'],['chantPower','「我們要來電！」來了。'],['chantLate','「我們要延時！」准了。'],['chantGirl','「女朋友！我們要女朋友！」',0,3.5]]},
   {title:'拿掃把',panels:[['momAsk','媽媽叫他去門口拿掃把。'],['darkDoor','「外面好黑，我不敢……」'],['momSure','「別怕，菩薩會保護你。」'],['kidShout','「菩薩，幫我拿掃把進來！」',0,3.5]]},
   {title:'菊花茶',panels:[['roseTea','玫瑰泡在茶裡，是玫瑰茶。'],['buttAsk','那屁股泡在茶裡呢？'],['buttTea','坐進去……'],['mumTea','菊花茶。囧',0,3.5]]},
   {title:'一百份套餐',panels:[['fightCall','「我打電話找人，你等著！」'],['aPhone','「三十分鐘後，大門見！」'],['gangGate','門口站著幾個染髮少年……'],['mealBags','「您點的一百份套餐到了。」',0,3.5]]},
@@ -1885,7 +1893,7 @@ const CATMAP={
   '諧音梗':['菊花茶','比三小','西北雨','北極的牛','地下道','下酒菜','梗多','滑馬','沒關C','在下','目光','泡你','我的天','沒氣了','南方','最甜的蜜','小氣蝦','瓦斯怎麼叫','缺陷','冰心地瓜','不在人事','多大','雨多甜','還沒滾','蟻后','坐白宮','擲筊','一個人過','鳳梨酥','仙草蜜','一波三折','八天的','飢童','美紅敢','仰式','你哪位','哈囉 win','窗戶凍住了','左右腦','換科目','業內人士','找誰接','半手李','閉眼說瞎話','誰是京都人','金口難開','看辦公室','週一休息','看穿'],
   '夫妻家庭':['拿掃把','湊滿一船','隔壁老王','臉色','好女子','著火了','我的天','算錯','仙女','誤點','玩夠沒','瓶蓋','最佳搭檔','帶過來的','明天減肥','我不知道','我知道','第一次','會下蛋嗎','南方','挑食','五個媽','雨多甜','還沒滾','看不到你','多生兩個','貓與虎','送回娘家','七十才開始','一模一樣','買菸','需要談談','不敢問','窗戶凍住了','一切都很好','沒安全感','所以要我留下','露台','四個孩子的爸','深夜講座','睜一隻眼','緩解疼痛','九十歲','撞到告訴我','很會說謊','很甜','兩根菸'],
   '搶匪小偷':['金口難開','負數','可能看到了','換科目','業內人士','遙控器','一起找'],
-  '職場校園':['下一位','送行宴','鏡子都敢照','不會再問我','自己寫','哪邊涼快','不在人事','一個人過','仙草蜜','飢童','不忍心','美紅敢','錯的先講','吸菸區','沉默','看辦公室','可以回家','倫理學','很會說謊','烤箱手套'],
+  '職場校園':['有求必應','下一位','送行宴','鏡子都敢照','不會再問我','自己寫','哪邊涼快','不在人事','一個人過','仙草蜜','飢童','不忍心','美紅敢','錯的先講','吸菸區','沉默','看辦公室','可以回家','倫理學','很會說謊','烤箱手套'],
   '時事諷刺':['凱文呢','民調','太晚了','有用','重燃希望','誰是白痴','塗成藍色','我們的願望','白羊吃草','會飛的車'],
   '故事小品':['省道','背上的字','手作禮物','只是欣賞','一片葉子','種子','不打你','慣性','颱風要來','收拾','放下','恆河','平安','等','釣','慢','午後']};
 STORIES.forEach(S=>{S.cats=CATS.filter(c=>(CATMAP[c]||[]).includes(S.title));if(!S.cats.length)S.cats=['日常冷笑話'];});
