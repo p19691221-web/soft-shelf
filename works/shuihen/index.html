@@ -725,7 +725,14 @@ const HELMET=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.beginPath();c.
 const SOLDIER=(c,x,y,k)=>{PAWN(c,x,y,k);HELMET(c,x,y-.33*k,k*.85);};
 const BRIDGE=(c,y)=>{c.fillRect(-.5,y,1,.06);c.lineWidth=.05;c.beginPath();c.moveTo(-.4,y+.3);c.quadraticCurveTo(0,y-.02,.4,y+.3);c.stroke();c.fillRect(-.44,y,.05,.32);c.fillRect(.39,y,.05,.32);};
 const SIGN=(c,x,y,w,h)=>{c.fillRect(x-.015,y,.03,.3);c.fillRect(x-w/2,y-h,w,h);};
+const POO2=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);fillE(c,0,.22,.3,.1);fillE(c,0,.08,.23,.09);fillE(c,0,-.05,.16,.08);c.beginPath();c.moveTo(-.1,-.08);c.quadraticCurveTo(0,-.24,.06,-.2);c.quadraticCurveTo(.04,-.12,.1,-.08);c.closePath();c.fill();c.restore();};
+const PEE=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.beginPath();c.moveTo(0,-.36);c.quadraticCurveTo(.26,.02,.22,.16);c.quadraticCurveTo(.18,.32,0,.32);c.quadraticCurveTo(-.18,.32,-.22,.16);c.quadraticCurveTo(-.26,.02,0,-.36);c.fill();c.restore();};
+const FACE2=(c,x,y,k,sad)=>{c.save();c.translate(x,y);c.scale(k,k);fillE(c,-.07,0,.025,.035);fillE(c,.07,0,.025,.035);c.lineWidth=.025;c.lineCap='round';c.beginPath();if(sad){c.arc(0,.12,.05,Math.PI*1.15,Math.PI*1.85);}else{c.arc(0,.05,.05,Math.PI*.15,Math.PI*.85);}c.stroke();c.restore();};
 function shapeById(id){
+  if(id==='peePoo')return {name:'小便和大便',kind:'o',rot:0,core:[0,.1],box:[1.05,.9],draw(c){PEE(c,-.24,.06,1);POO2(c,.24,.1,1);HEART(c,0,-.36,.08);},cut(c){FACE2(c,-.24,.12,1);FACE2(c,.24,.12,.9);}};
+  if(id==='carHit')return {name:'車禍',kind:'o',rot:0,core:[0,.05],box:[1.05,.8],draw(c){c.save();c.translate(-.1,.12);c.scale(.75,.75);carBody(c);c.restore();c.beginPath();for(let k=0;k<16;k++){const a=k/16*Math.PI*2,r=k%2?.06:.15;c.lineTo(.38+Math.cos(a)*r,-.12+Math.sin(a)*r);}c.closePath();c.fill();},cut(c){c.save();c.translate(-.1,.12);c.scale(.75,.75);carCut(c);c.restore();}};
+  if(id==='poopPhoto')return {name:'大便的遺照',kind:'o',rot:0,core:[0,.1],box:[1.05,1],draw(c){c.lineWidth=.05;c.strokeRect(-.42,-.46,.5,.6);POO2(c,-.17,-.12,.7);PEE(c,.3,.18,.75);DROP(c,.16,.1,.035);},cut(c){FACE2(c,-.17,-.08,.65);FACE2(c,.3,.22,.75,1);}};
+  if(id==='missPoo')return {name:'好想大便',kind:'o',rot:0,core:[0,.1],box:[1.05,1],draw(c){PEE(c,-.2,.14,1.05);for(const [x,y,r] of [[.08,-.18,.03],[.14,-.28,.045]])fillE(c,x,y,r,r);fillE(c,.3,-.42,.17,.13);},cut(c){FACE2(c,-.2,.2,1.05,1);POO2(c,.3,-.42,.32);}};
   if(id==='darkSky')return {name:'天黑黑',kind:'o',rot:0,core:[0,.1],box:[1.05,.95],draw(c){CLOUD(c,-.06,-.28,1.4);c.save();c.translate(-.7,.06);c.scale(.8,.8);QMARK(c);c.restore();},cut(c){}};
   if(id==='animals1')return {name:'象馬鹿',kind:'o',rot:0,core:[0,0],box:[1.05,1.1],draw(c){TXT(c,'象',-.22,-.22,42);TXT(c,'馬',.22,-.22,42);TXT(c,'鹿',0,.24,42);},cut(c){}};
   if(id==='animals2')return {name:'獅豹虎',kind:'o',rot:0,core:[0,0],box:[1.05,1.1],draw(c){TXT(c,'獅',-.22,-.22,42);TXT(c,'豹',.22,-.22,42);TXT(c,'虎',0,.24,42);},cut(c){}};
@@ -1656,6 +1663,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'好想',panels:[['peePoo','小便和大便是好朋友。'],['carHit','有一天，大便出車禍走了。'],['poopPhoto','小便對朋友說：'],['missPoo','「我好想大便喔。」',0,3.5]]},
   {title:'西北雨',panels:[['darkSky','天黑黑，猜六種動物。'],['animals1','象、馬、鹿……'],['animals2','獅、豹、虎……'],['bigRain','台語唸：像欲落西北雨！',0,3.5]]},
   {title:'游泳過河',panels:[['bridgeSign','演習牌子：「此橋已炸毀。」'],['colonelSees','上校卻看到士兵照樣過橋。'],['colonelMad','他氣沖沖趕到橋邊——'],['swimSign','牌子寫：「我們在游泳。」',0,3.5]]},
   {title:'毫無怨言',panels:[['threeSoldiers','三個人一起上了前線。'],['armSling','漢森：「胳膊被打斷了！」'],['wittShrug','「嚷什麼？看看科尼希。」'],['helmetOnly','「他頭都沒了，也沒抱怨。」',0,3.5]]},
