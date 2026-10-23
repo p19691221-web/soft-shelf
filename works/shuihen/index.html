@@ -760,7 +760,16 @@ const HAND=(c,x,y,k,flip)=>{c.save();c.translate(x,y);c.scale(flip?-k:k,k);fillE
 const CBOT=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.beginPath();c.moveTo(-.04,-.42);c.lineTo(.04,-.42);c.lineTo(.04,-.3);c.quadraticCurveTo(.14,-.22,.12,-.08);c.quadraticCurveTo(.08,0,.12,.08);c.lineTo(.12,.34);c.quadraticCurveTo(.12,.4,.06,.4);c.lineTo(-.06,.4);c.quadraticCurveTo(-.12,.4,-.12,.34);c.lineTo(-.12,.08);c.quadraticCurveTo(-.08,0,-.12,-.08);c.quadraticCurveTo(-.14,-.22,-.04,-.3);c.closePath();c.fill();c.fillRect(-.05,-.46,.1,.05);c.restore();};
 const CBOT_CUT=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.lineWidth=.025;c.beginPath();c.moveTo(-.12,.14);c.lineTo(.12,.14);c.stroke();c.restore();};
 const ROUNDP=(c,x,y,k)=>{fillE(c,x,y-.3*k,.11*k,.11*k);fillE(c,x,y+.06*k,.24*k,.24*k);};
+const HEN2=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);fillE(c,0,.06,.2,.16);fillE(c,.16,-.14,.09,.09);fillP(c,[[.23,-.15],[.32,-.12],[.23,-.09]]);fillP(c,[[.1,-.22],[.14,-.3],[.18,-.23],[.22,-.29],[.23,-.2]]);fillP(c,[[-.18,.0],[-.3,-.12],[-.22,.08]]);c.lineWidth=.035;c.lineCap='round';c.beginPath();c.moveTo(-.04,.2);c.lineTo(-.04,.34);c.moveTo(.06,.2);c.lineTo(.06,.34);c.stroke();c.restore();};
+const DUCK2=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);fillE(c,0,.1,.22,.14);fillE(c,.16,-.12,.09,.09);fillE(c,.29,-.1,.08,.03);c.fillRect(.1,-.06,.08,.12);fillP(c,[[-.2,.04],[-.3,-.04],[-.22,.12]]);c.lineWidth=.035;c.lineCap='round';c.beginPath();c.moveTo(0,.22);c.lineTo(0,.34);c.lineTo(.06,.34);c.stroke();c.restore();};
+const BIRD_EYE=(c,x,y,k,shut)=>{c.save();c.translate(x,y);c.scale(k,k);if(shut){c.lineWidth=.02;c.beginPath();c.moveTo(.13,-.15);c.lineTo(.19,-.13);c.stroke();}else fillE(c,.17,-.14,.018,.018);c.restore();};
+const FRIDGE=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.lineWidth=.05;c.strokeRect(-.34,-.46,.68,.92);c.beginPath();c.moveTo(-.34,-.14);c.lineTo(.34,-.14);c.stroke();c.fillRect(.24,-.36,.04,.14);c.fillRect(.24,-.06,.04,.18);c.restore();};
+const SNOWS=(c,pts)=>{for(const [x,y,r] of pts)SNOW(c,x,y,r);};
 function shapeById(id){
+  if(id==='henDuck')return {name:'雞和鴨',kind:'o',rot:0,core:[0,.1],box:[1.15,.95],draw(c){HEN2(c,-.3,.06,.85);DUCK2(c,.3,.06,.85);},cut(c){BIRD_EYE(c,-.3,.06,.85);BIRD_EYE(c,.3,.06,.85);}};
+  if(id==='inFridge')return {name:'關進冰箱',kind:'o',rot:0,core:[0,.1],box:[1,1.05],draw(c){FRIDGE(c,0,0,1.05);HEN2(c,-.15,.2,.45);DUCK2(c,.16,.2,.45);SNOWS(c,[[-.16,-.3,.06],[.08,-.3,.05]]);},cut(c){}};
+  if(id==='henDead')return {name:'雞死了鴨沒事',kind:'o',rot:0,core:[0,.1],box:[1.15,1],draw(c){c.save();c.translate(-.3,.14);c.rotate(Math.PI);HEN2(c,0,0,.8);c.restore();DUCK2(c,.3,.06,.85);SNOWS(c,[[-.34,-.4,.07],[0,-.44,.07],[.36,-.38,.06]]);},cut(c){BIRD_EYE(c,.3,.06,.85);}};
+  if(id==='duckCalm')return {name:'凍成冰塊的雞',kind:'o',rot:0,core:[0,.1],box:[1.15,1],draw(c){c.lineWidth=.05;c.strokeRect(-.56,-.26,.5,.58);HEN2(c,-.3,.06,.75);DUCK2(c,.3,.08,.85);SNOWS(c,[[-.3,-.44,.07],[.3,-.4,.07]]);},cut(c){BIRD_EYE(c,-.3,.06,.75,1);BIRD_EYE(c,.3,.08,.85,1);}};
   if(id==='roundEdge')return {name:'站在岸邊的人',kind:'o',rot:0,core:[0,.1],box:[1.05,1],draw(c){c.fillRect(-.5,.3,.36,.16);ROUNDP(c,-.32,0,.85);WAVES(c,.4);c.save();c.translate(-.56,-.46);c.scale(.7,.7);QMARK(c);c.restore();},cut(c){}};
   if(id==='splash')return {name:'掉進水裡',kind:'o',rot:0,core:[0,.1],box:[1.05,1],draw(c){ROUNDP(c,0,.1,.75);c.lineWidth=.04;c.lineCap='round';c.beginPath();for(const [x1,y1,x2,y2] of [[-.26,.3,-.4,.12],[-.14,.26,-.2,.06],[.14,.26,.2,.06],[.26,.3,.4,.12]]){c.moveTo(x1,y1);c.lineTo(x2,y2);}c.stroke();WAVES(c,.38);},cut(c){}};
   if(id==='floating')return {name:'浮在水面',kind:'o',rot:0,core:[0,.1],box:[1.05,1],draw(c){ROUNDP(c,0,.0,.9);WAVES(c,.12);WAVES(c,.3);},cut(c){c.save();c.translate(-.06,-.27);fillE(c,-.03,0,.015,.02);fillE(c,.05,0,.015,.02);c.lineWidth=.015;c.beginPath();c.arc(.01,.04,.03,.15*Math.PI,.85*Math.PI);c.stroke();c.restore();}};
@@ -1765,6 +1774,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'雞凍',panels:[['henDuck','雞和鴨被關進冰箱。'],['inFridge','砰。'],['henDead','雞死了，鴨卻沒事？'],['duckCalm','因為雞太激動（雞凍）了。',0,3.5]]},
   {title:'肥而不溺',panels:[['roundEdge','胖子掉進水裡，沒溺水？'],['splash','噗通——'],['floating','沒沉，還浮起來了。'],['floatSun','肥而不膩（溺）。',0,3.5]]},
   {title:'擺事可樂',panels:[['colaAsk','可樂放著不喝，叫什麼？'],['colaPass','沒人理它……'],['colaSit','就一直擺著。'],['colaPun','擺事（百事）可樂！',0,3.5]]},
   {title:'用筆',panels:[['askHand','「你寫字用哪隻手？」'],['leftRight','「左手，還是右手？」'],['thinkHand','他想了一下……'],['bigPen','「用筆。」',0,3.5]]},
@@ -1948,7 +1958,7 @@ const STORIES=[
 ];
 const CATS=['諧音梗','夫妻家庭','搶匪小偷','職場校園','時事諷刺','日常冷笑話','故事小品'];
 const CATMAP={
-  '諧音梗':['肥而不溺','擺事可樂','沒龜','猴頭菇','火腿','恁母伊郎','菊花茶','比三小','西北雨','北極的牛','地下道','下酒菜','梗多','滑馬','沒關C','在下','目光','泡你','我的天','沒氣了','南方','最甜的蜜','小氣蝦','瓦斯怎麼叫','缺陷','冰心地瓜','不在人事','多大','雨多甜','還沒滾','蟻后','坐白宮','擲筊','一個人過','鳳梨酥','仙草蜜','一波三折','八天的','飢童','美紅敢','仰式','你哪位','哈囉 win','窗戶凍住了','左右腦','換科目','業內人士','找誰接','半手李','閉眼說瞎話','誰是京都人','金口難開','看辦公室','週一休息','看穿'],
+  '諧音梗':['雞凍','肥而不溺','擺事可樂','沒龜','猴頭菇','火腿','恁母伊郎','菊花茶','比三小','西北雨','北極的牛','地下道','下酒菜','梗多','滑馬','沒關C','在下','目光','泡你','我的天','沒氣了','南方','最甜的蜜','小氣蝦','瓦斯怎麼叫','缺陷','冰心地瓜','不在人事','多大','雨多甜','還沒滾','蟻后','坐白宮','擲筊','一個人過','鳳梨酥','仙草蜜','一波三折','八天的','飢童','美紅敢','仰式','你哪位','哈囉 win','窗戶凍住了','左右腦','換科目','業內人士','找誰接','半手李','閉眼說瞎話','誰是京都人','金口難開','看辦公室','週一休息','看穿'],
   '夫妻家庭':['拿掃把','湊滿一船','隔壁老王','臉色','好女子','著火了','我的天','算錯','仙女','誤點','玩夠沒','瓶蓋','最佳搭檔','帶過來的','明天減肥','我不知道','我知道','第一次','會下蛋嗎','南方','挑食','五個媽','雨多甜','還沒滾','看不到你','多生兩個','貓與虎','送回娘家','七十才開始','一模一樣','買菸','需要談談','不敢問','窗戶凍住了','一切都很好','沒安全感','所以要我留下','露台','四個孩子的爸','深夜講座','睜一隻眼','緩解疼痛','九十歲','撞到告訴我','很會說謊','很甜','兩根菸'],
   '搶匪小偷':['金口難開','負數','可能看到了','換科目','業內人士','遙控器','一起找'],
   '職場校園':['有求必應','下一位','送行宴','鏡子都敢照','不會再問我','自己寫','哪邊涼快','不在人事','一個人過','仙草蜜','飢童','不忍心','美紅敢','錯的先講','吸菸區','沉默','看辦公室','可以回家','倫理學','很會說謊','烤箱手套'],
