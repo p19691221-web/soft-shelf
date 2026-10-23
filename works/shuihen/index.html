@@ -771,7 +771,13 @@ const FISH2=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);fillE(c,0,0,.2,.1
 const FISH2_EYE=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);fillE(c,.1,-.02,.022,.022);c.restore();};
 const FLAG2=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.fillRect(-.015,-.36,.03,.36);fillP(c,[[.015,-.36],[.22,-.3],[.015,-.22]]);c.restore();};
 const RANGLE=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.lineWidth=.08;c.lineCap='round';c.lineJoin='miter';c.beginPath();c.moveTo(-.2,-.3);c.lineTo(-.2,.2);c.lineTo(.3,.2);c.stroke();c.lineWidth=.035;c.beginPath();c.moveTo(-.2,.08);c.lineTo(-.08,.08);c.lineTo(-.08,.2);c.stroke();c.restore();};
+const PINE2=(c,x,y,k,a)=>{c.save();c.translate(x,y);c.rotate(a||0);c.scale(k,k);fillE(c,0,.1,.17,.24);fillP(c,[[-.1,-.12],[-.16,-.36],[-.04,-.2],[0,-.44],[.04,-.2],[.16,-.36],[.1,-.12]]);c.restore();};
+const PINE2_CUT=(c,x,y,k,a)=>{c.save();c.translate(x,y);c.rotate(a||0);c.scale(k,k);c.lineWidth=.018;c.beginPath();for(const d of [-.12,0,.12]){c.moveTo(-.14,.0+d);c.lineTo(.14,.14+d);c.moveTo(.14,.0+d);c.lineTo(-.14,.14+d);}c.stroke();c.restore();};
 function shapeById(id){
+  if(id==='twoPines')return {name:'兩顆鳳梨',kind:'o',rot:0,core:[0,.1],box:[1.1,1],draw(c){PINE2(c,-.3,.04,.85);PINE2(c,.2,.3,.85,Math.PI/2);c.save();c.translate(-.56,-.5);c.scale(.7,.7);QMARK(c);c.restore();},cut(c){PINE2_CUT(c,-.3,.04,.85);PINE2_CUT(c,.2,.3,.85,Math.PI/2);}};
+  if(id==='pineStand')return {name:'一直站著的鳳梨',kind:'o',rot:0,core:[0,.1],box:[1,1],draw(c){PINE2(c,-.06,.06,1.3);fillE(c,.36,-.32,.1,.1);},cut(c){PINE2_CUT(c,-.06,.06,1.3);c.lineWidth=.022;c.lineCap='round';c.beginPath();c.moveTo(.36,-.32);c.lineTo(.36,-.4);c.moveTo(.36,-.32);c.lineTo(.42,-.29);c.stroke();}};
+  if(id==='pineTired')return {name:'站累的鳳梨',kind:'o',rot:0,core:[0,.1],box:[1,1],draw(c){PINE2(c,-.06,.06,1.3,.25);DROP(c,.32,-.18,.05);DROP(c,.38,-.04,.04);c.lineWidth=.035;c.lineCap='round';c.beginPath();c.moveTo(-.3,.46);c.lineTo(-.4,.4);c.moveTo(.16,.46);c.lineTo(.26,.4);c.stroke();},cut(c){PINE2_CUT(c,-.06,.06,1.3,.25);}};
+  if(id==='pineLie')return {name:'躺著的鳳梨',kind:'o',rot:0,core:[0,.1],box:[1.1,1],draw(c){PINE2(c,.0,.22,1.2,Math.PI/2);HEART(c,-.3,-.28,.1);ZZ(c,.1,-.34,1);},cut(c){PINE2_CUT(c,.0,.22,1.2,Math.PI/2);}};
   if(id==='hotCup90')return {name:'90度的水',kind:'o',rot:0,core:[0,.1],box:[1,1.05],draw(c){fillP(c,[[-.2,-.1],[.2,-.1],[.15,.42],[-.15,.42]]);STEAM(c,0,-.18);},cut(c){c.lineWidth=.02;c.beginPath();c.moveTo(-.17,.06);c.lineTo(.17,.06);c.stroke();}};
   if(id==='cantDrink')return profileShape({id:'flat',fixed:1,name:'不能喝的人',extra:QMARK,cutP:MOUTH,scale:.8,shift:-.2,box:[1.5,1.15],core:[-.2,0]});
   if(id==='rightAngle')return {name:'直角',kind:'o',rot:0,core:[0,.1],box:[1,1],draw(c){RANGLE(c,-.02,.06,1.4);},cut(c){}};
@@ -1792,6 +1798,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'站久會酸',panels:[['twoPines','兩顆鳳梨，哪顆比較甜？'],['pineStand','站著的那顆，一直站……'],['pineTired','站久了——腳會酸。'],['pineLie','所以躺著的比較甜。',0,3.5]]},
   {title:'直角',panels:[['hotCup90','為什麼 90 度的水不能喝？'],['cantDrink','不是因為燙。'],['rightAngle','因為 90 度是直角——'],['throatStuck','會卡喉嚨。',0,3.5]]},
   {title:'導魚',panels:[['fishSchool','魚群裡帶頭的，叫什麼？'],['fishLead','游在最前面的那隻。'],['fishFlag','牠還舉著小旗子……'],['fishTour','導遊（導魚）！',0,3.5]]},
   {title:'菇毒',panels:[['mushAsk','吃蘑菇中的毒，叫什麼毒？'],['eatMush','一口吃下去……'],['mushSick','頭暈眼花。'],['aloneMush','孤獨（菇毒）。',0,3.5]]},
@@ -1979,7 +1986,7 @@ const STORIES=[
 ];
 const CATS=['諧音梗','夫妻家庭','搶匪小偷','職場校園','時事諷刺','日常冷笑話','故事小品'];
 const CATMAP={
-  '諧音梗':['導魚','菇毒','雞凍','肥而不溺','擺事可樂','沒龜','猴頭菇','火腿','恁母伊郎','菊花茶','比三小','西北雨','北極的牛','地下道','下酒菜','梗多','滑馬','沒關C','在下','目光','泡你','我的天','沒氣了','南方','最甜的蜜','小氣蝦','瓦斯怎麼叫','缺陷','冰心地瓜','不在人事','多大','雨多甜','還沒滾','蟻后','坐白宮','擲筊','一個人過','鳳梨酥','仙草蜜','一波三折','八天的','飢童','美紅敢','仰式','你哪位','哈囉 win','窗戶凍住了','左右腦','換科目','業內人士','找誰接','半手李','閉眼說瞎話','誰是京都人','金口難開','看辦公室','週一休息','看穿'],
+  '諧音梗':['站久會酸','導魚','菇毒','雞凍','肥而不溺','擺事可樂','沒龜','猴頭菇','火腿','恁母伊郎','菊花茶','比三小','西北雨','北極的牛','地下道','下酒菜','梗多','滑馬','沒關C','在下','目光','泡你','我的天','沒氣了','南方','最甜的蜜','小氣蝦','瓦斯怎麼叫','缺陷','冰心地瓜','不在人事','多大','雨多甜','還沒滾','蟻后','坐白宮','擲筊','一個人過','鳳梨酥','仙草蜜','一波三折','八天的','飢童','美紅敢','仰式','你哪位','哈囉 win','窗戶凍住了','左右腦','換科目','業內人士','找誰接','半手李','閉眼說瞎話','誰是京都人','金口難開','看辦公室','週一休息','看穿'],
   '夫妻家庭':['拿掃把','湊滿一船','隔壁老王','臉色','好女子','著火了','我的天','算錯','仙女','誤點','玩夠沒','瓶蓋','最佳搭檔','帶過來的','明天減肥','我不知道','我知道','第一次','會下蛋嗎','南方','挑食','五個媽','雨多甜','還沒滾','看不到你','多生兩個','貓與虎','送回娘家','七十才開始','一模一樣','買菸','需要談談','不敢問','窗戶凍住了','一切都很好','沒安全感','所以要我留下','露台','四個孩子的爸','深夜講座','睜一隻眼','緩解疼痛','九十歲','撞到告訴我','很會說謊','很甜','兩根菸'],
   '搶匪小偷':['金口難開','負數','可能看到了','換科目','業內人士','遙控器','一起找'],
   '職場校園':['有求必應','下一位','送行宴','鏡子都敢照','不會再問我','自己寫','哪邊涼快','不在人事','一個人過','仙草蜜','飢童','不忍心','美紅敢','錯的先講','吸菸區','沉默','看辦公室','可以回家','倫理學','很會說謊','烤箱手套'],
