@@ -776,7 +776,14 @@ const PINE2_CUT=(c,x,y,k,a)=>{c.save();c.translate(x,y);c.rotate(a||0);c.scale(k
 const COIN10=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);fillE(c,0,0,.3,.3);c.restore();};
 const COIN10_CUT=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.lineWidth=.03;c.beginPath();c.arc(0,0,.24,0,7);c.stroke();c.restore();TXT(c,'10',x,y+.01*k,Math.round(30*k));};
 const RAG=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.beginPath();c.moveTo(-.2,-.08);c.quadraticCurveTo(-.1,-.16,0,-.1);c.quadraticCurveTo(.1,-.04,.2,-.12);c.lineTo(.22,.1);c.quadraticCurveTo(.1,.18,0,.1);c.quadraticCurveTo(-.1,.04,-.2,.12);c.closePath();c.fill();c.restore();};
+const TOMB=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.beginPath();c.moveTo(-.16,.3);c.lineTo(-.16,-.14);c.quadraticCurveTo(-.16,-.3,0,-.3);c.quadraticCurveTo(.16,-.3,.16,-.14);c.lineTo(.16,.3);c.closePath();c.fill();c.restore();};
+const TOMB_CUT=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.lineWidth=.03;c.beginPath();c.moveTo(0,-.2);c.lineTo(0,.06);c.moveTo(-.08,-.12);c.lineTo(.08,-.12);c.stroke();c.restore();};
+const KNOCK=(c,x,y)=>{c.lineWidth=.03;c.lineCap='round';c.beginPath();for(const [a,b,d,e] of [[0,-.08,.06,-.16],[.02,0,.1,0],[0,.08,.06,.16]]){c.moveTo(x+a,y+b);c.lineTo(x+d,y+e);}c.stroke();};
 function shapeById(id){
+  if(id==='graveWalk')return {name:'穿過墳場',kind:'o',rot:0,core:[0,.1],box:[1.1,1],draw(c){TOMB(c,-.36,.12,.8);TOMB(c,.06,.08,.9);PAWN(c,.4,.16,.7);fillE(c,-.1,-.4,.1,.1);c.save();c.globalCompositeOperation='destination-out';fillE(c,-.05,-.43,.08,.08);c.restore();},cut(c){TOMB_CUT(c,-.36,.12,.8);TOMB_CUT(c,.06,.08,.9);}};
+  if(id==='knockScared')return {name:'聽到敲擊聲',kind:'o',rot:0,core:[0,.1],box:[1.1,1],draw(c){TOMB(c,-.3,.08,1);KNOCK(c,-.08,-.12);PAWN(c,.34,.16,.75);DROP(c,.16,-.18,.045);DROP(c,.12,-.04,.04);},cut(c){TOMB_CUT(c,-.3,.08,1);}};
+  if(id==='manChisel')return {name:'鑿石碑的人',kind:'o',rot:0,core:[0,.1],box:[1.1,1],draw(c){TOMB(c,.22,.06,1.1);PAWN(c,-.3,.16,.8);c.lineWidth=.05;c.lineCap='round';c.beginPath();c.moveTo(-.16,-.04);c.lineTo(.0,-.1);c.stroke();c.fillRect(.0,-.16,.08,.1);KNOCK(c,.08,-.36);},cut(c){c.save();c.translate(.22,.06);c.scale(1.1,1.1);c.lineWidth=.025;c.beginPath();c.moveTo(-.08,-.06);c.lineTo(.08,-.06);c.moveTo(-.06,.04);c.lineTo(.06,.04);c.moveTo(-.08,.14);c.lineTo(.08,.14);c.stroke();c.restore();}};
+  if(id==='wrongName')return {name:'刻錯名字的碑',kind:'o',rot:0,core:[0,.1],box:[1,1],draw(c){TOMB(c,-.04,.06,1.45);c.save();c.translate(.32,-.52);c.scale(.8,.8);EXCL(c);c.restore();},cut(c){c.save();c.translate(-.04,.06);c.scale(1.45,1.45);c.lineWidth=.022;c.beginPath();c.moveTo(-.08,-.1);c.lineTo(.08,-.1);c.moveTo(-.08,0);c.lineTo(.08,0);c.moveTo(-.1,-.06);c.lineTo(.1,.06);c.moveTo(.1,-.06);c.lineTo(-.1,.06);c.stroke();c.restore();}};
   if(id==='coin10Ask')return {name:'一個十元',kind:'o',rot:0,core:[0,.1],box:[1,1],draw(c){COIN10(c,-.04,.12,1.1);c.save();c.translate(-.56,-.48);c.scale(.75,.75);QMARK(c);c.restore();},cut(c){COIN10_CUT(c,-.04,.12,1.1);}};
   if(id==='coinRag')return {name:'拿抹布',kind:'o',rot:0,core:[0,.1],box:[1.05,1],draw(c){COIN10(c,-.2,.18,.95);RAG(c,.26,-.22,1.1);},cut(c){COIN10_CUT(c,-.2,.18,.95);}};
   if(id==='coinWipe')return {name:'擦一下',kind:'o',rot:0,core:[0,.1],box:[1.05,1],draw(c){COIN10(c,-.04,.2,1);RAG(c,-.02,-.3,.9);c.lineWidth=.03;c.lineCap='round';c.beginPath();for(const y of [-.36,-.26]){c.moveTo(-.4,y);c.lineTo(-.28,y);c.moveTo(.26,y);c.lineTo(.38,y);}c.stroke();},cut(c){COIN10_CUT(c,-.04,.2,1);}};
@@ -1809,6 +1816,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'刻錯了',panels:[['graveWalk','小明抄近路，穿過墳場。'],['knockScared','叩、叩、叩……越來越響。'],['manChisel','「呼，原來是你。在幹嘛？」'],['wrongName','「他們把我的名字刻錯了！」',0,3.5]]},
   {title:'拭十箍',panels:[['coin10Ask','十元怎麼變七十元？'],['coinRag','拿一條抹布。'],['coinWipe','在十元上拭一下——'],['coin70','台語：拭十箍＝七十箍！',0,3.5]]},
   {title:'矮love游',panels:[['tallShort','矮人和高人，誰愛游泳？'],['shortSwim','矮人。'],['aiLoveYou','矮 love 游——'],['iLoveU','I love you！',0,3.5]]},
   {title:'站久會酸',panels:[['twoPines','兩顆鳳梨，哪顆比較甜？'],['pineStand','站著的那顆，一直站……'],['pineTired','站久了——腳會酸。'],['pineLie','所以躺著的比較甜。',0,3.5]]},
