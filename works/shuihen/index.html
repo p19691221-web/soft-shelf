@@ -795,7 +795,14 @@ const CAM2=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.fillRect(-.3,-.1
 const CAM2_CUT=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.lineWidth=.04;c.beginPath();c.arc(0,.02,.12,0,7);c.stroke();fillE(c,0,.02,.05,.05);c.restore();};
 const SCIS=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.lineWidth=.05;c.lineCap='round';c.beginPath();c.moveTo(-.1,.06);c.lineTo(.28,-.24);c.moveTo(-.1,-.06);c.lineTo(.28,.24);c.stroke();c.lineWidth=.04;c.beginPath();c.arc(-.18,.12,.08,0,7);c.moveTo(-.1,-.12);c.arc(-.18,-.12,.08,0,7);c.stroke();c.restore();};
 const CHAIR=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.fillRect(-.2,0,.4,.07);c.fillRect(-.2,-.34,.07,.36);c.fillRect(-.03,.07,.06,.24);c.fillRect(-.16,.28,.32,.05);c.restore();};
+const ONEWAY=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.fillRect(-.015,-.1,.03,.5);c.fillRect(-.24,-.26,.48,.18);c.restore();};
+const ONEWAY_CUT=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.lineWidth=.035;c.lineCap='round';c.beginPath();c.moveTo(-.16,-.17);c.lineTo(.14,-.17);c.moveTo(.08,-.22);c.lineTo(.15,-.17);c.lineTo(.08,-.12);c.stroke();c.restore();};
+const ROAD=c=>{c.lineWidth=.03;c.beginPath();c.moveTo(-.52,.44);c.lineTo(.52,.44);c.stroke();c.lineWidth=.025;c.beginPath();for(const x of [-.4,-.1,.2]){c.moveTo(x,.36);c.lineTo(x+.14,.36);}c.stroke();};
 function shapeById(id){
+  if(id==='mushAsk2')return {name:'一朵香菇',kind:'o',rot:0,core:[0,.1],box:[1,1],draw(c){MUSH(c,-.06,.12,1.25);c.save();c.translate(-.6,-.56);c.scale(.75,.75);QMARK(c);c.restore();},cut(c){MUSH_CUT(c,-.06,.12,1.25);}};
+  if(id==='oneWay')return {name:'單行道',kind:'o',rot:0,core:[0,.1],box:[1.05,1],draw(c){ONEWAY(c,0,0,1.4);},cut(c){ONEWAY_CUT(c,0,0,1.4);}};
+  if(id==='mushRoad')return {name:'路上一朵菇',kind:'o',rot:0,core:[0,.1],box:[1.1,1],draw(c){ONEWAY(c,-.3,-.02,.9);MUSH(c,.26,.2,.55);ROAD(c);},cut(c){ONEWAY_CUT(c,-.3,-.02,.9);MUSH_CUT(c,.26,.2,.55);}};
+  if(id==='mushLonely')return {name:'孤單的香菇',kind:'o',rot:0,core:[0,.1],box:[1,1],draw(c){MUSH(c,-.04,.14,1.2);DROP(c,.34,-.08,.05);fillE(c,.34,-.38,.08,.08);c.save();c.globalCompositeOperation='destination-out';fillE(c,.38,-.41,.065,.065);c.restore();},cut(c){c.save();c.translate(-.04,.14);c.scale(1.2,1.2);fillE(c,-.1,-.16,.03,.04);fillE(c,.1,-.16,.03,.04);c.lineWidth=.025;c.beginPath();c.arc(0,-.02,.06,Math.PI*1.15,Math.PI*1.85);c.stroke();c.restore();}};
   if(id==='longHair')return profileShape({id:'long',fixed:1,name:'頭髮很長的人',extra:QMARK,cutP:MOUTH,box:[1.4,1.15]});
   if(id==='barber')return {name:'理髮店',kind:'o',rot:0,core:[0,.1],box:[1.1,1],draw(c){CHAIR(c,-.2,.1,1.1);SCIS(c,.3,-.26,.9);PAWN(c,.36,.2,.55);},cut(c){}};
   if(id==='waitAlone')return {name:'等不到人',kind:'o',rot:0,core:[0,.1],box:[1.1,1],draw(c){CHAIR(c,-.24,.1,1.1);PAWN(c,-.22,-.06,.5);fillE(c,.3,-.3,.12,.12);for(const x of [.22,.34,.46])fillE(c,x,.2,.03,.03);},cut(c){c.lineWidth=.022;c.lineCap='round';c.beginPath();c.moveTo(.3,-.3);c.lineTo(.3,-.38);c.moveTo(.3,-.3);c.lineTo(.36,-.26);c.stroke();}};
@@ -1883,6 +1890,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'菇單',panels:[['mushAsk2','香菇為何不種在單行道？'],['oneWay','單行道……'],['mushRoad','只放得下一朵菇。'],['mushLonely','怕菇（孤）單。',0,3.5]]},
   {title:'沒人理',panels:[['longHair','邊緣人為什麼不剪頭髮？'],['barber','走進理髮店——'],['waitAlone','等了一整天……'],['noOneLi','因為沒人要「理」他。',0,3.5]]},
   {title:'一個人',panels:[['friendVal','「情人節還是一個人嗎？」'],['meFurious','我勃然大怒：'],['meShout','「廢話！」'],['meDog','「難道我會變成一條狗嗎？」',0,3.5]]},
   {title:'一拍即合',panels:[['coupleAsk','結婚為什麼要拍婚紗照？'],['camera','來，看這裡——'],['flash','喀嚓！'],['photoFrame','因為一拍即合。',0,3.5]]},
@@ -2087,7 +2095,7 @@ const STORIES=[
 ];
 const CATS=['諧音梗','夫妻家庭','搶匪小偷','職場校園','時事諷刺','日常冷笑話','故事小品'];
 const CATMAP={
-  '諧音梗':['沒人理','一拍即合','最笨的字母','麥生氣','新衣耶','警察','阿拉伯','好鴨','拭十箍','矮love游','站久會酸','導魚','菇毒','雞凍','肥而不溺','擺事可樂','沒龜','猴頭菇','火腿','恁母伊郎','菊花茶','比三小','西北雨','北極的牛','地下道','下酒菜','梗多','滑馬','沒關C','在下','目光','泡你','我的天','沒氣了','南方','最甜的蜜','小氣蝦','瓦斯怎麼叫','缺陷','冰心地瓜','不在人事','多大','雨多甜','還沒滾','蟻后','坐白宮','擲筊','一個人過','鳳梨酥','仙草蜜','一波三折','八天的','飢童','美紅敢','仰式','你哪位','哈囉 win','窗戶凍住了','左右腦','換科目','業內人士','找誰接','半手李','閉眼說瞎話','誰是京都人','金口難開','看辦公室','週一休息','看穿'],
+  '諧音梗':['菇單','沒人理','一拍即合','最笨的字母','麥生氣','新衣耶','警察','阿拉伯','好鴨','拭十箍','矮love游','站久會酸','導魚','菇毒','雞凍','肥而不溺','擺事可樂','沒龜','猴頭菇','火腿','恁母伊郎','菊花茶','比三小','西北雨','北極的牛','地下道','下酒菜','梗多','滑馬','沒關C','在下','目光','泡你','我的天','沒氣了','南方','最甜的蜜','小氣蝦','瓦斯怎麼叫','缺陷','冰心地瓜','不在人事','多大','雨多甜','還沒滾','蟻后','坐白宮','擲筊','一個人過','鳳梨酥','仙草蜜','一波三折','八天的','飢童','美紅敢','仰式','你哪位','哈囉 win','窗戶凍住了','左右腦','換科目','業內人士','找誰接','半手李','閉眼說瞎話','誰是京都人','金口難開','看辦公室','週一休息','看穿'],
   '夫妻家庭':['拿掃把','湊滿一船','隔壁老王','臉色','好女子','著火了','我的天','算錯','仙女','誤點','玩夠沒','瓶蓋','最佳搭檔','帶過來的','明天減肥','我不知道','我知道','第一次','會下蛋嗎','南方','挑食','五個媽','雨多甜','還沒滾','看不到你','多生兩個','貓與虎','送回娘家','七十才開始','一模一樣','買菸','需要談談','不敢問','窗戶凍住了','一切都很好','沒安全感','所以要我留下','露台','四個孩子的爸','深夜講座','睜一隻眼','緩解疼痛','九十歲','撞到告訴我','很會說謊','很甜','兩根菸'],
   '搶匪小偷':['金口難開','負數','可能看到了','換科目','業內人士','遙控器','一起找'],
   '職場校園':['緩兵之計','呷好西瓜','有求必應','下一位','送行宴','鏡子都敢照','不會再問我','自己寫','哪邊涼快','不在人事','一個人過','仙草蜜','飢童','不忍心','美紅敢','錯的先講','吸菸區','沉默','看辦公室','可以回家','倫理學','很會說謊','烤箱手套'],
