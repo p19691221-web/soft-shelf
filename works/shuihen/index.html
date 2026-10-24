@@ -804,7 +804,14 @@ const TREE2=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.fillRect(-.05,0
 const TLIGHT=(c,x,y,k,a)=>{c.save();c.translate(x,y);c.rotate(a||0);c.scale(k,k);c.fillRect(-.03,-.1,.06,.5);c.fillRect(-.09,-.44,.18,.36);c.restore();};
 const TLIGHT_CUT=(c,x,y,k,a)=>{c.save();c.translate(x,y);c.rotate(a||0);c.scale(k,k);for(const yy of [-.37,-.26,-.15])fillE(c,0,yy,.045,.045);c.restore();};
 const EGG2=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.beginPath();c.moveTo(0,-.22);c.bezierCurveTo(.16,-.22,.2,.04,.18,.1);c.bezierCurveTo(.16,.22,-.16,.22,-.18,.1);c.bezierCurveTo(-.2,.04,-.16,-.22,0,-.22);c.fill();c.restore();};
+const BOWL2=(c,x,y,k,full)=>{c.save();c.translate(x,y);c.scale(k,k);c.beginPath();c.moveTo(-.26,0);c.quadraticCurveTo(-.24,.24,0,.24);c.quadraticCurveTo(.24,.24,.26,0);c.closePath();c.fill();c.fillRect(-.1,.24,.2,.05);if(full){fillE(c,0,-.02,.24,.1);}c.restore();};
+const SUN2=(c,x,y,r)=>{fillE(c,x,y,r,r);c.lineWidth=r*.3;c.lineCap='round';c.beginPath();for(let i=0;i<8;i++){const a=i*Math.PI/4;c.moveTo(x+Math.cos(a)*r*1.4,y+Math.sin(a)*r*1.4);c.lineTo(x+Math.cos(a)*r*1.9,y+Math.sin(a)*r*1.9);}c.stroke();};
+const MOON2=(c,x,y,r)=>{fillE(c,x,y,r,r);c.save();c.globalCompositeOperation='destination-out';fillE(c,x+r*.45,y-r*.3,r*.85,r*.85);c.restore();};
 function shapeById(id){
+  if(id==='mealAsk')return {name:'誰沒有午餐',kind:'o',rot:0,core:[0,.1],box:[1,1],draw(c){BOWL2(c,-.04,.16,1.2,1);c.save();c.translate(-.56,-.46);c.scale(.7,.7);QMARK(c);c.restore();},cut(c){}};
+  if(id==='mealMorning')return {name:'早餐',kind:'o',rot:0,core:[0,.1],box:[1.05,1],draw(c){SUN2(c,-.24,-.28,.09);BOWL2(c,.08,.2,1.1,1);c.lineWidth=.03;c.beginPath();c.moveTo(-.5,-.06);c.lineTo(-.02,-.06);c.stroke();},cut(c){}};
+  if(id==='mealNight')return {name:'晚餐',kind:'o',rot:0,core:[0,.1],box:[1.05,1],draw(c){MOON2(c,-.26,-.3,.12);BOWL2(c,.08,.2,1.1,1);},cut(c){}};
+  if(id==='mealNoon')return {name:'沒有午餐',kind:'o',rot:0,core:[0,.1],box:[1.05,1],draw(c){SUN2(c,-.04,-.3,.1);BOWL2(c,-.08,.22,1.05,0);c.lineWidth=.05;c.lineCap='round';c.beginPath();c.moveTo(.3,-.06);c.lineTo(.48,.1);c.moveTo(.48,-.06);c.lineTo(.3,.1);c.stroke();},cut(c){}};
   if(id==='dadQuiz')return {name:'爸爸出題',kind:'o',rot:0,core:[0,.1],box:[1.05,1],draw(c){PAWN(c,-.22,.04,1.1);PAWN(c,.28,.2,.65);c.save();c.translate(-.56,-.52);c.scale(.65,.65);QMARK(c);c.restore();},cut(c){}};
   if(id==='kidChair')return {name:'椅子',kind:'o',rot:0,core:[0,.1],box:[1.05,1],draw(c){PAWN(c,-.3,.2,.7);CHAIR(c,.18,.06,1.15);c.save();c.translate(-.6,-.5);c.scale(.6,.6);EXCL(c);c.restore();},cut(c){}};
   if(id==='dadSad')return profileShape({id:'flat',fixed:1,name:'難過的爸爸',extra:c=>{DROP(c,1.0,.62,.05);},cutP:c=>{EYE_SHUT(c);},box:[1.25,1.15]});
@@ -1912,6 +1919,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'免費的午餐',panels:[['mealAsk','什麼人從來沒有午餐？'],['mealMorning','有早餐，'],['mealNight','有晚餐，'],['mealNoon','免費——沒有免費的午餐。',0,3.5]]},
   {title:'四隻腳',panels:[['dadQuiz','「四隻腳不會動的是？」'],['kidChair','小明：「椅子！簡單！」'],['dadSad','爸：「是彼得……」'],['dogRest','「你的狗，牠走了。」',0,3.5]]},
   {title:'空腹',panels:[['eggsAsk','空腹最多能吃幾個蛋？'],['emptyBelly','肚子空空的。'],['eatOne','吃下第一個——'],['notEmpty','第二個，就不是空腹了。',0,3.5]]},
   {title:'砍光',panels:[['treeStand','甲：「不要亂砍樹。」'],['treeTrim','乙：「該先修剪才對。」'],['lightFall','丙：「紅綠燈倒了——」'],['lightsCut','「我建議把紅綠燈全砍光。」',0,3.5]]},
