@@ -808,7 +808,13 @@ const BOWL2=(c,x,y,k,full)=>{c.save();c.translate(x,y);c.scale(k,k);c.beginPath(
 const SUN2=(c,x,y,r)=>{fillE(c,x,y,r,r);c.lineWidth=r*.3;c.lineCap='round';c.beginPath();for(let i=0;i<8;i++){const a=i*Math.PI/4;c.moveTo(x+Math.cos(a)*r*1.4,y+Math.sin(a)*r*1.4);c.lineTo(x+Math.cos(a)*r*1.9,y+Math.sin(a)*r*1.9);}c.stroke();};
 const MOON2=(c,x,y,r)=>{fillE(c,x,y,r,r);c.save();c.globalCompositeOperation='destination-out';fillE(c,x+r*.45,y-r*.3,r*.85,r*.85);c.restore();};
 const ICE=(c,x,y,r)=>{c.save();c.translate(x,y);c.rotate(.3);c.fillRect(-r,-r,2*r,2*r);c.restore();};
+const CAPOBJ=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.beginPath();c.moveTo(-.2,.04);c.quadraticCurveTo(-.2,-.2,0,-.2);c.quadraticCurveTo(.2,-.2,.2,.04);c.closePath();c.fill();fillP(c,[[.14,0],[.42,.04],[.4,.1],[.14,.08]]);c.restore();};
+const SNAKE=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.lineWidth=.08;c.lineCap='round';c.beginPath();c.moveTo(-.4,.1);c.bezierCurveTo(-.3,-.06,-.2,.2,-.1,.06);c.bezierCurveTo(0,-.08,.1,.2,.2,.06);c.stroke();fillE(c,.28,.02,.09,.06);c.restore();};
 function shapeById(id){
+  if(id==='giveCap')return {name:'送帽子',kind:'o',rot:0,core:[0,.1],box:[1.1,1],draw(c){PAWN(c,-.3,.1,.95);CAPOBJ(c,.2,-.02,.75);},cut(c){}};
+  if(id==='wearCap')return {name:'戴帽子的她',kind:'o',rot:0,core:[0,.1],box:[1,1],draw(c){PAWN(c,-.06,.16,1.15);CAPOBJ(c,-.08,-.3,.9);},cut(c){}};
+  if(id==='heavyHead')return {name:'頭很重的她',kind:'o',rot:0,core:[0,.1],box:[1,1],draw(c){PAWN(c,-.06,.24,1.0);c.save();c.translate(-.06,-.1);c.rotate(.25);CAPOBJ(c,0,0,1.05);c.restore();c.lineWidth=.03;c.lineCap='round';c.beginPath();for(const x of [-.34,.24]){c.moveTo(x,-.34);c.lineTo(x,-.2);c.moveTo(x-.04,-.24);c.lineTo(x,-.2);c.lineTo(x+.04,-.24);}c.stroke();DROP(c,.34,.04,.045);},cut(c){}};
+  if(id==='capSnake')return {name:'壓蛇帽',kind:'o',rot:0,core:[0,.1],box:[1.1,1],draw(c){SNAKE(c,0,.2,1.15);CAPOBJ(c,-.14,.02,1.1);DROP(c,.44,-.16,.045);},cut(c){c.save();c.translate(0,.2);c.scale(1.15,1.15);fillE(c,.3,.0,.018,.018);c.restore();}};
   if(id==='hotTea')return {name:'熱奶茶',kind:'o',rot:0,core:[0,.1],box:[1,1],draw(c){fillP(c,[[-.08,-.1],[.32,-.1],[.27,.42],[-.03,.42]]);STEAM(c,.12,-.18);c.save();c.translate(-1.2,-.36);c.scale(.7,.7);QMARK(c);c.restore();},cut(c){}};
   if(id==='addIce')return {name:'加冰',kind:'o',rot:0,core:[0,.1],box:[1.05,1],draw(c){fillP(c,[[-.24,-.1],[.16,-.1],[.11,.42],[-.19,.42]]);for(const [x,y] of [[.34,-.36],[.22,-.22]])ICE(c,x,y,.06);c.lineWidth=.03;c.lineCap='round';c.beginPath();c.moveTo(.32,-.12);c.lineTo(.2,-.04);c.stroke();},cut(c){}};
   if(id==='noIce')return {name:'不加冰呢',kind:'o',rot:0,core:[0,.1],box:[1.05,1],draw(c){fillP(c,[[-.08,-.1],[.32,-.1],[.27,.42],[-.03,.42]]);c.save();c.translate(-1.2,-.36);c.scale(.7,.7);QMARK(c);c.restore();},cut(c){}};
@@ -1924,6 +1930,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'壓蛇帽',panels:[['giveCap','許仙送白娘子一頂帽子。'],['wearCap','她戴上了——'],['heavyHead','「怎麼頭這麼重？」'],['capSnake','因為是壓蛇（鴨舌）帽。',0,3.5]]},
   {title:'加錢',panels:[['hotTea','熱奶茶怎麼變冰奶茶？'],['addIce','加冰，當然。'],['noIce','除了加冰呢？'],['addMoney','加錢。',0,3.5]]},
   {title:'免費的午餐',panels:[['mealAsk','什麼人從來沒有午餐？'],['mealMorning','有早餐，'],['mealNight','有晚餐，'],['mealNoon','免費——沒有免費的午餐。',0,3.5]]},
   {title:'四隻腳',panels:[['dadQuiz','「四隻腳不會動的是？」'],['kidChair','小明：「椅子！簡單！」'],['dadSad','爸：「是彼得……」'],['dogRest','「你的狗，牠走了。」',0,3.5]]},
@@ -2135,7 +2142,7 @@ const STORIES=[
 ];
 const CATS=['諧音梗','夫妻家庭','搶匪小偷','職場校園','時事諷刺','日常冷笑話','故事小品'];
 const CATMAP={
-  '諧音梗':['菇單','沒人理','一拍即合','最笨的字母','麥生氣','新衣耶','警察','阿拉伯','好鴨','拭十箍','矮love游','站久會酸','導魚','菇毒','雞凍','肥而不溺','擺事可樂','沒龜','猴頭菇','火腿','恁母伊郎','菊花茶','比三小','西北雨','北極的牛','地下道','下酒菜','梗多','滑馬','沒關C','在下','目光','泡你','我的天','沒氣了','南方','最甜的蜜','小氣蝦','瓦斯怎麼叫','缺陷','冰心地瓜','不在人事','多大','雨多甜','還沒滾','蟻后','坐白宮','擲筊','一個人過','鳳梨酥','仙草蜜','一波三折','八天的','飢童','美紅敢','仰式','你哪位','哈囉 win','窗戶凍住了','左右腦','換科目','業內人士','找誰接','半手李','閉眼說瞎話','誰是京都人','金口難開','看辦公室','週一休息','看穿'],
+  '諧音梗':['壓蛇帽','菇單','沒人理','一拍即合','最笨的字母','麥生氣','新衣耶','警察','阿拉伯','好鴨','拭十箍','矮love游','站久會酸','導魚','菇毒','雞凍','肥而不溺','擺事可樂','沒龜','猴頭菇','火腿','恁母伊郎','菊花茶','比三小','西北雨','北極的牛','地下道','下酒菜','梗多','滑馬','沒關C','在下','目光','泡你','我的天','沒氣了','南方','最甜的蜜','小氣蝦','瓦斯怎麼叫','缺陷','冰心地瓜','不在人事','多大','雨多甜','還沒滾','蟻后','坐白宮','擲筊','一個人過','鳳梨酥','仙草蜜','一波三折','八天的','飢童','美紅敢','仰式','你哪位','哈囉 win','窗戶凍住了','左右腦','換科目','業內人士','找誰接','半手李','閉眼說瞎話','誰是京都人','金口難開','看辦公室','週一休息','看穿'],
   '夫妻家庭':['四隻腳','拿掃把','湊滿一船','隔壁老王','臉色','好女子','著火了','我的天','算錯','仙女','誤點','玩夠沒','瓶蓋','最佳搭檔','帶過來的','明天減肥','我不知道','我知道','第一次','會下蛋嗎','南方','挑食','五個媽','雨多甜','還沒滾','看不到你','多生兩個','貓與虎','送回娘家','七十才開始','一模一樣','買菸','需要談談','不敢問','窗戶凍住了','一切都很好','沒安全感','所以要我留下','露台','四個孩子的爸','深夜講座','睜一隻眼','緩解疼痛','九十歲','撞到告訴我','很會說謊','很甜','兩根菸'],
   '搶匪小偷':['金口難開','負數','可能看到了','換科目','業內人士','遙控器','一起找'],
   '職場校園':['緩兵之計','呷好西瓜','有求必應','下一位','送行宴','鏡子都敢照','不會再問我','自己寫','哪邊涼快','不在人事','一個人過','仙草蜜','飢童','不忍心','美紅敢','錯的先講','吸菸區','沉默','看辦公室','可以回家','倫理學','很會說謊','烤箱手套'],
