@@ -803,7 +803,12 @@ const FISHB_EYE=(c,x,y,k,flip,dead)=>{c.save();c.translate(x,y);c.scale(k,flip?-
 const TREE2=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.fillRect(-.05,0,.1,.4);fillE(c,0,-.14,.26,.2);fillE(c,-.16,-.04,.14,.12);fillE(c,.16,-.04,.14,.12);fillE(c,0,-.3,.16,.12);c.restore();};
 const TLIGHT=(c,x,y,k,a)=>{c.save();c.translate(x,y);c.rotate(a||0);c.scale(k,k);c.fillRect(-.03,-.1,.06,.5);c.fillRect(-.09,-.44,.18,.36);c.restore();};
 const TLIGHT_CUT=(c,x,y,k,a)=>{c.save();c.translate(x,y);c.rotate(a||0);c.scale(k,k);for(const yy of [-.37,-.26,-.15])fillE(c,0,yy,.045,.045);c.restore();};
+const EGG2=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.beginPath();c.moveTo(0,-.22);c.bezierCurveTo(.16,-.22,.2,.04,.18,.1);c.bezierCurveTo(.16,.22,-.16,.22,-.18,.1);c.bezierCurveTo(-.2,.04,-.16,-.22,0,-.22);c.fill();c.restore();};
 function shapeById(id){
+  if(id==='eggsAsk')return {name:'一排雞蛋',kind:'o',rot:0,core:[0,.1],box:[1.1,1],draw(c){for(const x of [-.32,0,.32])EGG2(c,x,.14,.75);c.save();c.translate(-.56,-.46);c.scale(.7,.7);QMARK(c);c.restore();},cut(c){}};
+  if(id==='emptyBelly')return {name:'肚子空空',kind:'o',rot:0,core:[0,.1],box:[1.05,1],draw(c){PAWN(c,-.06,.08,1.15);},cut(c){c.lineWidth=.03;c.beginPath();c.arc(-.06,.2,.12,0,7);c.stroke();}};
+  if(id==='eatOne')return {name:'吃第一個',kind:'o',rot:0,core:[0,.1],box:[1.1,1],draw(c){PAWN(c,-.26,.08,1);EGG2(c,.36,.04,.6);c.lineWidth=.03;c.lineCap='round';c.beginPath();c.moveTo(.2,.04);c.lineTo(.04,.04);c.lineTo(.09,-.01);c.moveTo(.04,.04);c.lineTo(.09,.09);c.stroke();},cut(c){c.lineWidth=.03;c.beginPath();c.arc(-.26,.2,.11,0,7);c.stroke();}};
+  if(id==='notEmpty')return {name:'不空了',kind:'o',rot:0,core:[0,.1],box:[1.1,1],draw(c){PAWN(c,-.26,.08,1);EGG2(c,.38,.04,.6);c.lineWidth=.04;c.lineCap='round';c.beginPath();c.moveTo(.26,-.32);c.lineTo(.5,-.12);c.moveTo(.5,-.32);c.lineTo(.26,-.12);c.stroke();},cut(c){c.save();c.translate(-.26,.2);c.scale(.6,.6);c.lineWidth=.05;c.beginPath();c.moveTo(0,-.22);c.bezierCurveTo(.16,-.22,.2,.04,.18,.1);c.bezierCurveTo(.16,.22,-.16,.22,-.18,.1);c.bezierCurveTo(-.2,.04,-.16,-.22,0,-.22);c.stroke();c.restore();}};
   if(id==='treeStand')return {name:'行道樹',kind:'o',rot:0,core:[0,.1],box:[1,1],draw(c){TREE2(c,-.04,.04,1.3);},cut(c){}};
   if(id==='treeTrim')return {name:'修剪',kind:'o',rot:0,core:[0,.1],box:[1.05,1],draw(c){TREE2(c,-.18,.06,1.1);SCIS(c,.32,-.22,.8);},cut(c){}};
   if(id==='lightFall')return {name:'倒下的紅綠燈',kind:'o',rot:0,core:[0,.1],box:[1.05,1],draw(c){TLIGHT(c,.0,.24,1.1,1.25);c.lineWidth=.03;c.beginPath();c.moveTo(-.5,.44);c.lineTo(.5,.44);c.stroke();c.save();c.translate(-.56,-.46);c.scale(.75,.75);EXCL(c);c.restore();},cut(c){TLIGHT_CUT(c,.0,.24,1.1,1.25);}};
@@ -1903,6 +1908,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'空腹',panels:[['eggsAsk','空腹最多能吃幾個蛋？'],['emptyBelly','肚子空空的。'],['eatOne','吃下第一個——'],['notEmpty','第二個，就不是空腹了。',0,3.5]]},
   {title:'砍光',panels:[['treeStand','甲：「不要亂砍樹。」'],['treeTrim','乙：「該先修剪才對。」'],['lightFall','丙：「紅綠燈倒了——」'],['lightsCut','「我建議把紅綠燈全砍光。」',0,3.5]]},
   {title:'背朝下',panels:[['fishSwim','背朝下的魚，是什麼魚？'],['fishTilt','翻過來——'],['fishUp','肚子朝上，浮在水面。'],['fishDead','死魚。',0,3.5]]},
   {title:'菇單',panels:[['mushAsk2','香菇為何不種在單行道？'],['oneWay','單行道……'],['mushRoad','只放得下一朵菇。'],['mushLonely','怕菇（孤）單。',0,3.5]]},
