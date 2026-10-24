@@ -813,6 +813,10 @@ const SNAKE=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.lineWidth=.08;c
 const RECV=(c,x,y,k,a)=>{c.save();c.translate(x,y);c.rotate(a||0);c.scale(k,k);c.lineWidth=.08;c.lineCap='round';c.beginPath();c.moveTo(-.2,-.08);c.quadraticCurveTo(0,-.18,.2,-.08);c.stroke();fillE(c,-.22,-.02,.07,.09);fillE(c,.22,-.02,.07,.09);c.restore();};
 const PHONEBASE=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);fillP(c,[[-.26,.14],[.26,.14],[.2,-.06],[-.2,-.06]]);c.restore();};
 function shapeById(id){
+  if(id==='drinkAsk')return {name:'喝酒',kind:'o',rot:0,core:[0,.1],box:[1.05,1],draw(c){PAWN(c,-.2,.1,1);BOT(c,.3,.06,1.2,.3);c.save();c.translate(-1.14,-.42);c.scale(.65,.65);QMARK(c);c.restore();},cut(c){}};
+  if(id==='drunkSway')return {name:'醉醺醺',kind:'o',rot:0,core:[0,.1],box:[1.05,1],draw(c){c.save();c.translate(-.04,.1);c.rotate(.2);PAWN(c,0,0,1.05);c.restore();c.lineWidth=.03;c.beginPath();for(let i=0;i<14;i++){const a=i*.6,r=.02+i*.006;c.lineTo(.36+Math.cos(a)*r,-.36+Math.sin(a)*r);}c.stroke();},cut(c){}};
+  if(id==='othersShort')return {name:'別人都變矮了',kind:'o',rot:0,core:[0,.1],box:[1.1,1],draw(c){PAWN(c,-.34,.04,1.1);for(const x of [.06,.26,.46])PAWN(c,x,.3,.42);},cut(c){}};
+  if(id==='drunkTall')return {name:'喝高了',kind:'o',rot:0,core:[0,.1],box:[1.05,1.05],draw(c){c.fillRect(-.3,.22,.6,.2);PAWN(c,0,-.04,.75);c.lineWidth=.035;c.lineCap='round';c.beginPath();for(const x of [-.42,.42]){c.moveTo(x,.1);c.lineTo(x,-.18);c.moveTo(x-.05,-.13);c.lineTo(x,-.18);c.lineTo(x+.05,-.13);}c.stroke();},cut(c){}};
   if(id==='whoHang')return {name:'什麼人容易掛',kind:'o',rot:0,core:[0,.1],box:[1,1],draw(c){PAWN(c,.12,.12,1.05);c.save();c.translate(-1.2,-.4);c.scale(.75,.75);QMARK(c);c.restore();},cut(c){}};
   if(id==='onPhone')return profileShape({id:'flat',fixed:1,name:'講電話的人',extra:c=>{c.save();c.translate(1.08,.42);c.scale(.36,.36);c.rotate(.2);PHONE(c);c.restore();},cutP:SMILE,scale:.8,shift:-.18,box:[1.35,1.15],core:[-.18,.05]});
   if(id==='byeBye')return profileShape({id:'flat',fixed:1,name:'說掰掰',extra:c=>{c.save();c.translate(1.08,.42);c.scale(.36,.36);c.rotate(.2);PHONE(c);c.restore();SHOUT_R(c,.98,.84);},cutP:SMILE,scale:.8,shift:-.18,box:[1.4,1.15],core:[-.18,.05]});
@@ -1936,6 +1940,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'喝高了',panels:[['drinkAsk','喝醉了，別人怎麼都變矮？'],['drunkSway','一杯接一杯……'],['othersShort','怎麼大家都變矮了？'],['drunkTall','因為喝高了。',0,3.5]]},
   {title:'容易掛',panels:[['whoHang','什麼人最容易「掛」？'],['onPhone','正在講電話的人。'],['byeBye','「好，掰掰——」'],['hangUp','喀，掛了。',0,3.5]]},
   {title:'壓蛇帽',panels:[['giveCap','許仙送白娘子一頂帽子。'],['wearCap','她戴上了——'],['heavyHead','「怎麼頭這麼重？」'],['capSnake','因為是壓蛇（鴨舌）帽。',0,3.5]]},
   {title:'加錢',panels:[['hotTea','熱奶茶怎麼變冰奶茶？'],['addIce','加冰，當然。'],['noIce','除了加冰呢？'],['addMoney','加錢。',0,3.5]]},
