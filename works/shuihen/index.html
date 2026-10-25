@@ -827,7 +827,14 @@ const SCROLL_CUT=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.lineWidth=
 const CONE2=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);fillP(c,[[-.08,-.3],[.08,-.3],[.18,.2],[-.18,.2]]);c.fillRect(-.24,.2,.48,.06);c.restore();};
 const BOOK=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.fillRect(-.24,-.3,.48,.6);c.fillRect(-.24,.3,.48,.04);c.restore();};
 const OPENBOOK=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);fillP(c,[[-.44,-.2],[-.02,-.14],[-.02,.28],[-.44,.22]]);fillP(c,[[.44,-.2],[.02,-.14],[.02,.28],[.44,.22]]);c.restore();};
+const REN=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.lineWidth=.1;c.lineCap='round';c.beginPath();c.moveTo(0,-.36);c.quadraticCurveTo(-.04,.06,-.32,.34);c.moveTo(-.02,-.04);c.quadraticCurveTo(.12,.2,.34,.34);c.stroke();c.restore();};
+const HENG=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.lineWidth=.1;c.lineCap='round';c.beginPath();c.moveTo(-.3,-.12);c.lineTo(.3,-.12);c.stroke();c.restore();};
+const DIAN=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);fillE(c,-.06,.22,.06,.07,-.6);c.restore();};
 function shapeById(id){
+  if(id==='charTai')return {name:'太',kind:'o',rot:0,core:[0,0],box:[1,1],draw(c){REN(c,0,0,1.15);HENG(c,0,0,1.15);DIAN(c,0,0,1.15);},cut(c){}};
+  if(id==='charDa')return {name:'大',kind:'o',rot:0,core:[0,0],box:[1,1],draw(c){REN(c,0,0,1.15);HENG(c,0,0,1.15);},cut(c){}};
+  if(id==='charSplit')return {name:'拿掉一和點',kind:'o',rot:0,core:[0,0],box:[1.1,1],draw(c){REN(c,-.14,.08,.95);HENG(c,.32,-.18,.5);c.save();c.translate(.42,.02);c.scale(1.6,1.6);DIAN(c,0,0,1);c.restore();},cut(c){}};
+  if(id==='charRen')return {name:'人',kind:'o',rot:0,core:[0,0],box:[1,1],draw(c){REN(c,0,0,1.2);},cut(c){}};
   if(id==='bookAsk')return {name:'一本書',kind:'o',rot:0,core:[0,.1],box:[1,1],draw(c){BOOK(c,.04,.14,1.1);c.save();c.translate(-1.16,-.36);c.scale(.7,.7);QMARK(c);c.restore();},cut(c){c.lineWidth=.022;c.beginPath();for(const y of [-.12,-.02,.08]){c.moveTo(-.22,y);c.lineTo(.14,y);}c.stroke();}};
   if(id==='typoBook')return {name:'錯字很多的書',kind:'o',rot:0,core:[0,.1],box:[1.05,1],draw(c){OPENBOOK(c,0,.12,1.1);},cut(c){c.lineWidth=.022;c.beginPath();for(const y of [-.06,.04,.14]){c.moveTo(-.4,y);c.lineTo(-.08,y+.02);c.moveTo(.08,y+.02);c.lineTo(.4,y);}c.stroke();c.lineWidth=.03;c.beginPath();c.moveTo(-.3,-.08);c.lineTo(-.22,.0);c.moveTo(-.22,-.08);c.lineTo(-.3,.0);c.moveTo(.22,.06);c.lineTo(.3,.14);c.moveTo(.3,.06);c.lineTo(.22,.14);c.stroke();}};
   if(id==='notTypo')return {name:'不是',kind:'o',rot:0,core:[0,.1],box:[1.05,1],draw(c){OPENBOOK(c,0,.2,.9);c.lineWidth=.05;c.lineCap='round';c.beginPath();c.moveTo(-.14,-.44);c.lineTo(.14,-.16);c.moveTo(.14,-.44);c.lineTo(-.14,-.16);c.stroke();},cut(c){}};
@@ -2002,6 +2009,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'去掉一點',panels:[['charTai','「太」去掉一點是什麼？'],['charDa','「大」？'],['charSplit','去掉一，再去掉點——'],['charRen','人！',0,3.5]]},
   {title:'毛病最多',panels:[['bookAsk','什麼書的毛病最多？'],['typoBook','錯字最多的那本？'],['notTypo','不是。'],['medBook','醫學書——整本都是病。',0,3.5]]},
   {title:'最貴的床',panels:[['bedAsk','世界上什麼床最貴？'],['fancyBed','豪華大床？'],['notFancy','不是。'],['hospBed','病床。',0,3.5]]},
   {title:'不會說話',panels:[['dogBark','狗為什麼老是汪汪叫？'],['dogThink','牠其實有很多話想說——'],['dogTry','張開嘴……'],['dogWoof','因為牠不會說話。',0,3.5]]},
