@@ -831,6 +831,10 @@ const REN=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.lineWidth=.1;c.li
 const HENG=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.lineWidth=.1;c.lineCap='round';c.beginPath();c.moveTo(-.3,-.12);c.lineTo(.3,-.12);c.stroke();c.restore();};
 const DIAN=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);fillE(c,-.06,.22,.06,.07,-.6);c.restore();};
 function shapeById(id){
+  if(id==='seaDrops')return {name:'海納百川',kind:'o',rot:0,core:[0,.1],box:[1.1,1],draw(c){for(const [x,y] of [[-.34,-.4],[-.1,-.34],[.16,-.42],[.38,-.3]])DROP(c,x,y,.05);fillP(c,[[-.52,.06],[.52,.06],[.52,.44],[-.52,.44]]);},cut(c){c.lineWidth=.03;c.save();c.translate(0,0);WAVES(c,.16);c.restore();}};
+  if(id==='mountStones')return {name:'山不辭土石',kind:'o',rot:0,core:[0,.1],box:[1.1,1],draw(c){fillP(c,[[-.52,.44],[-.06,-.4],[.14,-.06],[.26,-.22],[.52,.44]]);for(const [x,y] of [[-.4,-.4],[.36,-.44],[.44,-.28]])fillE(c,x,y,.05,.04);},cut(c){c.lineWidth=.025;c.beginPath();c.moveTo(-.12,-.26);c.lineTo(-.02,-.3);c.lineTo(.04,-.22);c.stroke();}};
+  if(id==='rulerCrowd')return {name:'明主不厭人',kind:'o',rot:0,core:[0,.1],box:[1.15,1],draw(c){PAWN(c,0,-.06,.7);c.save();c.translate(0,-.36);fillP(c,[[-.1,0],[-.11,-.14],[-.05,-.06],[0,-.16],[.05,-.06],[.11,-.14],[.1,0]]);c.restore();for(let i=0;i<6;i++){const x=-.46+i*.184;PAWN(c,x,.3+(i%2)*.04,.34);}},cut(c){}};
+  if(id==='scholarBooks')return profileShape({id:'bun',fixed:1,name:'不厭學的士',extra:c=>{BOOK(c,1.14,.66,.55);},cutP:EYE_SHUT,scale:.78,shift:-.24,box:[1.5,1.15],core:[-.24,0]});
   if(id==='charTai')return {name:'太',kind:'o',rot:0,core:[0,0],box:[1,1],draw(c){REN(c,0,0,1.15);HENG(c,0,0,1.15);DIAN(c,0,0,1.15);},cut(c){}};
   if(id==='charDa')return {name:'大',kind:'o',rot:0,core:[0,0],box:[1,1],draw(c){REN(c,0,0,1.15);HENG(c,0,0,1.15);},cut(c){}};
   if(id==='charSplit')return {name:'拿掉一和點',kind:'o',rot:0,core:[0,0],box:[1.1,1],draw(c){REN(c,-.14,.08,.95);HENG(c,.32,-.18,.5);c.save();c.translate(.42,.02);c.scale(1.6,1.6);DIAN(c,0,0,1);c.restore();},cut(c){}};
@@ -2009,6 +2013,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'成其大',panels:[['seaDrops','海不辭水，故能成其大；'],['mountStones','山不辭土石，故能成其高'],['rulerCrowd','明主不厭人，故能成其眾'],['scholarBooks','士不厭學，故能成其聖。',0,3.5]]},
   {title:'去掉一點',panels:[['charTai','「太」去掉一點是什麼？'],['charDa','「大」？'],['charSplit','去掉一，再去掉點——'],['charRen','人！',0,3.5]]},
   {title:'毛病最多',panels:[['bookAsk','什麼書的毛病最多？'],['typoBook','錯字最多的那本？'],['notTypo','不是。'],['medBook','醫學書——整本都是病。',0,3.5]]},
   {title:'最貴的床',panels:[['bedAsk','世界上什麼床最貴？'],['fancyBed','豪華大床？'],['notFancy','不是。'],['hospBed','病床。',0,3.5]]},
@@ -2241,7 +2246,7 @@ const CATMAP={
   '搶匪小偷':['金口難開','負數','可能看到了','換科目','業內人士','遙控器','一起找'],
   '職場校園':['緩兵之計','呷好西瓜','有求必應','下一位','送行宴','鏡子都敢照','不會再問我','自己寫','哪邊涼快','不在人事','一個人過','仙草蜜','飢童','不忍心','美紅敢','錯的先講','吸菸區','沉默','看辦公室','可以回家','倫理學','很會說謊','烤箱手套'],
   '時事諷刺':['砍光','凱文呢','民調','太晚了','有用','重燃希望','誰是白痴','塗成藍色','我們的願望','白羊吃草','會飛的車'],
-  '故事小品':['省道','背上的字','手作禮物','只是欣賞','一片葉子','種子','不打你','慣性','颱風要來','收拾','放下','恆河','平安','等','釣','慢','午後']};
+  '故事小品':['成其大','省道','背上的字','手作禮物','只是欣賞','一片葉子','種子','不打你','慣性','颱風要來','收拾','放下','恆河','平安','等','釣','慢','午後']};
 STORIES.forEach(S=>{S.cats=CATS.filter(c=>(CATMAP[c]||[]).includes(S.title));if(!S.cats.length)S.cats=['日常冷笑話'];});
 let storyCat='all';
 const inCat=S=>storyCat==='all'||S.cats.includes(storyCat);
