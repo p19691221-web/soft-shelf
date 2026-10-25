@@ -818,7 +818,14 @@ const STAR2=(c,x,y,r)=>{c.beginPath();for(let i=0;i<10;i++){const a=-Math.PI/2+i
 const ROCK=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.beginPath();c.moveTo(-.3,.16);c.quadraticCurveTo(-.34,-.12,-.1,-.2);c.quadraticCurveTo(.16,-.28,.3,-.06);c.quadraticCurveTo(.38,.12,.26,.18);c.closePath();c.fill();c.restore();};
 const ROCK_FACE=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);fillE(c,-.1,-.06,.03,.04);fillE(c,.1,-.06,.03,.04);c.lineWidth=.035;c.beginPath();c.arc(0,.0,.1,.15*Math.PI,.85*Math.PI);c.stroke();c.restore();};
 const RAZOR=(c,x,y,k,a)=>{c.save();c.translate(x,y);c.rotate(a||0);c.scale(k,k);c.fillRect(-.03,-.02,.06,.4);c.fillRect(-.14,-.08,.28,.08);c.restore();};
+const PIG2=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);fillE(c,0,.04,.26,.18);fillE(c,.26,-.04,.1,.09);fillP(c,[[.18,-.12],[.22,-.22],[.26,-.12]]);c.lineWidth=.05;c.lineCap='round';c.beginPath();for(const lx of [-.14,-.04,.08,.16]){c.moveTo(lx,.16);c.lineTo(lx,.3);}c.stroke();c.lineWidth=.025;c.beginPath();c.arc(-.3,0,.05,0,Math.PI*1.5);c.stroke();c.restore();};
+const PIG2_CUT=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);fillE(c,.34,-.03,.015,.02);fillE(c,.34,.02,.015,.02);fillE(c,.22,-.08,.015,.015);c.restore();};
+const SPIDER=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);fillE(c,0,.04,.12,.14);fillE(c,0,-.14,.08,.07);c.lineWidth=.035;c.lineCap='round';c.beginPath();for(const s of [-1,1])for(const [a,b,d,e] of [[.08,-.02,.3,-.18],[.1,.04,.34,.0],[.1,.1,.32,.2],[.08,.14,.24,.32]]){c.moveTo(s*a,b);c.quadraticCurveTo(s*(a+d)/2,Math.min(b,e)-.06,s*d,e);}c.stroke();c.lineWidth=.02;c.beginPath();c.moveTo(0,-.2);c.lineTo(0,-.5);c.stroke();c.restore();};
 function shapeById(id){
+  if(id==='pigAsk')return {name:'一隻豬',kind:'o',rot:0,core:[0,.1],box:[1.05,1],draw(c){PIG2(c,-.02,.12,1.3);c.save();c.translate(-.56,-.48);c.scale(.7,.7);QMARK(c);c.restore();},cut(c){PIG2_CUT(c,-.02,.12,1.3);}};
+  if(id==='notDogCat')return {name:'不是狗',kind:'o',rot:0,core:[0,.1],box:[1.05,1],draw(c){c.save();c.translate(-.06,.12);c.scale(.8,.8);DOG(c);c.restore();c.lineWidth=.05;c.lineCap='round';c.beginPath();c.moveTo(.26,-.42);c.lineTo(.48,-.2);c.moveTo(.48,-.42);c.lineTo(.26,-.2);c.stroke();},cut(c){}};
+  if(id==='spiderDown')return {name:'垂下來的蜘蛛',kind:'o',rot:0,core:[0,.1],box:[1,1.05],draw(c){SPIDER(c,0,.1,1.3);},cut(c){fillE(c,-.03,-.19,.015,.015);fillE(c,.03,-.19,.015,.015);}};
+  if(id==='spiderPig')return {name:'蜘蛛和豬',kind:'o',rot:0,core:[0,.1],box:[1.1,1],draw(c){SPIDER(c,-.3,-.08,.8);PIG2(c,.22,.22,.9);HEART(c,-.02,-.34,.08);},cut(c){PIG2_CUT(c,.22,.22,.9);}};
   if(id==='beardAsk')return profileShape({id:'beard',fixed:1,name:'滿臉鬍子',extra:QMARK,cutP:MOUTH,scale:.85,shift:-.14,box:[1.45,1.3],core:[-.14,.1]});
   if(id==='razorShave')return profileShape({id:'beard',fixed:1,name:'刮鬍子',extra:c=>{RAZOR(c,1.0,.62,1,-.5);},cutP:EYE_SHUT,scale:.82,shift:-.18,box:[1.45,1.3],core:[-.18,.1]});
   if(id==='cleanFace')return profileShape({id:'flat',fixed:1,name:'刮乾淨的臉',extra:c=>{for(const [x,y] of [[.96,.3],[1.12,.5],[.98,.7]]){c.lineWidth=.03;c.lineCap='round';c.beginPath();c.moveTo(x-.05,y);c.lineTo(x+.05,y);c.moveTo(x,y-.05);c.lineTo(x,y+.05);c.stroke();}},cutP:SMILE,box:[1.3,1.15]});
@@ -1966,6 +1973,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'知豬',panels:[['pigAsk','什麼動物最了解豬？'],['notDogCat','不是狗——'],['spiderDown','是蜘蛛。'],['spiderPig','蜘蛛＝知豬！',0,3.5]]},
   {title:'刀削面',panels:[['beardAsk','刮鬍子，猜一種食物？'],['razorShave','拿刀，在臉上削一削——'],['cleanFace','臉＝面。'],['knifeNoodle','刀削面（麵）！',0,3.5]]},
   {title:'你媽笑了',panels:[['monkRock','唐三藏撿了一顆石頭。'],['rockDraw','在上面畫了個笑臉。'],['monkTurn','轉頭對悟空說：'],['rockMom','「你媽笑了。」',0,3.5]]},
   {title:'李拜一',panels:[['twoKids','「老婆，以後生兩個好嗎？」'],['sevenKids','「生七個啦！」'],['husbandSweat','「……也太多了吧？」'],['kidsRow','「李拜一到李拜日，剛好！」',0,3.5]]},
@@ -2185,7 +2193,7 @@ const STORIES=[
 ];
 const CATS=['諧音梗','夫妻家庭','搶匪小偷','職場校園','時事諷刺','日常冷笑話','故事小品'];
 const CATMAP={
-  '諧音梗':['刀削面','碰頭','容易掛','壓蛇帽','菇單','沒人理','一拍即合','最笨的字母','麥生氣','新衣耶','警察','阿拉伯','好鴨','拭十箍','矮love游','站久會酸','導魚','菇毒','雞凍','肥而不溺','擺事可樂','沒龜','猴頭菇','火腿','恁母伊郎','菊花茶','比三小','西北雨','北極的牛','地下道','下酒菜','梗多','滑馬','沒關C','在下','目光','泡你','我的天','沒氣了','南方','最甜的蜜','小氣蝦','瓦斯怎麼叫','缺陷','冰心地瓜','不在人事','多大','雨多甜','還沒滾','蟻后','坐白宮','擲筊','一個人過','鳳梨酥','仙草蜜','一波三折','八天的','飢童','美紅敢','仰式','你哪位','哈囉 win','窗戶凍住了','左右腦','換科目','業內人士','找誰接','半手李','閉眼說瞎話','誰是京都人','金口難開','看辦公室','週一休息','看穿'],
+  '諧音梗':['知豬','刀削面','碰頭','容易掛','壓蛇帽','菇單','沒人理','一拍即合','最笨的字母','麥生氣','新衣耶','警察','阿拉伯','好鴨','拭十箍','矮love游','站久會酸','導魚','菇毒','雞凍','肥而不溺','擺事可樂','沒龜','猴頭菇','火腿','恁母伊郎','菊花茶','比三小','西北雨','北極的牛','地下道','下酒菜','梗多','滑馬','沒關C','在下','目光','泡你','我的天','沒氣了','南方','最甜的蜜','小氣蝦','瓦斯怎麼叫','缺陷','冰心地瓜','不在人事','多大','雨多甜','還沒滾','蟻后','坐白宮','擲筊','一個人過','鳳梨酥','仙草蜜','一波三折','八天的','飢童','美紅敢','仰式','你哪位','哈囉 win','窗戶凍住了','左右腦','換科目','業內人士','找誰接','半手李','閉眼說瞎話','誰是京都人','金口難開','看辦公室','週一休息','看穿'],
   '夫妻家庭':['李拜一','四隻腳','拿掃把','湊滿一船','隔壁老王','臉色','好女子','著火了','我的天','算錯','仙女','誤點','玩夠沒','瓶蓋','最佳搭檔','帶過來的','明天減肥','我不知道','我知道','第一次','會下蛋嗎','南方','挑食','五個媽','雨多甜','還沒滾','看不到你','多生兩個','貓與虎','送回娘家','七十才開始','一模一樣','買菸','需要談談','不敢問','窗戶凍住了','一切都很好','沒安全感','所以要我留下','露台','四個孩子的爸','深夜講座','睜一隻眼','緩解疼痛','九十歲','撞到告訴我','很會說謊','很甜','兩根菸'],
   '搶匪小偷':['金口難開','負數','可能看到了','換科目','業內人士','遙控器','一起找'],
   '職場校園':['緩兵之計','呷好西瓜','有求必應','下一位','送行宴','鏡子都敢照','不會再問我','自己寫','哪邊涼快','不在人事','一個人過','仙草蜜','飢童','不忍心','美紅敢','錯的先講','吸菸區','沉默','看辦公室','可以回家','倫理學','很會說謊','烤箱手套'],
