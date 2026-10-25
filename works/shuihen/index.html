@@ -826,6 +826,9 @@ const SCROLL=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.fillRect(-.14,
 const SCROLL_CUT=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.lineWidth=.02;c.beginPath();for(const xx of [-.07,0,.07]){c.moveTo(xx,-.18);c.lineTo(xx,.16);}c.stroke();c.restore();};
 const CONE2=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);fillP(c,[[-.08,-.3],[.08,-.3],[.18,.2],[-.18,.2]]);c.fillRect(-.24,.2,.48,.06);c.restore();};
 function shapeById(id){
+  if(id==='bedAsk')return {name:'一張床',kind:'o',rot:0,core:[0,.15],box:[1.05,.9],draw(c){BED2(c);c.save();c.translate(-.6,-.5);c.scale(.6,.6);QMARK(c);c.restore();},cut(c){}};
+  if(id==='fancyBed')return {name:'豪華大床',kind:'o',rot:0,core:[0,.15],box:[1.05,.95],draw(c){BED2(c);c.save();c.translate(-.43,-.24);fillP(c,[[-.1,0],[-.11,-.14],[-.05,-.06],[0,-.16],[.05,-.06],[.11,-.14],[.1,0]]);c.restore();for(const [x,y] of [[.1,-.36],[.34,-.24]]){c.lineWidth=.03;c.lineCap='round';c.beginPath();c.moveTo(x-.06,y);c.lineTo(x+.06,y);c.moveTo(x,y-.06);c.lineTo(x,y+.06);c.stroke();}},cut(c){}};
+  if(id==='notFancy')return {name:'都不是',kind:'o',rot:0,core:[0,.15],box:[1.05,.95],draw(c){BED2(c);c.lineWidth=.05;c.lineCap='round';c.beginPath();c.moveTo(-.3,-.44);c.lineTo(-.06,-.2);c.moveTo(-.06,-.44);c.lineTo(-.3,-.2);c.stroke();},cut(c){}};
   if(id==='dogBark')return {name:'汪汪叫的狗',kind:'o',rot:0,core:[0,.1],box:[1.1,1],draw(c){c.save();c.translate(-.1,.14);c.scale(.9,.9);DOG(c);c.restore();SHOUT_R(c,.36,-.04);c.save();c.translate(-.62,-.5);c.scale(.6,.6);QMARK(c);c.restore();},cut(c){}};
   if(id==='dogThink')return {name:'想講話的狗',kind:'o',rot:0,core:[0,.1],box:[1.05,1],draw(c){c.save();c.translate(-.12,.2);c.scale(.85,.85);DOG(c);c.restore();for(const [x,y,r] of [[.2,-.04,.03],[.28,-.14,.045]])fillE(c,x,y,r,r);fillE(c,.3,-.36,.2,.14);},cut(c){c.lineWidth=.022;c.beginPath();for(const y of [-.4,-.32]){c.moveTo(.18,y);c.lineTo(.42,y);}c.stroke();}};
   if(id==='dogTry')return {name:'張嘴',kind:'o',rot:0,core:[0,.1],box:[1.05,1],draw(c){c.save();c.translate(-.06,.14);c.scale(1.05,1.05);DOG(c);c.restore();for(const x of [.3,.4,.5])fillE(c,x,-.12,.03,.03);},cut(c){}};
@@ -1993,6 +1996,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'最貴的床',panels:[['bedAsk','世界上什麼床最貴？'],['fancyBed','豪華大床？'],['notFancy','不是。'],['hospBed','病床。',0,3.5]]},
   {title:'不會說話',panels:[['dogBark','狗為什麼老是汪汪叫？'],['dogThink','牠其實有很多話想說——'],['dogTry','張開嘴……'],['dogWoof','因為牠不會說話。',0,3.5]]},
   {title:'老當易撞',panels:[['elderFlex','阿公身體硬朗，精神很好。'],['elderDrive','開起車來也很有自信。'],['bumpCone','叩——'],['elderGrin','老當益壯（易撞）嘛！',0,3.5]]},
   {title:'詩靈',panels:[['poetLi','李白是詩仙，'],['poetDu','杜甫是詩聖，'],['brakeAsk','那煞車是什麼？'],['brakeFail','煞車失（詩）靈！',0,3.5]]},
