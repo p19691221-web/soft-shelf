@@ -826,6 +826,10 @@ const SCROLL=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.fillRect(-.14,
 const SCROLL_CUT=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.lineWidth=.02;c.beginPath();for(const xx of [-.07,0,.07]){c.moveTo(xx,-.18);c.lineTo(xx,.16);}c.stroke();c.restore();};
 const CONE2=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);fillP(c,[[-.08,-.3],[.08,-.3],[.18,.2],[-.18,.2]]);c.fillRect(-.24,.2,.48,.06);c.restore();};
 function shapeById(id){
+  if(id==='dogBark')return {name:'汪汪叫的狗',kind:'o',rot:0,core:[0,.1],box:[1.1,1],draw(c){c.save();c.translate(-.1,.14);c.scale(.9,.9);DOG(c);c.restore();SHOUT_R(c,.36,-.04);c.save();c.translate(-.62,-.5);c.scale(.6,.6);QMARK(c);c.restore();},cut(c){}};
+  if(id==='dogThink')return {name:'想講話的狗',kind:'o',rot:0,core:[0,.1],box:[1.05,1],draw(c){c.save();c.translate(-.12,.2);c.scale(.85,.85);DOG(c);c.restore();for(const [x,y,r] of [[.2,-.04,.03],[.28,-.14,.045]])fillE(c,x,y,r,r);fillE(c,.3,-.36,.2,.14);},cut(c){c.lineWidth=.022;c.beginPath();for(const y of [-.4,-.32]){c.moveTo(.18,y);c.lineTo(.42,y);}c.stroke();}};
+  if(id==='dogTry')return {name:'張嘴',kind:'o',rot:0,core:[0,.1],box:[1.05,1],draw(c){c.save();c.translate(-.06,.14);c.scale(1.05,1.05);DOG(c);c.restore();for(const x of [.3,.4,.5])fillE(c,x,-.12,.03,.03);},cut(c){}};
+  if(id==='dogWoof')return {name:'只能汪',kind:'o',rot:0,core:[0,.1],box:[1.1,1],draw(c){c.save();c.translate(-.14,.16);c.scale(.95,.95);DOG(c);c.restore();SHOUT_R(c,.34,-.06);SHOUT_R(c,.34,.16);DROP(c,-.36,-.22,.045);},cut(c){}};
   if(id==='elderFlex')return profileShape({id:'beard',fixed:1,name:'精神很好的阿公',extra:c=>{c.lineWidth=.07;c.lineCap='round';c.beginPath();c.moveTo(1.0,.9);c.lineTo(1.2,.7);c.lineTo(1.2,.46);c.stroke();fillE(c,1.2,.42,.07,.07);},cutP:SMILE,scale:.82,shift:-.18,box:[1.45,1.3],core:[-.18,.1]});
   if(id==='elderDrive')return {name:'阿公開車',kind:'o',rot:0,core:[0,.05],box:[1.05,.9],draw(c){c.save();c.translate(.06,.16);c.scale(.75,.75);carBody(c);c.restore();c.lineWidth=.03;c.lineCap='round';c.beginPath();for(const y of [.0,.12,.24]){c.moveTo(-.4,y);c.lineTo(-.5,y);}c.stroke();},cut(c){c.save();c.translate(.06,.16);c.scale(.75,.75);carCut(c);c.restore();}};
   if(id==='bumpCone')return {name:'撞上三角錐',kind:'o',rot:0,core:[0,.05],box:[1.1,.95],draw(c){c.save();c.translate(-.2,.18);c.scale(.65,.65);carBody(c);c.restore();c.save();c.translate(.3,.24);c.rotate(1.2);CONE2(c,0,0,.45);c.restore();c.lineWidth=.03;c.lineCap='round';c.beginPath();for(const [a,b,d,e] of [[.14,-.08,.2,-.2],[.24,-.04,.34,-.12]]){c.moveTo(a,b);c.lineTo(d,e);}c.stroke();},cut(c){c.save();c.translate(-.2,.18);c.scale(.65,.65);carCut(c);c.restore();}};
@@ -1989,6 +1993,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'不會說話',panels:[['dogBark','狗為什麼老是汪汪叫？'],['dogThink','牠其實有很多話想說——'],['dogTry','張開嘴……'],['dogWoof','因為牠不會說話。',0,3.5]]},
   {title:'老當易撞',panels:[['elderFlex','阿公身體硬朗，精神很好。'],['elderDrive','開起車來也很有自信。'],['bumpCone','叩——'],['elderGrin','老當益壯（易撞）嘛！',0,3.5]]},
   {title:'詩靈',panels:[['poetLi','李白是詩仙，'],['poetDu','杜甫是詩聖，'],['brakeAsk','那煞車是什麼？'],['brakeFail','煞車失（詩）靈！',0,3.5]]},
   {title:'喝T',panels:[['lettersDrink','哪個字母可以喝？'],['bigT','T。'],['tCup','唸唸看——'],['teaT','T＝Tea，來杯茶！',0,3.5]]},
