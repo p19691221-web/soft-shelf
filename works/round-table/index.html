@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>開一間自己的圍桌聊天室</title>
+<meta name="description" content="三步驟，在自己的 Claude 開一間圍桌聊天室，找自己的朋友聊天，AI 夥伴小禾也在桌邊。">
+<meta property="og:title" content="開一間自己的圍桌聊天室">
+<meta property="og:description" content="三步驟，在自己的 Claude 開一間圍桌聊天室，找自己的朋友聊天。">
+<meta property="og:image" content="https://p19691221-web.github.io/soft-shelf/works/round-table/preview.jpg">
+<style>
+:root{--bg:#f3efe8;--panel:#fffdf9;--ink:#24201b;--muted:#6d655b;--line:#ddd3c6;--accent:#2f6b5a;--on:#f3faf6;--warn:#a2541f}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#171512;--panel:#201d19;--ink:#ece5da;--muted:#a59b8e;--line:#36302a;--accent:#5fae96;--on:#10201a;--warn:#e69a62}}
+:root[data-theme="dark"]{--bg:#171512;--panel:#201d19;--ink:#ece5da;--muted:#a59b8e;--line:#36302a;--accent:#5fae96;--on:#10201a;--warn:#e69a62}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Noto Sans TC","PingFang TC",sans-serif;line-height:1.7;-webkit-text-size-adjust:100%}
+main{max-width:640px;margin:0 auto;padding:28px 16px calc(40px + env(safe-area-inset-bottom))}
+h1{font-size:26px;margin:0 0 6px;letter-spacing:1px}
+.sub{color:var(--muted);margin:0 0 22px}
+.hero{display:flex;gap:18px;align-items:flex-start;margin-bottom:26px}
+.hero img{width:150px;flex:none;border-radius:14px;border:1px solid var(--line)}
+.hero p{margin:0 0 10px}
+@media (max-width:480px){.hero{flex-direction:column}.hero img{width:100%;max-width:260px;align-self:center}}
+ol.steps{list-style:none;padding:0;margin:0;counter-reset:s}
+ol.steps>li{counter-increment:s;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px 16px 16px 58px;margin-bottom:12px;position:relative}
+ol.steps>li::before{content:counter(s);position:absolute;left:16px;top:15px;width:28px;height:28px;border-radius:50%;background:var(--accent);color:var(--on);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px}
+ol.steps h2{font-size:17px;margin:0 0 4px}
+ol.steps p{margin:0 0 8px;color:var(--muted);font-size:15px}
+.btn{display:inline-block;font:inherit;font-size:15px;padding:10px 16px;border-radius:12px;border:1px solid var(--accent);background:var(--accent);color:var(--on);text-decoration:none;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--accent)}
+.prompt{background:var(--bg);border:1px dashed var(--line);border-radius:12px;padding:12px;font-size:14px;white-space:pre-wrap;word-break:break-all;margin:6px 0 10px;color:var(--ink)}
+.ok{color:var(--accent);font-size:14px;margin-left:8px}
+.note{font-size:14px;color:var(--muted);border-top:1px solid var(--line);margin-top:26px;padding-top:16px}
+.note li{margin-bottom:6px}
+.note b{color:var(--ink)}
+a{color:var(--accent)}
+</style>
+</head>
+<body>
+<main>
+  <h1>開一間自己的圍桌聊天室</h1>
+  <p class="sub">找自己的朋友聊天，AI 夥伴「小禾」也在桌邊。</p>
+
+  <div class="hero">
+    <img src="preview.jpg" alt="圍桌聊天室示意畫面：幾位朋友在聊週末行程，小禾接話並邀請還沒說話的人">
+    <div>
+      <p>小禾平常不搶話。有人叫它的名字、按「請小禾說說」，或大家連聊幾則之後，它會用一兩句話接話，也會把還沒說話的人拉進來。</p>
+      <p>照下面三步做，你會得到一間<b>屬於你的</b>聊天室：誰能進來、小禾叫什麼名字、是什麼個性，都由你決定。</p>
+    </div>
+  </div>
+
+  <ol class="steps">
+    <li>
+      <h2>下載聊天室檔案</h2>
+      <p>一個 HTML 檔，存在手機或電腦裡就好。</p>
+      <a class="btn" href="round-table.html" download="round-table.html">下載 round-table.html</a>
+    </li>
+    <li>
+      <h2>交給你的 Claude 發布</h2>
+      <p>打開 Claude（網頁或 App），開一個新對話，附上剛剛下載的檔案，再貼上這段話送出：</p>
+      <div class="prompt" id="prompt">請把附上的 round-table.html 原封不動發布成一個新的 artifact（不要改寫內容），發布時宣告這組 runtime capabilities：{"db":{"rules":[{"path":"config","write":"admin"}]},"user":{"scopes":["profile"]},"sample":{}}。發布完告訴我怎麼邀請朋友成為參與者。</div>
+      <button class="btn ghost" id="copy" type="button">複製這段話</button><span class="ok" id="ok" hidden>已複製</span>
+    </li>
+    <li>
+      <h2>邀朋友進來</h2>
+      <p>發布好之後，在那個聊天室的分享設定裡，把朋友加成「參與者」，再把連結傳給他們。沒有被加成參與者的人只能看、不能發言。</p>
+      <p>想改小禾的名字、個性或多久插話一次，按聊天室右上角的「設定」。</p>
+    </li>
+  </ol>
+
+  <div class="note">
+    <ul>
+      <li><b>每個人都要有 Claude 帳號。</b>你和朋友都要登入 Claude 才能進聊天室。</li>
+      <li><b>小禾用的是叫它那個人的 Claude 用量。</b>誰叫小禾、誰按「請小禾說說」，就用誰的。</li>
+      <li><b>如果 Claude 說沒辦法發布這種頁面，</b>或發布後一直顯示「請在 Claude 裡打開這個聊天室」，代表你的帳號目前還沒開放這些功能，這不是檔案的問題。</li>
+      <li>聊天內容存在你自己的那間聊天室裡，作者看不到，也不經過其他地方。</li>
+    </ul>
+    <p>想先看看長什麼樣子：<a href="https://claude.ai/artifact/JCPjCXYxAuoFhTWfw9nJcP">原版圍桌聊天室</a>（要登入 Claude）・收錄於 <a href="https://p19691221-web.github.io/soft-shelf/">小軟體收藏館</a>・作者 Calvin Lin</p>
+  </div>
+</main>
+<script>
+document.getElementById("copy").onclick = async () => {
+  const t = document.getElementById("prompt").textContent;
+  try { await navigator.clipboard.writeText(t); }
+  catch (e) {
+    const r = document.createRange(); r.selectNodeContents(document.getElementById("prompt"));
+    const s = getSelection(); s.removeAllRanges(); s.addRange(r);
+    try { document.execCommand("copy"); } catch (e2) {}
+  }
+  const ok = document.getElementById("ok"); ok.hidden = false; setTimeout(() => ok.hidden = true, 2000);
+};
+</script>
+</body>
+</html>
