@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}[hidden]{display:none!important}html,body{margin:0}img{max-width:100%}</style>
+<title>AI城市配套規劃</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="現有城市的 AI 輔助配套規劃台：選行政區與配套措施，在預算內看各區交通、防災、照護、能源、熱島、數位可及、經濟的改善，並排出導入順序與治理檢核。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: 上方城市與預算列；左邊配套×行政區矩陣；右邊改善結果、導入順序、治理檢核。窄螢幕依序堆疊 */
+:root{
+  --bg:#eef0f2; --panel:#fbfcfc; --ink:#171c21; --muted:#5b6670; --line:#cfd6dc; --soft:#e2e7eb;
+  --accent:#1f5f8b; --accent-fg:#f1f7fb; --before:#a9b4bd; --after:#1f5f8b;
+  --good:#2f7d3a; --warn:#b26a00; --bad:#b3362c;
+  --sans:"Noto Sans TC",system-ui,-apple-system,"PingFang TC",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#101418; --panel:#171d22; --ink:#e2e9ee; --muted:#97a3ad; --line:#2a333b; --soft:#222a31;
+  --accent:#6fb3e0; --accent-fg:#0d1418; --before:#4a5560; --after:#6fb3e0; --good:#6cc278; --warn:#e9a640; --bad:#ec7a6f; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#101418; --panel:#171d22; --ink:#e2e9ee; --muted:#97a3ad; --line:#2a333b; --soft:#222a31;
+  --accent:#6fb3e0; --accent-fg:#0d1418; --before:#4a5560; --after:#6fb3e0; --good:#6cc278; --warn:#e9a640; --bad:#ec7a6f; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14px;line-height:1.55}
+button,input,select{font:inherit;color:inherit}
+.wrap{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:18px 28px;max-width:1380px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:10px 24px}
+h1{margin:0;font-weight:900;font-size:clamp(24px,3.4vw,36px);letter-spacing:.02em;text-wrap:balance}
+.lede{margin:2px 0 0;color:var(--muted);max-width:66ch}
+.btn{min-height:36px;padding:0 12px;border:1px solid var(--line);background:var(--panel);border-radius:8px;cursor:pointer;white-space:nowrap}
+.btn:hover{border-color:var(--accent)}
+.btn.pri{background:var(--accent);color:var(--accent-fg);border-color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px;min-width:0}
+.panel h2{margin:0 0 8px;font-size:13px;font-weight:700;letter-spacing:.08em;color:var(--muted)}
+.topbar{display:flex;flex-wrap:wrap;gap:12px 22px;align-items:center}
+.topbar label{display:flex;align-items:center;gap:8px}
+.topbar input[type=range]{width:min(260px,60vw)}
+.kpi{display:flex;flex-wrap:wrap;gap:8px 18px;margin-left:auto}
+.kpi div{display:flex;flex-direction:column}
+.kpi small{color:var(--muted);font-size:12px}
+.kpi b{font-family:var(--mono);font-size:20px;font-variant-numeric:tabular-nums}
+.over{color:var(--bad)}
+.main{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:14px;align-items:start}
+@media (max-width:980px){.main{grid-template-columns:minmax(0,1fr)}}
+.mx{overflow-x:auto}
+table.m{border-collapse:separate;border-spacing:0;width:100%;min-width:640px}
+table.m th,table.m td{padding:6px 6px;border-bottom:1px solid var(--line);vertical-align:middle}
+table.m thead th{font-size:12px;color:var(--muted);font-weight:500;text-align:center;line-height:1.3}
+table.m thead th:first-child{text-align:left}
+table.m td.name{min-width:190px}
+table.m td.name b{display:block;font-weight:500}
+table.m td.name small{display:block;font-size:11px;color:var(--muted);line-height:1.35}
+table.m td.c{text-align:center}
+.cell{width:30px;height:30px;border-radius:7px;border:1.5px solid var(--line);background:var(--panel);cursor:pointer;display:inline-grid;place-items:center;font-size:15px;font-weight:700}
+.cell[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+.cell.blocked{border-style:dashed}
+.cost{font-family:var(--mono);font-size:12px;color:var(--muted);text-align:right;white-space:nowrap}
+.tag{display:inline-block;font-size:10.5px;padding:0 6px;border-radius:999px;border:1px solid var(--line);color:var(--muted);margin-right:3px}
+.res{display:flex;flex-direction:column;gap:14px}
+.dsel{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px}
+.dsel button{border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:3px 10px;cursor:pointer;font-size:13px}
+.dsel button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.ind{display:grid;grid-template-columns:5.5em 1fr 4.6em;gap:4px 8px;align-items:center;font-size:13px}
+.ind .bars{position:relative;height:16px;background:var(--soft);border-radius:4px;overflow:hidden}
+.ind .bars i{position:absolute;left:0;top:0;bottom:0;border-radius:4px}
+.ind .bars i.b{background:var(--before)}
+.ind .bars i.a{background:var(--after);opacity:.85}
+.ind .v{font-family:var(--mono);font-size:12px;text-align:right;font-variant-numeric:tabular-nums}
+.ind .up{color:var(--good)}
+.legend{display:flex;gap:14px;font-size:12px;color:var(--muted);margin-top:6px}
+.legend span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px;background:var(--c)}
+.dprof{font-size:12px;color:var(--muted);margin:-4px 0 8px}
+.phases{display:flex;flex-direction:column;gap:10px}
+.phase h3{margin:0 0 4px;font-size:13px}
+.phase ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:2px}
+.phase li small{color:var(--muted)}
+.gov{display:flex;flex-direction:column;gap:8px}
+.gov details{border:1px solid var(--line);border-radius:8px;padding:6px 10px}
+.gov summary{cursor:pointer;font-weight:500}
+.gov dl{display:grid;grid-template-columns:5em 1fr;gap:2px 10px;margin:6px 0 2px;font-size:13px}
+.gov dt{color:var(--muted)}
+.warns{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px}
+.warns li{font-size:13px;padding:6px 8px 6px 10px;border-radius:6px;background:var(--soft);border-left:3px solid var(--warn)}
+.warns li.bad{border-left-color:var(--bad)} .warns li.good{border-left-color:var(--good)}
+.note{font-size:12px;color:var(--muted);margin:6px 0 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>AI城市配套規劃</h1>
+      <p class="lede">給已經存在的城市用：先看各行政區哪裡最弱，再挑 AI 輔助配套、決定先做哪幾區，在預算內看改善了多少、要照什麼順序導入、每一項要守住哪些治理底線。</p>
+    </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap">
+      <button class="btn pri" id="auto">在預算內自動建議</button>
+      <button class="btn" id="reset">全部取消</button>
+    </div>
+  </header>
+
+  <div class="panel topbar">
+    <label>城市 <select id="city"></select></label>
+    <label>預算 <input type="range" id="budget" min="10" max="120" step="5" value="45"><b id="budgetv" style="font-family:var(--mono)">45 億</b></label>
+    <div class="kpi">
+      <div><small>已用預算</small><b id="spent">0</b></div>
+      <div><small>全市綜合分數</small><b id="cityscore">0</b></div>
+      <div><small>受惠人口</small><b id="benef">0</b></div>
+    </div>
+  </div>
+
+  <div class="main">
+    <section class="panel" aria-labelledby="h-mx">
+      <h2 id="h-mx">配套 × 行政區（點格子決定在哪一區導入）</h2>
+      <div class="mx"><table class="m" id="mx"></table></div>
+      <p class="note">虛線格代表前置條件還沒做到，可以先選，導入順序會把前置項目排在前面。費用為每區的示意估算。</p>
+    </section>
+
+    <section class="res">
+      <div class="panel">
+        <h2>改善結果</h2>
+        <div class="dsel" id="dsel" role="group" aria-label="選擇行政區"></div>
+        <p class="dprof" id="dprof"></p>
+        <div class="ind" id="ind"></div>
+        <div class="legend"><span style="--c:var(--before)">導入前</span><span style="--c:var(--after)">導入後</span></div>
+      </div>
+      <div class="panel">
+        <h2>提醒</h2>
+        <ul class="warns" id="warns"></ul>
+      </div>
+      <div class="panel">
+        <h2>導入順序</h2>
+        <div class="phases" id="phases"></div>
+      </div>
+      <div class="panel">
+        <h2>治理檢核</h2>
+        <div class="gov" id="gov"></div>
+        <p class="note">每一項 AI 配套上線前，都要能回答：用了誰的資料、誰負責、出錯時誰能接手。</p>
+      </div>
+    </section>
+  </div>
+  <p class="note">城市與行政區是虛構的示範資料，所有分數、費用、效果都是示意參數，用來比較方案優先順序，不是實際評估。要用在真實城市，請換成當地的統計資料與工程估價。</p>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const IND = ["交通", "防災", "照護", "能源", "空氣熱島", "數位可及", "經濟"];
+const CITIES = {
+  port: {name: "示範港都（虛構）", d: [
+    {id:"old",  name:"舊市區",     pop:18, aged:24, s:[35,50,55,50,30,50,55], note:"人口密、老屋多、路口塞"},
+    {id:"harbor",name:"港區工業區", pop:6,  aged:15, s:[45,40,45,40,25,60,70], note:"貨車多、空污、低窪易淹"},
+    {id:"new",  name:"新興住宅區", pop:22, aged:12, s:[40,65,60,60,55,80,60], note:"通勤長、年輕家庭多"},
+    {id:"hill", name:"山邊社區",   pop:3,  aged:32, s:[30,35,25,45,70,35,35], note:"公車少、坡地災害、高齡"},
+    {id:"river",name:"河岸低窪區", pop:8,  aged:20, s:[50,25,50,50,50,55,45], note:"每逢豪雨就淹"},
+  ]},
+  hill: {name: "示範山城（虛構）", d: [
+    {id:"core", name:"市中心",   pop:9, aged:22, s:[45,55,60,55,50,60,55], note:"觀光人潮、停車難"},
+    {id:"tea",  name:"茶園聚落", pop:2, aged:38, s:[25,30,20,40,80,30,30], note:"高齡、就醫遠"},
+    {id:"univ", name:"大學城",   pop:5, aged:8,  s:[50,60,55,55,65,85,50], note:"學生多、晚上冷清"},
+    {id:"valley",name:"溪谷社區", pop:3, aged:28, s:[35,25,40,35,70,40,35], note:"颱風斷路、停電"},
+  ]},
+};
+/* 配套：每區費用（億元）、效果（以「離 100 分的缺口」放大）、前置、治理 */
+const M = [
+  {id:"sense", name:"路側感測網／5G", cost:1.2, eff:{"數位可及":8}, tag:"基礎", gov:["路口影像、車流","交通局＋資訊局","感測失效時回到既有定時號誌"], risk:"影像要去識別化"},
+  {id:"signal",name:"AI 智慧號誌",   cost:1.6, eff:{"交通":16,"空氣熱島":4}, pre:"sense", gov:["路口車流","交通局","一鍵切回定時號誌，現場員警可接手"], risk:"演算法偏好主幹道，巷弄等更久"},
+  {id:"flood", name:"淹水預警＋抽水站 AI 調度", cost:1.0, eff:{"防災":22}, pre:"sense", boost:{"river":1.6,"harbor":1.3,"valley":1.4}, gov:["雨量、水位、抽水站","水利局","預警只建議，開關抽水由值班人員確認"], risk:"誤報太多會讓人不理警報"},
+  {id:"shuttle",name:"自駕接駁最後一哩", cost:2.4, eff:{"交通":12,"照護":8,"經濟":3}, pre:"sense", boost:{"hill":1.6,"tea":1.6,"valley":1.3}, gov:["行車紀錄、乘客上下車點","交通局＋營運商","遠端監控員可接管，故障停靠點要有人"], risk:"司機轉型、偏鄉訊號不穩"},
+  {id:"care",  name:"AI 長照陪伴＋遠距醫療", cost:1.4, eff:{"照護":20,"數位可及":5}, ageW:true, gov:["健康量測、通話紀錄","衛生局＋醫療院所","異常只通知照服員或醫師，不由 AI 下診斷"], risk:"健康資料外洩、長輩不願被監看"},
+  {id:"solar", name:"屋頂太陽能＋社區微電網", cost:2.0, eff:{"能源":20,"空氣熱島":5}, gov:["社區用電量","經發局＋台電","孤島運轉時手動切換"], risk:"屋頂結構、老屋產權複雜"},
+  {id:"dr",    name:"需求反應與儲能 AI 調度", cost:1.2, eff:{"能源":12}, gov:["電表資料","經發局＋台電","住戶可隨時退出、手動覆寫"], risk:"住戶覺得被限電"},
+  {id:"edge",  name:"邊緣資料中心＋廢熱供熱", cost:3.0, eff:{"經濟":12,"數位可及":6,"能源":-10}, needs:"solar", gov:["機房用電、廢熱量","經發局","用電超標時自動降載"], risk:"搶電、噪音、居民反對"},
+  {id:"green", name:"熱島感測＋綠帶灑水 AI 排程", cost:0.6, eff:{"空氣熱島":16}, gov:["溫度、空品","環保局＋公園處","排程可由現場人員停用"], risk:"效果不明顯時易被砍預算"},
+  {id:"factory",name:"工業區 AI 節能與排放監測", cost:1.5, eff:{"空氣熱島":18,"經濟":5,"能源":6}, only:["harbor"], gov:["工廠用電、排放","環保局","超標先通知廠商，裁罰由人審核"], risk:"廠商不願分享資料"},
+  {id:"desk",  name:"AI 市民服務窗口", cost:0.4, eff:{"數位可及":10,"經濟":3}, gov:["市民提問紀錄","研考會","答不出或涉及權益時轉真人"], risk:"答錯政策細節"},
+  {id:"class", name:"數位落差陪跑課程", cost:0.3, eff:{"數位可及":14,"照護":3}, ageW:true, gov:["上課出席","社會局＋里辦公處","由志工與老師帶，不是只發平板"], risk:"課程結束後沒人陪就不用了"},
+];
+const KEY = "ai-retrofit-v1";
+let cityId = "port", sel = {}, focus = null;
+
+const city = () => CITIES[cityId];
+const on = (m, d) => !!(sel[m] && sel[m][d]);
+const allowed = (m, d) => !m.only || m.only.includes(d.id);
+function costOf(m, d) { return +(m.cost * (0.6 + d.pop / 20)).toFixed(1); }  /* 人口越多，建置費越高 */
+function after(d) {
+  const s = d.s.slice();
+  M.forEach(m => {
+    if (!on(m.id, d.id)) return;
+    let k = (m.boost && m.boost[d.id]) || 1;
+    if (m.ageW) k *= 0.6 + d.aged / 25;
+    if (m.pre && !on(m.pre, d.id)) k *= 0.5;           /* 前置沒做：效果打對折 */
+    for (const [n, v] of Object.entries(m.eff)) {
+      const i = IND.indexOf(n);
+      let dv = v * k;
+      if (m.id === "edge" && n === "能源" && on("solar", d.id)) dv = 4;  /* 有微電網撐住，反而提升 */
+      if (dv > 0) dv *= (100 - s[i]) / 60;             /* 越弱的地方，改善越明顯 */
+      s[i] = Math.max(0, Math.min(100, s[i] + dv));
+    }
+  });
+  return s;
+}
+const avg = a => a.reduce((x, y) => x + y, 0) / a.length;
+function cityScore(useAfter) { const ds = city().d, tp = ds.reduce((a, d) => a + d.pop, 0); return ds.reduce((a, d) => a + avg(useAfter ? after(d) : d.s) * d.pop, 0) / tp; }
+function spent() { let t = 0; M.forEach(m => city().d.forEach(d => { if (on(m.id, d.id)) t += costOf(m, d); })); return t; }
+
+/* ---------- 矩陣 ---------- */
+function buildMatrix() {
+  const ds = city().d;
+  let h = `<thead><tr><th>配套</th>${ds.map(d => `<th>${d.name}<br><small>${d.pop} 萬人</small></th>`).join("")}<th>每區約</th></tr></thead><tbody>`;
+  M.forEach(m => {
+    const tags = [m.pre ? `<span class="tag">需先有${M.find(x => x.id === m.pre).name.replace(/／.*/, "")}</span>` : "", m.needs ? `<span class="tag">建議搭配微電網</span>` : "", m.ageW ? `<span class="tag">高齡區效果大</span>` : ""].join("");
+    h += `<tr><td class="name"><b>${m.name}</b><small>${tags}${m.risk}</small></td>`;
+    ds.forEach(d => {
+      if (!allowed(m, d)) { h += `<td class="c"><span style="color:var(--muted)">–</span></td>`; return; }
+      const blocked = m.pre && !on(m.pre, d.id);
+      h += `<td class="c"><button class="cell${blocked ? " blocked" : ""}" data-m="${m.id}" data-d="${d.id}" aria-pressed="${on(m.id, d.id)}" aria-label="${d.name}導入${m.name}">${on(m.id, d.id) ? "✓" : ""}</button></td>`;
+    });
+    const cs = ds.filter(d => allowed(m, d)).map(d => costOf(m, d));
+    h += `<td class="cost">${Math.min(...cs).toFixed(1)}–${Math.max(...cs).toFixed(1)} 億</td></tr>`;
+  });
+  $("#mx").innerHTML = h + "</tbody>";
+  $("#mx").querySelectorAll(".cell").forEach(b => b.onclick = () => {
+    const m = b.dataset.m, d = b.dataset.d; sel[m] = sel[m] || {}; sel[m][d] = !sel[m][d]; focus = d; render();
+  });
+}
+
+/* ---------- 結果 ---------- */
+function render() {
+  buildMatrix();
+  const ds = city().d; if (!ds.find(d => d.id === focus)) focus = ds[0].id;
+  const budget = +$("#budget").value, sp = spent();
+  $("#budgetv").textContent = budget + " 億";
+  $("#spent").textContent = `${sp.toFixed(1)} 億`; $("#spent").className = sp > budget ? "over" : "";
+  const b0 = cityScore(false), b1 = cityScore(true);
+  $("#cityscore").innerHTML = `${b0.toFixed(0)} → ${b1.toFixed(0)}`;
+  $("#benef").textContent = ds.filter(d => M.some(m => on(m.id, d.id))).reduce((a, d) => a + d.pop, 0) + " 萬";
+  $("#dsel").innerHTML = ds.map(d => `<button data-d="${d.id}" aria-pressed="${d.id === focus}">${d.name}</button>`).join("");
+  $("#dsel").querySelectorAll("button").forEach(b => b.onclick = () => { focus = b.dataset.d; render(); });
+  const d = ds.find(x => x.id === focus), a = after(d);
+  $("#dprof").textContent = `${d.pop} 萬人・65 歲以上 ${d.aged}%・${d.note}`;
+  $("#ind").innerHTML = IND.map((n, i) => {
+    const up = a[i] - d.s[i];
+    return `<span>${n}</span><div class="bars"><i class="a" style="width:${a[i]}%"></i><i class="b" style="width:${d.s[i]}%"></i></div><span class="v">${Math.round(a[i])}${up >= 1 ? ` <span class="up">+${Math.round(up)}</span>` : up <= -1 ? ` <span class="over">${Math.round(up)}</span>` : ""}</span>`;
+  }).join("");
+  warn(budget, sp); phases(); gov();
+  try { localStorage.setItem(KEY, JSON.stringify({cityId, sel})); } catch {}
+}
+function warn(budget, sp) {
+  const out = [], ds = city().d;
+  if (!M.some(m => ds.some(d => on(m.id, d.id)))) out.push(["", "還沒選任何配套。先按「在預算內自動建議」看看，或在左邊矩陣點格子。"]);
+  if (sp > budget) out.push(["bad", `超出預算 ${(sp - budget).toFixed(1)} 億。拿掉效果較小的區，或把預算調高。`]);
+  M.forEach(m => ds.forEach(d => { if (on(m.id, d.id) && m.pre && !on(m.pre, d.id)) out.push(["", `${d.name}選了「${m.name}」，但還沒有「${M.find(x => x.id === m.pre).name}」，效果只有一半。`]); }));
+  ds.forEach(d => { if (on("edge", d.id) && !on("solar", d.id)) out.push(["bad", `${d.name}的邊緣資料中心沒有微電網撐，地方能源分數會下降。`]); });
+  ds.forEach(d => { const a = after(d); IND.forEach((n, i) => { if (a[i] < 35) out.push(["", `${d.name}的${n}只有 ${Math.round(a[i])} 分，是全市最該補的地方之一。`]); }); });
+  if (!out.length) out.push(["good", "沒有明顯缺口。可以試著把預算調低，看哪些配套最先被犧牲。"]);
+  $("#warns").innerHTML = out.slice(0, 7).map(([c, t]) => `<li class="${c}">${t}</li>`).join("");
+}
+function chosen() { return M.filter(m => city().d.some(d => on(m.id, d.id))); }
+function phases() {
+  const ms = chosen(); if (!ms.length) { $("#phases").innerHTML = `<p class="note" style="margin:0">選了配套之後，這裡會排出三階段的導入順序。</p>`; return; }
+  const P = [[], [], []];
+  ms.forEach(m => {
+    const where = city().d.filter(d => on(m.id, d.id)).map(d => d.name).join("、");
+    const p = (!m.pre && (m.cost <= 1.2 || m.id === "sense")) ? 0 : (m.cost >= 2.4 || m.needs) ? 2 : 1;
+    P[p].push(`<li>${m.name} <small>（${where}）</small></li>`);
+  });
+  const T = ["第一階段・0–1 年：基礎建設與便宜好做的", "第二階段・1–3 年：依賴前置的服務", "第三階段・3 年以上：大型建設"];
+  $("#phases").innerHTML = P.map((l, i) => l.length ? `<div class="phase"><h3>${T[i]}</h3><ol>${l.join("")}</ol></div>` : "").join("");
+}
+function gov() {
+  const ms = chosen();
+  $("#gov").innerHTML = ms.length ? ms.map(m => `<details><summary>${m.name}</summary><dl><dt>用到的資料</dt><dd>${m.gov[0]}</dd><dt>負責單位</dt><dd>${m.gov[1]}</dd><dt>人工接手</dt><dd>${m.gov[2]}</dd><dt>主要風險</dt><dd>${m.risk}</dd></dl></details>`).join("") : `<p class="note" style="margin:0">選了配套之後，這裡會列出每一項的資料來源、負責單位和人工接手方式。</p>`;
+}
+
+/* ---------- 自動建議：依「每億元換到的人口加權改善」貪婪挑選，前置優先 ---------- */
+function auto() {
+  sel = {}; const budget = +$("#budget").value, ds = city().d;
+  const gain = (m, d) => { const b = avg(after(d)); sel[m.id] = sel[m.id] || {}; sel[m.id][d.id] = true; const g = (avg(after(d)) - b) * d.pop; sel[m.id][d.id] = false; return g; };
+  for (let guard = 0; guard < 80; guard++) {
+    let best = null;
+    M.forEach(m => ds.forEach(d => {
+      if (!allowed(m, d) || on(m.id, d.id)) return;
+      const c = costOf(m, d); if (spent() + c > budget) return;
+      let g = gain(m, d);
+      if (m.pre && !on(m.pre, d.id)) return;            /* 前置沒做就先不挑 */
+      if (m.id === "sense") g += 0.4 * d.pop * 3;        /* 感測網會讓後續配套加倍，給一點加分 */
+      if (m.needs && !on(m.needs, d.id)) return;
+      const r = g / c; if (g > 0 && (!best || r > best.r)) best = {m, d, r};
+    }));
+    if (!best) break;
+    sel[best.m.id] = sel[best.m.id] || {}; sel[best.m.id][best.d.id] = true;
+  }
+  render();
+}
+
+/* ---------- 控制 ---------- */
+$("#city").innerHTML = Object.entries(CITIES).map(([k, c]) => `<option value="${k}">${c.name}</option>`).join("");
+$("#city").onchange = e => { cityId = e.target.value; sel = {}; focus = null; render(); };
+$("#budget").oninput = render;
+$("#auto").onclick = auto;
+let arm = null;
+$("#reset").onclick = () => { const b = $("#reset"); if (!arm) { b.textContent = "再按一次確定"; arm = setTimeout(() => { arm = null; b.textContent = "全部取消"; }, 3000); return; } clearTimeout(arm); arm = null; b.textContent = "全部取消"; sel = {}; render(); };
+try { const s = JSON.parse(localStorage.getItem(KEY) || "null"); if (s && CITIES[s.cityId]) { cityId = s.cityId; sel = s.sel || {}; } } catch {}
+$("#city").value = cityId;
+if (!chosen().length) auto(); else render();
+</script>
+</body>
+</html>
