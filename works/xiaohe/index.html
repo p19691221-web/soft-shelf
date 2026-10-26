@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="用聲音跟 AI 夥伴小禾聊天。按一下說話，小禾用聲音回你；一個人或一群人圍著同一支手機輪流說都可以。">
+<meta property="og:title" content="小禾陪你聊">
+<meta property="og:description" content="按一下說話，小禾用聲音回你。不用登入。">
+<meta name="theme-color" content="#262c5a">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Ccircle cx=%2232%22 cy=%2232%22 r=%2230%22 fill=%22%23e39b2d%22/%3E%3Ctext x=%2232%22 y=%2244%22 font-size=%2234%22 text-anchor=%22middle%22 fill=%22%235a3a06%22%3E%E7%A6%BE%3C/text%3E%3C/svg%3E">
+<title>小禾陪你聊</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Huninn&family=Noto+Sans+TC:wght@400;500;700&display=swap">
+<style>
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+[hidden]{display:none!important}
+html,body{margin:0}
+/* Layout: 一個畫面的「通話」介面——上方是小禾和狀態，中間是像字幕一樣的對話，下方是說話的輸入列 */
+:root{
+  --bg:#eef0f6; --panel:#ffffff; --ink:#1d2140; --muted:#5f6488; --line:#d6d9e8;
+  --night:#262c5a; --on-night:#f4f1ff; --amber:#e39b2d; --amber-ink:#5a3a06; --you:#dfe3f4;
+  --round:"Huninn","Noto Sans TC",system-ui,"PingFang TC",sans-serif;
+  --sans:"Noto Sans TC",system-ui,-apple-system,"PingFang TC",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#12142a; --panel:#1b1e3a; --ink:#e9e8fb; --muted:#a3a6c8; --line:#2d3160;
+  --night:#2b3170; --on-night:#f4f1ff; --amber:#f2b04a; --amber-ink:#2a1a02; --you:#262a52; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#12142a; --panel:#1b1e3a; --ink:#e9e8fb; --muted:#a3a6c8; --line:#2d3160;
+  --night:#2b3170; --on-night:#f4f1ff; --amber:#f2b04a; --amber-ink:#2a1a02; --you:#262a52; color-scheme:dark}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.6}
+.app{height:100%;max-width:560px;margin:0 auto;display:flex;flex-direction:column;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:14px 10px}
+
+/* 上方：小禾 */
+.who{display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:22px;background:var(--night);color:var(--on-night)}
+.orb{flex:none;width:58px;height:58px;border-radius:50%;display:grid;place-items:center;font-family:var(--round);font-size:28px;
+  background:var(--amber);color:var(--amber-ink);position:relative}
+.orb::after{content:"";position:absolute;inset:-6px;border-radius:50%;border:2px solid var(--amber);opacity:0}
+.speaking .orb::after{animation:ring 1.2s ease-out infinite}
+.thinking .orb{animation:breathe 1.4s ease-in-out infinite}
+@keyframes ring{0%{opacity:.9;transform:scale(.92)}100%{opacity:0;transform:scale(1.25)}}
+@keyframes breathe{50%{opacity:.55}}
+@media (prefers-reduced-motion:reduce){.speaking .orb::after,.thinking .orb{animation:none}.speaking .orb::after{opacity:.8}}
+.who h1{margin:0;font-family:var(--round);font-weight:400;font-size:22px;letter-spacing:1px;line-height:1.2}
+.who .st{font-size:13px;opacity:.85;margin-top:2px;min-height:20px}
+.who .tools{margin-left:auto;display:flex;gap:6px}
+.icon{white-space:nowrap;font:inherit;font-size:13px;border:1px solid color-mix(in srgb,var(--on-night) 35%,transparent);background:transparent;color:var(--on-night);border-radius:999px;padding:6px 11px;cursor:pointer}
+.icon[aria-pressed="false"]{opacity:.6;text-decoration:line-through}
+
+/* 中間：對話 */
+.talk{flex:1;min-height:0;overflow-y:auto;padding:16px 2px;display:flex;flex-direction:column;gap:12px}
+.line{max-width:88%;padding:10px 14px;border-radius:18px;white-space:pre-wrap;word-break:break-word}
+.line.ai{align-self:flex-start;background:var(--panel);border:1px solid var(--line);font-family:var(--round);font-size:19px;line-height:1.65;border-bottom-left-radius:6px}
+.line.me{align-self:flex-end;background:var(--you);font-size:15px;border-bottom-right-radius:6px}
+.line.sample{opacity:.75}
+.tag{font-size:11px;color:var(--muted);letter-spacing:1px;margin:0 6px -8px}
+.tag.me{align-self:flex-end}
+.again{align-self:flex-start;font:inherit;font-size:13px;color:var(--muted);background:none;border:none;padding:0 6px;cursor:pointer;text-decoration:underline}
+.note{font-size:13px;color:var(--muted);text-align:center}
+.notts{font-size:14px;line-height:1.6;padding:10px 14px;border-radius:14px;background:color-mix(in srgb,var(--amber) 18%,var(--panel));border:1px solid var(--amber);color:var(--ink)}
+.notts b{display:block}
+
+/* 開始前 */
+.start{display:flex;flex-direction:column;gap:12px;align-items:center;text-align:center;padding:4px 4px 8px}
+.start p{margin:0;color:var(--muted);font-size:14px;max-width:34em}
+.big{font:inherit;font-family:var(--round);font-size:20px;border:none;border-radius:999px;padding:14px 34px;background:var(--amber);color:var(--amber-ink);cursor:pointer}
+
+/* 下方：說話 */
+.say{border-top:1px solid var(--line);padding-top:10px;padding-bottom:env(safe-area-inset-bottom,0px)}
+.hint{font-size:13px;color:var(--muted);margin:0 2px 8px;display:flex;align-items:center;gap:6px}
+.mic{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--amber);color:var(--amber-ink);flex:none}
+.mic svg{width:12px;height:12px}
+.row{display:flex;gap:8px;align-items:flex-end}
+textarea{flex:1;min-width:0;font:inherit;font-size:17px;border:1px solid var(--line);border-radius:16px;background:var(--panel);color:var(--ink);padding:11px 14px;resize:none;min-height:48px;max-height:140px}
+textarea:focus-visible,button:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+.send{font:inherit;font-size:16px;border:none;border-radius:16px;padding:12px 18px;background:var(--night);color:var(--on-night);cursor:pointer}
+.send:disabled{opacity:.5}
+.opts{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;margin-top:8px;font-size:13px;color:var(--muted)}
+.opts label{display:flex;align-items:center;gap:6px}
+.opts select{font:inherit;font-size:13px;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:8px;padding:3px 6px;max-width:170px}
+.opts button{font:inherit;font-size:13px;background:none;border:none;color:var(--muted);text-decoration:underline;cursor:pointer;padding:0;margin-left:auto}
+.who-row{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:0 0 8px}
+.who-row .lbl{font-size:12px;color:var(--muted);margin-right:2px}
+.chip{font:inherit;font-size:14px;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:999px;padding:5px 12px;cursor:pointer;display:inline-flex;gap:6px;align-items:center}
+.chip[aria-pressed="true"]{background:var(--night);border-color:var(--night);color:var(--on-night)}
+.chip .x{font-size:12px;opacity:.7}
+.chip.add{border-style:dashed;color:var(--muted)}
+.add-form{display:flex;gap:6px;margin:0 0 8px}
+.add-form input{flex:1;min-width:0;font:inherit;font-size:15px;border:1px solid var(--line);border-radius:10px;background:var(--panel);color:var(--ink);padding:6px 10px}
+.add-form button{font:inherit;font-size:14px;border:none;border-radius:10px;background:var(--night);color:var(--on-night);padding:6px 12px;cursor:pointer}
+.bar{width:100%;height:3px;border-radius:3px;background:var(--line);overflow:hidden;margin:-6px 0 6px;visibility:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--amber)}
+.bar.on{visibility:visible}
+
+.talkbtn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;font:inherit;font-family:var(--round);font-size:20px;border:none;border-radius:999px;padding:14px;margin:0 0 10px;background:var(--amber);color:var(--amber-ink);cursor:pointer}
+.talkbtn svg{width:22px;height:22px}
+.talkbtn.listening{background:var(--night);color:var(--on-night);animation:breathe 1.4s ease-in-out infinite}
+.heard{font-size:15px;color:var(--muted);min-height:22px;margin:-4px 2px 8px;text-align:center}
+</style>
+</head>
+<body>
+
+<div class="app" id="app">
+  <header class="who" id="who">
+    <div class="orb" aria-hidden="true">禾</div>
+    <div>
+      <h1>小禾</h1>
+      <div class="st" id="st">按「開始聊天」，小禾會用聲音回你</div>
+    </div>
+    <div class="tools">
+      <button class="icon" id="voice-btn" type="button" aria-pressed="true" title="小禾說話的聲音">聲音</button>
+    </div>
+  </header>
+
+  <main class="talk" id="talk" aria-live="polite">
+    <div class="tag">小禾（範例）</div>
+    <div class="line ai sample">嗨，我是小禾。想聊什麼都可以，今天過得怎麼樣？</div>
+    <div class="tag me">你（範例）</div>
+    <div class="line me sample">還不錯，只是下午開會開好久，有點累。</div>
+    <div class="tag">小禾（範例）</div>
+    <div class="line ai sample">開那麼久真的會累。晚上有沒有想做點什麼讓自己放鬆一下？</div>
+    <div class="start" id="start">
+      <button class="big" id="go" type="button">開始聊天</button>
+      <p>一個人聊，或一群人圍著同一支手機輪流說都可以。按「說話」講完，小禾就用聲音回你，不用登入。<br>第一次會問能不能用麥克風，請按允許。請用 Chrome 或 Safari 打開，LINE、臉書裡面可能用不了麥克風。</p>
+    </div>
+  </main>
+
+  <footer class="say" id="say" hidden>
+    <div class="bar" id="bar"><i id="bar-i"></i></div>
+    <div class="who-row" id="who-row"></div>
+    <form class="add-form" id="add-form" hidden><input id="add-name" maxlength="8" placeholder="名字，例如 阿明" autocomplete="off"><button type="submit">加入</button></form>
+    <button class="talkbtn" id="talk-btn" type="button" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8.5" y="2" width="7" height="13" rx="3.5" fill="currentColor"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg><span id="talk-t">按一下說話</span></button>
+    <div class="heard" id="heard" hidden></div>
+    <p class="hint"><span class="mic" aria-hidden="true"><svg viewBox="0 0 12 12"><rect x="4" y="1" width="4" height="7" rx="2" fill="currentColor"/><path d="M2.5 6a3.5 3.5 0 0 0 7 0M6 9.5V11" stroke="currentColor" stroke-width="1.2" fill="none"/></svg></span><span id="hint-t">點下面的框，再按鍵盤上的麥克風說話</span></p>
+    <div class="row">
+      <textarea id="box" rows="1" placeholder="說話或打字…" aria-label="想對小禾說的話"></textarea>
+      <button class="send" id="send" type="button">送出</button>
+    </div>
+    <div class="opts">
+      <label id="loop-l" hidden><input type="checkbox" id="loop" checked> 小禾說完自動換我說</label>
+      <label><input type="checkbox" id="auto" checked> 打字停 2 秒自動送出</label>
+      <label>語速 <select id="rate"><option value="0.85">慢</option><option value="1" selected>一般</option><option value="1.15">快</option></select></label>
+      <label>聲音 <select id="voice"></select></label>
+      <button type="button" id="clear">重新開始</button>
+    </div>
+  </footer>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const store = {
+  get(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } },
+  set(k, v){ try{ localStorage.setItem(k, v); }catch(e){} },
+  del(k){ try{ localStorage.removeItem(k); }catch(e){} }
+};
+
+// 小禾的說話規則放在伺服器（Supabase Edge Function），網頁只送對話過去
+const CFG = window.XH_CONFIG || {
+  FN_URL: "https://mfxxtiyivtcuhohtpqgs.supabase.co/functions/v1/xiaohe",
+  KEY: "sb_publishable_tymrFI7PiAIxB7R2mRUjFw_jnmuQ0-f"
+};
+let ready = false, turns = [], busy = false, ctl = null, voices = [], speakOn = true;
+let idleTimer = null, barTimer = null, lastAI = "";
+let people = [], speaker = 0, editing = false;
+try{ people = JSON.parse(store.get("hv_people") || "[]").filter(x => typeof x === "string" && x.trim()).slice(0, 8); }catch(e){ people = []; }
+function savePeople(){ store.set("hv_people", JSON.stringify(people)); }
+function renderPeople(){
+  const row = $("who-row"); row.innerHTML = "";
+  const l = document.createElement("span"); l.className = "lbl"; l.textContent = people.length ? "誰在說：" : "一群人一起聊？"; row.append(l);
+  people.forEach((n, i) => {
+    const b = document.createElement("button"); b.type = "button"; b.className = "chip";
+    b.setAttribute("aria-pressed", String(i === speaker && !editing));
+    b.textContent = n;
+    if (editing){ const x = document.createElement("span"); x.className = "x"; x.textContent = "✕"; b.append(x); b.setAttribute("aria-label", "移除 " + n); }
+    b.onclick = () => {
+      if (editing){ people.splice(i, 1); if (speaker >= people.length) speaker = 0; savePeople(); renderPeople(); return; }
+      speaker = i; renderPeople(); $("box").focus();
+    };
+    row.append(b);
+  });
+  if (!editing && people.length < 8){
+    const a = document.createElement("button"); a.type = "button"; a.className = "chip add"; a.textContent = people.length ? "＋ 加人" : "＋ 加上大家的名字";
+    a.onclick = () => { $("add-form").hidden = false; $("add-name").focus(); }; row.append(a);
+  }
+  if (people.length){
+    const e = document.createElement("button"); e.type = "button"; e.className = "chip add"; e.textContent = editing ? "完成" : "移除";
+    e.onclick = () => { editing = !editing; renderPeople(); }; row.append(e);
+  }
+  $("hint-t").textContent = people.length >= 2 ? `先點自己的名字，再${REC ? "按上面的按鈕" : "按鍵盤上的麥克風"}說話（現在是 ${people[speaker]}）` : (REC ? "也可以點下面的框打字，或用鍵盤的麥克風" : "點下面的框，再按鍵盤上的麥克風說話");
+}
+$("add-form").onsubmit = e => {
+  e.preventDefault();
+  const n = $("add-name").value.trim().replace(/[【】]/g, "").slice(0, 8);
+  if (n && !people.includes(n) && people.length < 8){ people.push(n); speaker = people.length - 1; savePeople(); }
+  $("add-name").value = ""; $("add-form").hidden = true; renderPeople(); $("box").focus();
+};
+
+/* ---------- 聲音（念出來） ---------- */
+const tts = window.speechSynthesis || null;
+function loadVoices(){
+  if (!tts) return;
+  const all = tts.getVoices();
+  const zh = all.filter(v => /^zh|^cmn|^yue/i.test(v.lang));
+  voices = zh.length ? zh : all;
+  const pick = store.get("hv_voice");
+  const sel = $("voice"); sel.innerHTML = "";
+  const rank = v => /TW|Hant/i.test(v.lang) ? 0 : /^zh/i.test(v.lang) ? 1 : 2;
+  voices.sort((a, b) => rank(a) - rank(b)).forEach((v, i) => {
+    const o = document.createElement("option"); o.value = String(i);
+    o.textContent = v.name.replace(/Microsoft |Google |\(.*?\)/g, "").trim() + "・" + v.lang;
+    if (v.name === pick) o.selected = true; sel.append(o);
+  });
+  sel.disabled = !voices.length;
+}
+if (tts){ loadVoices(); tts.onvoiceschanged = loadVoices; }
+$("voice").onchange = () => { const v = voices[+$("voice").value]; if (v) store.set("hv_voice", v.name); speak("這是我現在的聲音。", true); };
+$("rate").value = store.get("hv_rate") || "1";
+$("rate").onchange = () => store.set("hv_rate", $("rate").value);
+
+let queue = 0;
+function speak(text, now){
+  if (!tts || !speakOn || !text.trim()) return;
+  if (now) tts.cancel();
+  const u = new SpeechSynthesisUtterance(text.replace(/[*#_`~>]/g, ""));
+  const v = voices[+$("voice").value]; if (v){ u.voice = v; u.lang = v.lang; } else u.lang = "zh-TW";
+  u.rate = +$("rate").value || 1;
+  queue++; setState();
+  u.onend = u.onerror = () => { queue = Math.max(0, queue - 1); setState(); if (!queue && wantListen){ wantListen = false; setTimeout(listen, 250); } };
+  tts.speak(u);
+}
+function hush(){ wantListen = false; if (tts) tts.cancel(); queue = 0; setState(); }
+$("voice-btn").onclick = () => {
+  speakOn = !speakOn; $("voice-btn").setAttribute("aria-pressed", String(speakOn));
+  $("voice-btn").textContent = speakOn ? "聲音" : "靜音"; if (!speakOn) hush();
+};
+
+/* ---------- 狀態 ---------- */
+function setState(){
+  const who = $("who");
+  who.classList.toggle("thinking", busy && queue === 0);
+  who.classList.toggle("speaking", queue > 0);
+  $("st").textContent = queue > 0 ? "小禾在說話…（點一下頭像可以打斷）" : busy ? "小禾在想…" : listening ? "在聽你說…" : ready ? (tts ? "換你說" : "換你說（這個瀏覽器不能念出聲音）") : $("st").textContent;
+}
+document.querySelector(".orb").onclick = () => { hush(); if (ctl) ctl.abort(); };
+
+/* ---------- 對話 ---------- */
+function addLine(who, text, name){
+  const talk = $("talk");
+  if (who === "me"){ const m = text.match(/^【(.{1,8}?)】/); if (m){ name = m[1]; text = text.slice(m[0].length); } }
+  const tag = document.createElement("div"); tag.className = "tag" + (who === "me" ? " me" : ""); tag.textContent = who === "me" ? (name || "你") : "小禾";
+  const d = document.createElement("div"); d.className = "line " + who; d.textContent = text;
+  talk.append(tag, d); talk.scrollTop = talk.scrollHeight; return d;
+}
+function save(){ store.set("hv_turns", JSON.stringify(turns.slice(-30))); }
+
+async function send(){
+  clearTimeout(idleTimer); stopBar();
+  const t = $("box").value.trim();
+  if (!t || busy || !ready) return;
+  $("box").value = ""; grow();
+  hush(); stopListen();
+  const msg = people.length >= 2 ? `【${people[speaker]}】${t}` : t;
+  addLine("me", msg);
+  turns.push({ role: "user", content: msg });
+  busy = true; $("send").disabled = true; setState();
+  const bubble = addLine("ai", "…");
+  ctl = new AbortController();
+  try{
+    const r = await fetch(CFG.FN_URL, {
+      method: "POST", signal: ctl.signal,
+      headers: Object.assign({ apikey: CFG.KEY, "Content-Type": "application/json" }, /^eyJ/.test(CFG.KEY) ? { Authorization: "Bearer " + CFG.KEY } : {}),
+      body: JSON.stringify({ turns: turns.slice(-20), people: people.length >= 2 ? people : [] })
+    });
+    const j = await r.json().catch(() => null);
+    if (!r.ok || !j || !j.text) throw { code: r.status, message: j && j.message };
+    bubble.textContent = j.text; lastAI = j.text;
+    turns.push({ role: "assistant", content: j.text }); save();
+    wantListen = $("loop").checked && !!REC;
+    j.text.split(/(?<=[。！？!?\n～~])/).forEach(part => speak(part));
+    if (!tts || !speakOn){ if (wantListen){ wantListen = false; setTimeout(listen, 400); } }
+  }catch(e){
+    if (e && e.name === "AbortError"){ bubble.remove(); }
+    else { bubble.textContent = (e && e.message) || "連線斷了一下，再說一次試試。"; bubble.style.fontSize = "15px"; }
+  }
+  $("talk").scrollTop = $("talk").scrollHeight;
+  busy = false; ctl = null; $("send").disabled = false; setState();
+}
+function message(code){
+  return ({
+    not_granted: "沒有拿到使用 Claude 的同意，小禾沒辦法回話。重新整理頁面可以再選一次。",
+    sampling_disabled: "這個帳號目前不能使用 Claude，小禾沒辦法回話。",
+    rate_limited: "說得太快或今天的用量到了，休息一下再聊。",
+    session_expired: "登入過期了，請重新登入 Claude 再回來。",
+    refused: "這句小禾沒辦法回，換個說法試試。",
+    empty_completion: "小禾一時想不到要說什麼，再說一次看看。"
+  })[code] || "連線斷了一下，再送一次試試。";
+}
+function lock(msg){ $("box").disabled = true; $("send").disabled = true; $("hint-t").textContent = msg; }
+
+/* 停 2 秒自動送出：語音輸入講完、字不再變動就送 */
+function stopBar(){ clearInterval(barTimer); $("bar").classList.remove("on"); $("bar-i").style.width = "0"; }
+function armAuto(){
+  clearTimeout(idleTimer); stopBar();
+  if (!$("auto").checked || !$("box").value.trim() || busy) return;
+  const t0 = Date.now(); $("bar").classList.add("on");
+  barTimer = setInterval(() => { $("bar-i").style.width = Math.min(100, (Date.now() - t0) / 20) + "%"; }, 50);
+  idleTimer = setTimeout(send, 2000);
+}
+function grow(){ const b = $("box"); b.style.height = "auto"; b.style.height = Math.min(b.scrollHeight, 140) + "px"; }
+$("box").addEventListener("input", () => { grow(); if (queue) hush(); armAuto(); });
+$("box").addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey && !e.isComposing){ e.preventDefault(); send(); } });
+$("auto").checked = store.get("hv_auto") !== "0";
+$("auto").onchange = () => { store.set("hv_auto", $("auto").checked ? "1" : "0"); if (!$("auto").checked){ clearTimeout(idleTimer); stopBar(); } };
+$("send").onclick = send;
+$("clear").onclick = () => {
+  if (ctl) ctl.abort(); hush(); turns = []; store.del("hv_turns");
+  $("talk").querySelectorAll(".line,.tag,.again").forEach(n => n.remove());
+  greet();
+};
+
+/* ---------- 按一下說話（瀏覽器的語音辨識） ---------- */
+const REC = window.SpeechRecognition || window.webkitSpeechRecognition || null;
+let rec = null, listening = false, wantListen = false, heardFinal = "";
+function listen(){
+  if (!REC || busy || listening) return;
+  hush();
+  rec = new REC(); rec.lang = "zh-TW"; rec.interimResults = true; rec.continuous = false; rec.maxAlternatives = 1;
+  heardFinal = "";
+  rec.onresult = e => {
+    let fin = "", tmp = "";
+    for (let i = 0; i < e.results.length; i++){ const r = e.results[i]; if (r.isFinal) fin += r[0].transcript; else tmp += r[0].transcript; }
+    heardFinal = fin; $("heard").hidden = false; $("heard").textContent = (fin + tmp) || "…";
+  };
+  rec.onerror = e => {
+    if (e.error === "not-allowed" || e.error === "service-not-allowed"){
+      $("talk-btn").hidden = true; $("loop-l").hidden = true;
+      $("hint-t").textContent = "沒有拿到麥克風權限。可以在瀏覽器設定裡允許，或點下面的框用鍵盤的麥克風說話。";
+    } else if (e.error === "no-speech"){ $("heard").textContent = "沒聽到聲音，再按一次說話"; }
+    else if (e.error !== "aborted"){ $("heard").textContent = "沒聽清楚，再說一次"; }
+  };
+  rec.onend = () => {
+    listening = false; $("talk-btn").classList.remove("listening"); $("talk-t").textContent = "按一下說話"; setState();
+    const t = heardFinal.trim();
+    if (t){ $("heard").hidden = true; $("box").value = t; send(); }
+    else if ($("heard").textContent === "請說話") $("heard").textContent = "沒聽到聲音，按一下再說";
+  };
+  try{ rec.start(); listening = true; $("talk-btn").classList.add("listening"); $("talk-t").textContent = "在聽…（再按一下停止）"; $("heard").hidden = false; $("heard").textContent = "請說話"; setState(); }
+  catch(e){ listening = false; }
+}
+function stopListen(){ if (rec && listening){ try{ rec.stop(); }catch(e){} } }
+$("talk-btn").onclick = () => { if (listening) stopListen(); else listen(); };
+$("loop").checked = store.get("xh_loop") !== "0";
+$("loop").onchange = () => store.set("xh_loop", $("loop").checked ? "1" : "0");
+
+/* ---------- 開始 ---------- */
+function greet(){
+  const g = people.length >= 2 ? `嗨，${people.join("、")}，我是小禾。誰先說？先點自己的名字再說話喔。` : (REC ? "嗨，我是小禾。想聊什麼都可以，按下面的按鈕直接說就好。" : "嗨，我是小禾。想聊什麼都可以，按鍵盤上的麥克風直接說就好。");
+  addLine("ai", g); speak(g, true);
+}
+$("go").onclick = async () => {
+  // 先在點擊裡念一句，手機才會允許之後自動發聲
+  $("go").disabled = true;
+  $("talk").querySelectorAll(".sample,.tag").forEach(n => n.remove());
+  $("start").remove();
+  $("say").hidden = false; renderPeople();
+  try{ turns = JSON.parse(store.get("hv_turns") || "[]").filter(t => t && t.content); }catch(e){ turns = []; }
+  if (turns.length){
+    turns.forEach(t => addLine(t.role === "user" ? "me" : "ai", t.content));
+    const again = document.createElement("div"); again.className = "note"; again.textContent = "上次聊到這裡，接著說吧。";
+    $("talk").append(again); $("talk").scrollTop = $("talk").scrollHeight;
+    speak("我們上次聊到這裡，接著說吧。", true);
+  } else greet();
+  if (!tts){
+    $("voice-btn").hidden = true; $("voice").closest("label").hidden = true; $("rate").closest("label").hidden = true;
+    const n = document.createElement("div"); n.className = "notts";
+    n.innerHTML = "<b>這個瀏覽器不能念出聲音。</b>小禾會用文字回你。想聽到聲音，請用 Chrome 或 Safari 打開這個網址。";
+    $("talk").prepend(n);
+  }
+  if (REC){ $("talk-btn").hidden = false; $("loop-l").hidden = false; $("hint-t").textContent = people.length >= 2 ? `先點自己的名字，再按上面的按鈕說話（現在是 ${people[speaker]}）` : "也可以點下面的框打字，或用鍵盤的麥克風"; }
+  ready = true; setState();
+};
+</script>
+</body>
+</html>
