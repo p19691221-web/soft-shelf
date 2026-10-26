@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}[hidden]{display:none!important}html,body{margin:0}img{max-width:100%}</style>
+<title>AI城市生態系</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="新城設計台：在街廓上配置住宅、資料中心、能源、水、交通與公共服務，即時看城市的電力、用水、算力、服務覆蓋與生活品質。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: 左邊工具與分區圖例，中間街廓地圖，右邊城市儀表；窄螢幕依序堆疊 */
+:root{
+  --bg:#eef1ef; --panel:#fbfcfb; --ink:#17201c; --muted:#5a6762; --line:#cdd6d1; --grid:#dfe5e2;
+  --accent:#0f6e6a; --accent-fg:#f2faf9;
+  --good:#2f7d3a; --warn:#b26a00; --bad:#b3362c;
+  /* 土地使用分區色（沿用都市計畫圖慣例） */
+  --z-home:#e8c64a; --z-work:#d9534a; --z-dc:#6e4fa3; --z-sun:#f09a2a; --z-store:#a5732f; --z-water:#3f8fd1;
+  --z-transit:#2b5876; --z-bot:#7a8a92; --z-med:#e57fa1; --z-school:#58a8a0; --z-green:#5fa04e; --z-plaza:#c7b48a; --z-empty:#e4e9e6;
+  --sans:"Noto Sans TC",system-ui,-apple-system,"PingFang TC",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#111715; --panel:#18201d; --ink:#e3ebe7; --muted:#97a6a0; --line:#2c3833; --grid:#222c28;
+  --accent:#4fc2b9; --accent-fg:#0d1513; --good:#6cc278; --warn:#e9a640; --bad:#ec7a6f; --z-empty:#1f2825; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#111715; --panel:#18201d; --ink:#e3ebe7; --muted:#97a6a0; --line:#2c3833; --grid:#222c28;
+  --accent:#4fc2b9; --accent-fg:#0d1513; --good:#6cc278; --warn:#e9a640; --bad:#ec7a6f; --z-empty:#1f2825; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14px;line-height:1.55}
+button,input,textarea{font:inherit;color:inherit}
+.wrap{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:18px 28px;max-width:1360px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:10px 24px}
+h1{margin:0;font-weight:900;font-size:clamp(24px,3.4vw,36px);letter-spacing:.02em;text-wrap:balance}
+.lede{margin:2px 0 0;color:var(--muted);max-width:62ch}
+.acts{display:flex;flex-wrap:wrap;gap:6px}
+.btn{min-height:36px;padding:0 12px;border:1px solid var(--line);background:var(--panel);border-radius:8px;cursor:pointer;white-space:nowrap}
+.btn:hover{border-color:var(--accent)}
+.btn.pri{background:var(--accent);color:var(--accent-fg);border-color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.main{display:grid;grid-template-columns:230px minmax(0,1fr) 310px;gap:14px;align-items:start}
+@media (max-width:1100px){.main{grid-template-columns:210px minmax(0,1fr)}.dash{grid-column:1/-1}}
+@media (max-width:720px){.main{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px;min-width:0}
+.panel h2{margin:0 0 8px;font-size:13px;font-weight:700;letter-spacing:.08em;color:var(--muted)}
+.tools{display:flex;flex-direction:column;gap:4px}
+@media (max-width:720px){.tools{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}}
+.tool{display:flex;align-items:center;gap:8px;border:1px solid transparent;background:none;border-radius:8px;padding:6px 8px;cursor:pointer;text-align:left}
+.tool:hover{border-color:var(--line)}
+.tool[aria-pressed="true"]{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,var(--panel))}
+.sw{width:18px;height:18px;border-radius:4px;flex:none;border:1px solid color-mix(in srgb,var(--ink) 18%,transparent)}
+.tool b{font-weight:500}
+.tool small{display:block;font-size:11px;color:var(--muted);line-height:1.3}
+.mapbox{display:flex;flex-direction:column;gap:8px}
+.mapwrap{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px}
+canvas#map{display:block;width:100%;height:auto;touch-action:none;cursor:crosshair;border-radius:4px}
+.maphint{font-size:12px;color:var(--muted);display:flex;flex-wrap:wrap;gap:4px 14px;justify-content:space-between}
+.tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--bg);font-size:12px;padding:4px 8px;border-radius:6px;white-space:nowrap;transform:translate(-50%,-120%)}
+.dash{display:flex;flex-direction:column;gap:12px}
+.score{display:flex;align-items:baseline;gap:10px}
+.score .big{font-family:var(--mono);font-weight:600;font-size:44px;line-height:1;font-variant-numeric:tabular-nums}
+.score .of{color:var(--muted)}
+.grade{font-size:12px;padding:2px 8px;border-radius:999px;font-weight:700}
+.meters{display:flex;flex-direction:column;gap:9px}
+.m{display:grid;grid-template-columns:1fr auto;gap:2px 8px;font-size:13px}
+.m .v{font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right}
+.bar{grid-column:1/-1;height:7px;border-radius:4px;background:var(--grid);position:relative;overflow:hidden}
+.bar i{position:absolute;left:0;top:0;bottom:0;border-radius:4px}
+.flows{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.flow{border:1px solid var(--line);border-radius:8px;padding:8px}
+.flow .k{font-size:12px;color:var(--muted)}
+.flow .n{font-family:var(--mono);font-size:18px;font-weight:600;font-variant-numeric:tabular-nums}
+.flow .n.neg{color:var(--bad)} .flow .n.pos{color:var(--good)}
+.flow .s{font-size:11px;color:var(--muted);font-family:var(--mono)}
+.advice{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px}
+.advice li{font-size:13px;padding:6px 8px 6px 10px;border-radius:6px;background:color-mix(in srgb,var(--ink) 4%,var(--panel));border-left:3px solid var(--muted)}
+.advice li.bad{border-left-color:var(--bad)} .advice li.warn{border-left-color:var(--warn)} .advice li.good{border-left-color:var(--good)}
+details.params{font-size:13px}
+details.params summary{cursor:pointer;color:var(--muted)}
+.ptable{overflow-x:auto;margin-top:8px}
+.ptable table{border-collapse:collapse;font-size:12px;width:100%;min-width:560px}
+.ptable th,.ptable td{border-bottom:1px solid var(--line);padding:5px 6px;text-align:right;font-variant-numeric:tabular-nums}
+.ptable th:first-child,.ptable td:first-child{text-align:left}
+.ptable th{color:var(--muted);font-weight:500}
+.note{font-size:12px;color:var(--muted);margin:6px 0 0}
+.toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:8px;font-size:13px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>AI城市生態系</h1>
+      <p class="lede">新城設計台：把住宅、資料中心、能源、水、交通和公共服務放上街廓，看這座城的電夠不夠、水夠不夠、廢熱有沒有回收、每戶人家走得到哪些服務。</p>
+    </div>
+    <div class="acts">
+      <button class="btn" id="sample">載入範例新城</button>
+      <button class="btn" id="clear">清空</button>
+      <button class="btn" id="copy">複製設計（JSON）</button>
+      <button class="btn" id="paste">貼上設計</button>
+    </div>
+  </header>
+
+  <div class="main">
+    <aside class="panel" aria-labelledby="h-tools">
+      <h2 id="h-tools">放置</h2>
+      <div class="tools" id="tools" role="toolbar" aria-label="土地使用"></div>
+    </aside>
+
+    <section class="mapbox" aria-label="街廓地圖">
+      <div class="mapwrap">
+        <canvas id="map" width="960" height="720" aria-label="12 乘 9 的街廓地圖，點或拖曳放置"></canvas>
+        <div class="tip" id="tip" hidden></div>
+      </div>
+      <div class="maphint"><span>點一下或拖曳放置；選「拆除」清掉。每格是一個 1 公頃的街廓。</span><span id="count"></span></div>
+      <details class="params panel">
+        <summary>模型參數（每格的示意數值）</summary>
+        <div class="ptable"><table id="ptable"></table></div>
+        <p class="note">數字是為了比較配置好壞的示意參數，不是工程設計值。實際規劃要換成當地的用電、用水和人口資料。</p>
+      </details>
+    </section>
+
+    <aside class="dash" aria-label="城市儀表">
+      <div class="panel">
+        <h2>城市健康度</h2>
+        <div class="score"><span class="big" id="score">0</span><span class="of">/ 100</span><span class="grade" id="grade"></span></div>
+        <div class="meters" id="meters" style="margin-top:10px"></div>
+      </div>
+      <div class="panel">
+        <h2>供需</h2>
+        <div class="flows" id="flows"></div>
+      </div>
+      <div class="panel">
+        <h2>規劃建議</h2>
+        <ul class="advice" id="advice"></ul>
+      </div>
+    </aside>
+  </div>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+const $ = s => document.querySelector(s);
+const COLS = 12, ROWS = 9, KEY = "ai-city-v1";
+/* 每格（1 公頃）示意參數：人口、就業、電力 MW（正為供給）、用水 千噸/日（正為供給）、算力 PFLOPS、廢熱 MW、服務半徑（格） */
+const Z = {
+  home:   {name:"住宅",       tip:"約 250 人", c:"--z-home",   pop:250, jobs:0,   mw:-1,  w:-0.5, pf:0,  heat:0, r:0},
+  work:   {name:"辦公／產業", tip:"約 400 個工作", c:"--z-work", pop:0, jobs:400, mw:-4,  w:-0.6, pf:0,  heat:0, r:0},
+  dc:     {name:"AI 資料中心", tip:"算力與高耗能", c:"--z-dc",  pop:0, jobs:60,  mw:-30, w:-4,   pf:20, heat:18, r:0},
+  sun:    {name:"太陽能／風電", tip:"+15 MW", c:"--z-sun",    pop:0, jobs:5,   mw:15,  w:0,    pf:0,  heat:0, r:0},
+  store:  {name:"儲能／微電網", tip:"+20 MW 可調度", c:"--z-store", pop:0, jobs:10, mw:20, w:0, pf:0, heat:0, r:0},
+  water:  {name:"水廠／再生水", tip:"+20 千噸/日", c:"--z-water", pop:0, jobs:20, mw:-3, w:20, pf:0, heat:0, r:0},
+  transit:{name:"自駕轉運站",   tip:"服務半徑 3 格", c:"--z-transit", pop:0, jobs:40, mw:-2, w:-0.1, pf:0, heat:0, r:3},
+  bot:    {name:"機器人物流站", tip:"服務半徑 3 格", c:"--z-bot", pop:0, jobs:30, mw:-2, w:-0.1, pf:0, heat:0, r:3},
+  med:    {name:"醫療中心",     tip:"服務半徑 3 格", c:"--z-med", pop:0, jobs:120, mw:-3, w:-0.8, pf:0, heat:0, r:3},
+  school: {name:"學校",         tip:"服務半徑 2 格", c:"--z-school", pop:0, jobs:60, mw:-1, w:-0.4, pf:0, heat:0, r:2},
+  green:  {name:"綠地",         tip:"降溫、蓄水", c:"--z-green", pop:0, jobs:0, mw:0, w:0.3, pf:0, heat:0, r:0},
+  plaza:  {name:"社區廣場",     tip:"人與人見面的地方", c:"--z-plaza", pop:0, jobs:10, mw:0, w:0, pf:0, heat:0, r:2},
+};
+const TOOLS = [...Object.keys(Z), "erase"];
+let tool = "home", grid = new Array(COLS * ROWS).fill(null);
+
+/* ---------- 範例新城 ---------- */
+function sample() {
+  const m = [
+    "sun sun green home home home home green work work dc dc",
+    "sun store home home transit home home home work work water dc",
+    "green home home school home home med home plaza work work green",
+    "sun home plaza home home home home home home transit work sun",
+    "store home home home green green home home school home home sun",
+    "sun home transit home green green home home home home bot green",
+    "green home home home home home home med home home home sun",
+    "water dc home school home plaza home home transit home store sun",
+    "green green bot work work work green green home home green sun",
+  ];
+  grid = m.flatMap(r => r.split(" "));
+}
+
+/* ---------- 計算 ---------- */
+const at = (x, y) => (x < 0 || y < 0 || x >= COLS || y >= ROWS) ? null : grid[y * COLS + x];
+const nb = (x, y) => [[1,0],[-1,0],[0,1],[0,-1]].map(([dx, dy]) => at(x + dx, y + dy));
+function compute() {
+  const t = {pop:0, jobs:0, mwUse:0, mwGen:0, wUse:0, wGen:0, pf:0, heat:0, heatReuse:0, coolSave:0, green:0, built:0, hot:0};
+  const covers = {transit:[], bot:[], med:[], school:[], plaza:[]};
+  for (let y = 0; y < ROWS; y++) for (let x = 0; x < COLS; x++) {
+    const k = at(x, y); if (!k) continue; const z = Z[k], n = nb(x, y);
+    t.built++; t.pop += z.pop; t.jobs += z.jobs; t.pf += z.pf;
+    if (z.mw > 0) t.mwGen += z.mw; else t.mwUse += -z.mw;
+    let w = z.w;
+    if (k === "dc") {
+      /* 鄰近水廠或綠地：冷卻用水少 30%；鄰近住宅：廢熱拿去供暖／熱水 */
+      if (n.some(v => v === "water" || v === "green")) { t.coolSave += -w * .3; w *= .7; }
+      const homes = n.filter(v => v === "home").length;
+      const reuse = Math.min(z.heat, homes * 6); t.heatReuse += reuse; t.heat += z.heat;
+    }
+    if (w > 0) t.wGen += w; else t.wUse += -w;
+    if (k === "green") t.green++;
+    if ((k === "dc" || k === "work") && !n.some(v => v === "green")) t.hot++;
+    if (covers[k]) covers[k].push([x, y, z.r]);
+  }
+  /* 服務覆蓋：住宅格在服務半徑（曼哈頓距離）內才算走得到 */
+  const homes = []; for (let y = 0; y < ROWS; y++) for (let x = 0; x < COLS; x++) if (at(x, y) === "home") homes.push([x, y]);
+  const cov = {};
+  for (const k of Object.keys(covers)) cov[k] = homes.length ? homes.filter(([hx, hy]) => covers[k].some(([x, y, r]) => Math.abs(x - hx) + Math.abs(y - hy) <= r)).length / homes.length : 0;
+  t.homes = homes.length; t.cov = cov;
+  t.workforce = Math.round(t.pop * .55);
+  return t;
+}
+const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+function scoreOf(t) {
+  if (!t.built) return {total:0, parts:[]};
+  const power = t.mwUse ? clamp(t.mwGen / t.mwUse) : 1;
+  const water = t.wUse ? clamp(t.wGen / t.wUse) : 1;
+  const jobsFit = t.workforce ? clamp(1 - Math.abs(t.jobs - t.workforce) / t.workforce) : 0;
+  const services = (t.cov.transit + t.cov.med + t.cov.school + t.cov.bot) / 4;
+  const greenR = clamp(t.green / Math.max(1, t.built) / .2);
+  const heat = t.heat ? t.heatReuse / t.heat : 1;
+  const people = t.cov.plaza;
+  const parts = [
+    ["電力自給", power, .2], ["用水自給", water, .15], ["職住平衡", jobsFit, .15],
+    ["公共服務覆蓋", services, .2], ["綠覆率", greenR, .1], ["廢熱回收", heat, .1], ["社區廣場可及", people, .1],
+  ];
+  return {total: Math.round(parts.reduce((a, [, v, w]) => a + v * w, 0) * 100), parts};
+}
+
+/* ---------- 建議 ---------- */
+function advise(t) {
+  const out = [];
+  if (!t.built) return [["warn", "地圖是空的。先按「載入範例新城」看看，或從左邊選一種用地開始放。"]];
+  const def = t.mwUse - t.mwGen;
+  if (def > 0) out.push(["bad", `電力缺 ${def} MW。再放 ${Math.ceil(def / 15)} 格太陽能／風電，或 ${Math.ceil(def / 20)} 格儲能／微電網。`]);
+  else out.push(["good", `電力有餘 ${-def} MW，可以再多容納 ${Math.floor(-def / 30)} 座資料中心。`]);
+  const wd = t.wUse - t.wGen;
+  if (wd > 0) out.push(["bad", `每天缺水 ${wd.toFixed(1)} 千噸。加 ${Math.ceil(wd / 20)} 座水廠／再生水，或把資料中心移到水廠、綠地旁邊。`]);
+  if (t.heat && t.heatReuse / t.heat < .5) out.push(["warn", `資料中心的廢熱只回收了 ${Math.round(t.heatReuse / t.heat * 100)}%。把住宅放在資料中心旁邊，廢熱可以拿去供應熱水。`]);
+  if (t.workforce && t.jobs < t.workforce * .7) out.push(["warn", `工作只有 ${t.jobs} 個，勞動人口約 ${t.workforce} 人，很多人得出城上班。加辦公／產業或醫療中心。`]);
+  if (t.workforce && t.jobs > t.workforce * 1.3) out.push(["warn", `工作 ${t.jobs} 個比勞動人口多，通勤會從城外湧進來。多蓋一些住宅。`]);
+  const names = {transit:"自駕轉運站", med:"醫療中心", school:"學校", bot:"機器人物流站", plaza:"社區廣場"};
+  for (const [k, n] of Object.entries(names)) if (t.homes && t.cov[k] < .8) out.push([t.cov[k] < .5 ? "bad" : "warn", `${Math.round((1 - t.cov[k]) * 100)}% 的住宅走不到${n}。`]);
+  if (t.hot) out.push(["warn", `${t.hot} 格資料中心或產業旁邊沒有綠地，熱島會集中在那裡。`]);
+  if (out.length === 1 && out[0][0] === "good") out.push(["good", "這個配置沒有明顯短板。試試多放一座資料中心，看哪裡先撐不住。"]);
+  return out;
+}
+
+/* ---------- 繪圖 ---------- */
+const cv = $("#map"), ctx = cv.getContext("2d");
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const CELL = 80;
+function draw() {
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  cv.width = COLS * CELL * dpr; cv.height = ROWS * CELL * dpr;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.fillStyle = css("--grid"); ctx.fillRect(0, 0, COLS * CELL, ROWS * CELL);
+  for (let y = 0; y < ROWS; y++) for (let x = 0; x < COLS; x++) {
+    const k = at(x, y), px = x * CELL + 3, py = y * CELL + 3, s = CELL - 6;
+    ctx.fillStyle = k ? css(Z[k].c) : css("--z-empty");
+    ctx.beginPath(); ctx.roundRect(px, py, s, s, 6); ctx.fill();
+    if (k) glyph(k, px + s / 2, py + s / 2, s);
+  }
+  /* 資料中心：廢熱連到相鄰住宅 */
+  ctx.strokeStyle = css("--z-sun"); ctx.lineWidth = 3; ctx.setLineDash([4, 4]);
+  for (let y = 0; y < ROWS; y++) for (let x = 0; x < COLS; x++) if (at(x, y) === "dc")
+    [[1,0],[-1,0],[0,1],[0,-1]].forEach(([dx, dy]) => { if (at(x + dx, y + dy) === "home") { ctx.beginPath(); ctx.moveTo(x * CELL + 40, y * CELL + 40); ctx.lineTo((x + dx) * CELL + 40, (y + dy) * CELL + 40); ctx.stroke(); } });
+  ctx.setLineDash([]);
+  if (hover && TOOLS.includes(tool) && Z[tool] && Z[tool].r) {
+    const [hx, hy] = hover; ctx.fillStyle = "rgba(15,110,106,.14)";
+    for (let y = 0; y < ROWS; y++) for (let x = 0; x < COLS; x++) if (Math.abs(x - hx) + Math.abs(y - hy) <= Z[tool].r) ctx.fillRect(x * CELL, y * CELL, CELL, CELL);
+  }
+}
+function glyph(k, cx, cy, s) {
+  ctx.save(); ctx.translate(cx, cy); ctx.fillStyle = "rgba(0,0,0,.42)"; ctx.strokeStyle = "rgba(0,0,0,.42)"; ctx.lineWidth = 3; ctx.lineCap = "round";
+  const u = s / 74;
+  ctx.scale(u, u);
+  switch (k) {
+    case "home": ctx.beginPath(); ctx.moveTo(-14, 2); ctx.lineTo(0, -12); ctx.lineTo(14, 2); ctx.lineTo(14, 14); ctx.lineTo(-14, 14); ctx.closePath(); ctx.fill(); break;
+    case "work": [-12, 0, 12].forEach((x, i) => ctx.fillRect(x - 5, -14 + i * 4, 10, 28 - i * 4)); break;
+    case "dc": for (let i = 0; i < 3; i++) { ctx.fillRect(-14, -14 + i * 10, 28, 7); } ctx.fillStyle = "rgba(255,255,255,.7)"; for (let i = 0; i < 3; i++) ctx.fillRect(8, -12 + i * 10, 3, 3); break;
+    case "sun": ctx.beginPath(); ctx.arc(0, 0, 7, 0, 7); ctx.fill(); for (let i = 0; i < 8; i++) { const a = i * Math.PI / 4; ctx.beginPath(); ctx.moveTo(Math.cos(a) * 11, Math.sin(a) * 11); ctx.lineTo(Math.cos(a) * 16, Math.sin(a) * 16); ctx.stroke(); } break;
+    case "store": ctx.fillRect(-9, -12, 18, 26); ctx.fillRect(-4, -16, 8, 4); ctx.fillStyle = "rgba(255,255,255,.6)"; ctx.beginPath(); ctx.moveTo(2, -8); ctx.lineTo(-4, 2); ctx.lineTo(1, 2); ctx.lineTo(-2, 10); ctx.lineTo(5, -1); ctx.lineTo(0, -1); ctx.closePath(); ctx.fill(); break;
+    case "water": ctx.beginPath(); ctx.moveTo(0, -15); ctx.quadraticCurveTo(13, 2, 0, 14); ctx.quadraticCurveTo(-13, 2, 0, -15); ctx.fill(); break;
+    case "transit": ctx.fillRect(-15, -6, 30, 13); ctx.fillRect(-9, -12, 18, 7); ctx.beginPath(); ctx.arc(-8, 10, 4, 0, 7); ctx.arc(8, 10, 4, 0, 7); ctx.fill(); break;
+    case "bot": ctx.fillRect(-12, -6, 24, 16); ctx.fillRect(-2, -14, 4, 8); ctx.beginPath(); ctx.arc(0, -15, 3, 0, 7); ctx.fill(); ctx.fillStyle = "rgba(255,255,255,.7)"; ctx.fillRect(-7, 0, 4, 4); ctx.fillRect(3, 0, 4, 4); break;
+    case "med": ctx.fillRect(-4, -14, 8, 28); ctx.fillRect(-14, -4, 28, 8); break;
+    case "school": ctx.beginPath(); ctx.moveTo(-15, -3); ctx.lineTo(0, -12); ctx.lineTo(15, -3); ctx.lineTo(0, 6); ctx.closePath(); ctx.fill(); ctx.beginPath(); ctx.moveTo(-8, 2); ctx.lineTo(-8, 10); ctx.quadraticCurveTo(0, 15, 8, 10); ctx.lineTo(8, 2); ctx.stroke(); break;
+    case "green": [[-7, 4], [7, -2]].forEach(([x, y]) => { ctx.beginPath(); ctx.arc(x, y - 6, 7, 0, 7); ctx.fill(); ctx.fillRect(x - 1.5, y, 3, 10); }); break;
+    case "plaza": [-10, 0, 10].forEach((x, i) => { ctx.beginPath(); ctx.arc(x, -6 + (i === 1 ? -3 : 0), 4, 0, 7); ctx.fill(); ctx.beginPath(); ctx.arc(x, 8 + (i === 1 ? -3 : 0), 6, Math.PI, 0); ctx.fill(); }); break;
+  }
+  ctx.restore();
+}
+
+/* ---------- 儀表 ---------- */
+function bar(v) { const col = v >= .8 ? "--good" : v >= .5 ? "--warn" : "--bad"; return `<div class="bar"><i style="width:${Math.round(v * 100)}%;background:var(${col})"></i></div>`; }
+const fmt = n => n.toLocaleString("zh-TW");
+function render() {
+  draw();
+  const t = compute(), s = scoreOf(t);
+  $("#score").textContent = s.total;
+  const g = s.total >= 80 ? ["可以開工", "--good"] : s.total >= 55 ? ["還要調整", "--warn"] : ["撐不住", "--bad"];
+  $("#grade").textContent = t.built ? g[0] : "尚未規劃"; $("#grade").style.background = `color-mix(in srgb,var(${g[1]}) 20%,transparent)`; $("#grade").style.color = `var(${g[1]})`;
+  $("#meters").innerHTML = s.parts.map(([n, v]) => `<div class="m"><span>${n}</span><span class="v">${Math.round(v * 100)}%</span>${bar(v)}</div>`).join("");
+  const pw = t.mwGen - t.mwUse, wa = t.wGen - t.wUse;
+  $("#flows").innerHTML = [
+    ["電力", `${pw > 0 ? "+" : ""}${pw} MW`, pw >= 0, `供 ${t.mwGen}／需 ${t.mwUse}`],
+    ["用水", `${wa > 0 ? "+" : ""}${wa.toFixed(1)}`, wa >= 0, `千噸/日・省下冷卻水 ${t.coolSave.toFixed(1)}`],
+    ["人口", fmt(t.pop), null, `${t.homes} 格住宅`],
+    ["工作", fmt(t.jobs), null, `勞動人口約 ${fmt(t.workforce)}`],
+    ["AI 算力", `${t.pf} PF`, null, `${t.pf / 20} 座資料中心`],
+    ["廢熱回收", `${t.heatReuse}/${t.heat} MW`, null, t.heat ? `${Math.round(t.heatReuse / t.heat * 100)}% 供應住宅熱水` : "沒有資料中心"],
+  ].map(([k, n, ok, sub]) => `<div class="flow"><div class="k">${k}</div><div class="n ${ok === null ? "" : ok ? "pos" : "neg"}">${n}</div><div class="s">${sub}</div></div>`).join("");
+  $("#advice").innerHTML = advise(t).map(([lv, txt]) => `<li class="${lv}">${txt}</li>`).join("");
+  $("#count").textContent = `已規劃 ${t.built}／${COLS * ROWS} 格`;
+  try { localStorage.setItem(KEY, JSON.stringify(grid)); } catch {}
+}
+
+/* ---------- 工具列 ---------- */
+TOOLS.forEach(k => {
+  const b = document.createElement("button"); b.className = "tool"; b.dataset.k = k;
+  const sw = document.createElement("span"); sw.className = "sw";
+  sw.style.background = k === "erase" ? "repeating-linear-gradient(45deg,var(--z-empty) 0 3px,var(--line) 3px 6px)" : `var(${Z[k].c})`;
+  const t = document.createElement("span");
+  t.innerHTML = k === "erase" ? "<b>拆除</b><small>清空這格</small>" : `<b>${Z[k].name}</b><small>${Z[k].tip}</small>`;
+  b.append(sw, t); b.onclick = () => { tool = k; syncTools(); };
+  $("#tools").append(b);
+});
+function syncTools() { document.querySelectorAll(".tool").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.k === tool))); }
+
+/* ---------- 地圖操作 ---------- */
+let painting = false, hover = null;
+function cellAt(e) { const r = cv.getBoundingClientRect(); const x = Math.floor((e.clientX - r.left) / r.width * COLS), y = Math.floor((e.clientY - r.top) / r.height * ROWS); return (x >= 0 && y >= 0 && x < COLS && y < ROWS) ? [x, y] : null; }
+function paint(c) { if (!c) return; const i = c[1] * COLS + c[0], v = tool === "erase" ? null : tool; if (grid[i] !== v) { grid[i] = v; render(); } }
+cv.addEventListener("pointerdown", e => { painting = true; cv.setPointerCapture(e.pointerId); paint(cellAt(e)); });
+cv.addEventListener("pointermove", e => {
+  const c = cellAt(e); if (painting) paint(c);
+  const tip = $("#tip");
+  if (c && e.pointerType === "mouse") { const k = at(...c); tip.textContent = k ? `${Z[k].name}（${c[0] + 1}, ${c[1] + 1}）` : `空地（${c[0] + 1}, ${c[1] + 1}）`; const r = cv.getBoundingClientRect(), wr = cv.parentElement.getBoundingClientRect();
+    tip.style.left = (e.clientX - wr.left) + "px"; tip.style.top = (e.clientY - wr.top) + "px"; tip.hidden = false; } else tip.hidden = true;
+  const h = c && c.join(); if (h !== (hover && hover.join())) { hover = c; draw(); }
+});
+const stop = () => { painting = false; };
+cv.addEventListener("pointerup", stop); cv.addEventListener("pointercancel", stop);
+cv.addEventListener("pointerleave", () => { $("#tip").hidden = true; hover = null; draw(); });
+
+/* ---------- 按鈕 ---------- */
+function toast(t) { const el = $("#toast"); el.textContent = t; el.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => el.hidden = true, 2200); }
+$("#sample").onclick = () => { sample(); render(); toast("已載入範例新城"); };
+let clearArm = null;
+$("#clear").onclick = () => {
+  const b = $("#clear");
+  if (!clearArm) { b.textContent = "再按一次清空"; clearArm = setTimeout(() => { clearArm = null; b.textContent = "清空"; }, 3000); return; }
+  clearTimeout(clearArm); clearArm = null; b.textContent = "清空"; grid.fill(null); render(); toast("已清空");
+};
+$("#copy").onclick = async () => {
+  const txt = JSON.stringify({v: 1, cols: COLS, rows: ROWS, grid});
+  try { await navigator.clipboard.writeText(txt); toast("已複製，可以貼給別人或存起來"); }
+  catch { prompt0(txt); }
+};
+function prompt0(txt) { const ta = document.createElement("textarea"); ta.value = txt; ta.style.cssText = "position:fixed;inset:20% 10%;z-index:9;padding:10px"; document.body.append(ta); ta.select(); toast("無法自動複製，已選取文字，請手動複製"); ta.onblur = () => ta.remove(); ta.focus(); }
+$("#paste").onclick = () => {
+  const ta = document.createElement("textarea"); ta.placeholder = "把設計的 JSON 貼在這裡，貼上後自動載入"; ta.setAttribute("aria-label", "貼上設計");
+  ta.style.cssText = "position:fixed;inset:25% 10%;z-index:9;padding:10px;border:2px solid var(--accent);border-radius:8px;background:var(--panel)";
+  document.body.append(ta); ta.focus();
+  ta.addEventListener("paste", e => setTimeout(() => {
+    try { const d = JSON.parse(ta.value); if (!Array.isArray(d.grid) || d.grid.length !== COLS * ROWS) throw 0; grid = d.grid.map(v => Z[v] ? v : null); render(); toast("已載入設計"); }
+    catch { toast("看不懂這段文字，請貼上「複製設計」產生的 JSON"); }
+    ta.remove();
+  }, 0));
+  ta.onblur = () => setTimeout(() => ta.remove(), 200);
+};
+
+/* 參數表 */
+$("#ptable").innerHTML = `<tr><th>用地</th><th>人口</th><th>工作</th><th>電力 MW</th><th>用水 千噸/日</th><th>算力 PF</th><th>廢熱 MW</th><th>服務半徑</th></tr>` +
+  Object.values(Z).map(z => `<tr><td>${z.name}</td><td>${z.pop || "–"}</td><td>${z.jobs || "–"}</td><td>${z.mw > 0 ? "+" : ""}${z.mw || "–"}</td><td>${z.w > 0 ? "+" : ""}${z.w || "–"}</td><td>${z.pf || "–"}</td><td>${z.heat || "–"}</td><td>${z.r ? z.r + " 格" : "–"}</td></tr>`).join("");
+
+/* 啟動 */
+try { const d = JSON.parse(localStorage.getItem(KEY) || "null"); if (Array.isArray(d) && d.length === COLS * ROWS && d.some(Boolean)) grid = d.map(v => Z[v] ? v : null); else sample(); } catch { sample(); }
+syncTools(); render();
+matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change", render);
+new MutationObserver(render).observe(document.documentElement, {attributes: true, attributeFilter: ["data-theme"]});
+</script>
+</body>
+</html>
