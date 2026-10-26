@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>開放聊天室</title>
+<meta name="description" content="打開就能用聲音聊天。開一間房、把連結傳給朋友，一個人、兩個人、一群人都行，開始和停止都由你決定。">
+<meta property="og:title" content="開放聊天室">
+<meta property="og:description" content="打開就能用聲音聊天。開始和停止都由你決定。">
+<meta name="theme-color" content="#2b4a5c">
+<style>
+:root{--bg:#eef1f2;--fg:#1f2a30;--muted:#66747c;--line:#d3dbdf;--card:#fbfcfc;--accent:#2b4a5c;--on:#fff;--go:#2f7a55;--stop:#b4442c;--ring:#e0a440}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141a1d;--fg:#e4eaed;--muted:#8d9ba3;--line:#2a353b;--card:#1b2327;--accent:#8fb6cc;--on:#10181c;--go:#4fae80;--stop:#e0705a;--ring:#f0b85a}}
+:root[data-theme="dark"]{--bg:#141a1d;--fg:#e4eaed;--muted:#8d9ba3;--line:#2a353b;--card:#1b2327;--accent:#8fb6cc;--on:#10181c;--go:#4fae80;--stop:#e0705a;--ring:#f0b85a}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,"Noto Sans TC","PingFang TC",sans-serif;-webkit-tap-highlight-color:transparent}
+main{max-width:520px;margin:0 auto;padding:24px 16px calc(28px + env(safe-area-inset-bottom));min-height:100vh;display:flex;flex-direction:column}
+h1{font-size:24px;margin:8px 0 4px;letter-spacing:1px;color:var(--accent)}
+.sub{color:var(--muted);margin:0 0 22px;line-height:1.6}
+label{display:block;font-size:14px;color:var(--muted);margin:16px 0 6px}
+input{font:inherit;font-size:17px;width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--fg)}
+button{font:inherit;font-size:16px;border:1px solid var(--line);background:var(--card);color:var(--fg);border-radius:12px;padding:12px 18px;cursor:pointer}
+button.pri{background:var(--accent);border-color:var(--accent);color:var(--on)}
+button:disabled{opacity:.5}
+.row{display:flex;gap:8px}
+.row input{flex:1}
+.or{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:13px;margin:22px 0 6px}
+.or::before,.or::after{content:"";flex:1;border-top:1px solid var(--line)}
+.err{color:var(--stop);font-size:14px;min-height:20px;margin-top:10px}
+.hint{color:var(--muted);font-size:13px;line-height:1.7}
+.hint b{color:var(--fg);font-weight:600}
+
+/* 房間 */
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.code{font-size:13px;color:var(--muted)}
+.code b{display:block;font-size:20px;color:var(--fg);letter-spacing:1px;font-family:ui-monospace,Menlo,monospace}
+.top button{padding:9px 14px;font-size:14px}
+.status{text-align:center;color:var(--muted);margin:22px 0 4px;min-height:24px}
+.ppl{flex:1;display:flex;flex-wrap:wrap;gap:18px 14px;justify-content:center;align-content:center;padding:18px 0;min-height:240px}
+.p{width:92px;text-align:center}
+.p .av{position:relative;width:76px;height:76px;margin:0 auto 6px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:600;background:var(--card);border:3px solid var(--line);color:var(--accent);transition:border-color .12s,box-shadow .12s}
+.p.talk .av{border-color:var(--ring);box-shadow:0 0 0 5px color-mix(in srgb,var(--ring) 30%,transparent)}
+.p.me .av{background:var(--accent);color:var(--on);border-color:var(--accent)}
+.p.me.talk .av{border-color:var(--ring)}
+.p .mute{position:absolute;right:-4px;bottom:-2px;background:var(--stop);color:#fff;font-size:11px;padding:2px 6px;border-radius:999px}
+.p .nm{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.p .st{font-size:11px;color:var(--muted);min-height:15px}
+.empty{color:var(--muted);text-align:center;line-height:1.8}
+.ctl{display:flex;gap:10px;justify-content:center;margin-top:8px}
+.big{width:100%;max-width:340px;padding:18px;font-size:20px;font-weight:600;border-radius:999px;border:none;color:#fff}
+.big.go{background:var(--go)}
+.big.stop{background:var(--stop)}
+.ctl .mic{border-radius:999px;padding:18px 20px;font-size:16px;flex:none}
+.ctl .mic.off{background:color-mix(in srgb,var(--stop) 14%,transparent);border-color:var(--stop);color:var(--stop);font-weight:600}
+.foot{margin-top:18px}
+.nickrow{max-width:340px;margin:0 auto 12px}
+.nickrow label{margin-top:0;text-align:center}
+.nickrow input{text-align:center}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:999px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.on{opacity:1}
+</style>
+</head>
+<body>
+<main id="home">
+  <h1>開放聊天室</h1>
+  <p class="sub">打開就能用聲音聊天。<br>開一間房、把連結傳給朋友，一個人先等、兩個人對談、一群人一起聊都行。開始和停止都由你決定。</p>
+  <label for="nick">你的暱稱</label>
+  <input id="nick" maxlength="16" autocomplete="nickname" placeholder="大家會看到這個名字">
+  <button class="pri" id="new" style="width:100%;margin-top:14px">開一間新房間</button>
+  <div class="or">或</div>
+  <label for="code" style="margin-top:4px">輸入朋友給的房間代碼</label>
+  <div class="row"><input id="code" autocomplete="off" autocapitalize="off" placeholder="例如 k7m2-p9qa"><button id="go">進入</button></div>
+  <div class="err" id="h-err"></div>
+  <p class="hint foot"><b>聲音是手機之間直接連線</b>，不經過伺服器，也不會錄下來。<br><b>拿到連結的人都能進來</b>，連結只傳給你想聊的人。<br>每間最多 10 人。在 LINE、臉書裡打開可能用不了麥克風，請改用 Safari 或 Chrome。</p>
+</main>
+
+<main id="room" hidden>
+  <div class="top">
+    <div class="code">房間代碼<b id="r-code"></b></div>
+    <div class="row"><button id="share">分享連結</button><button id="back">換房間</button></div>
+  </div>
+  <div class="status" id="status"></div>
+  <div class="ppl" id="ppl"></div>
+  <div class="err" id="r-err" style="text-align:center"></div>
+  <div id="ctl-idle">
+    <div class="nickrow"><label for="r-nick">你的暱稱</label><input id="r-nick" maxlength="16" autocomplete="nickname" placeholder="大家會看到這個名字"></div>
+    <div class="ctl"><button class="big go" id="start">開始</button></div>
+  </div>
+  <div class="ctl" id="ctl-live" hidden><button class="mic" id="mic">靜音</button><button class="big stop" id="stop">停止</button></div>
+  <p class="hint foot" id="r-hint" style="text-align:center">按「開始」會問能不能用麥克風，請按允許。<br>聊天時請保持這個畫面開著。</p>
+</main>
+<div class="toast" id="toast"></div>
+
+<script>
+(() => {
+// 資料庫只負責「誰在房間裡」和交換連線資料；這把是公開用的金鑰，權限只限下面幾個函式。
+const CFG = window.OV_CONFIG || {
+  SUPABASE_URL: "https://mfxxtiyivtcuhohtpqgs.supabase.co",
+  SUPABASE_ANON_KEY: "sb_publishable_tymrFI7PiAIxB7R2mRUjFw_jnmuQ0-f",
+  ICE_SERVERS: [{ urls: ["stun:stun.l.google.com:19302", "stun:stun.cloudflare.com:3478"] }]
+};
+const $ = id => document.getElementById(id);
+const store = { get(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }, set(k,v){ try{ localStorage.setItem(k,v); }catch(e){} } };
+function el(tag, cls, text){ const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+function toast(t){ const x = $("toast"); x.textContent = t; x.classList.add("on"); clearTimeout(x._t); x._t = setTimeout(() => x.classList.remove("on"), 2200); }
+const headers = () => Object.assign({ apikey: CFG.SUPABASE_ANON_KEY, "Content-Type": "application/json" },
+  /^eyJ/.test(CFG.SUPABASE_ANON_KEY) ? { Authorization: "Bearer " + CFG.SUPABASE_ANON_KEY } : {});
+async function rpc(fn, args, keep){
+  const r = await fetch(CFG.SUPABASE_URL.replace(/\/$/, "") + "/rest/v1/rpc/" + fn,
+    { method: "POST", headers: headers(), body: JSON.stringify(args || {}), keepalive: !!keep });
+  const j = await r.json().catch(() => null);
+  if (!r.ok) throw new Error((j && j.message) || ("連線失敗（" + r.status + "）"));
+  return j;
+}
+
+/* ---------- 首頁 ---------- */
+const CODE_RE = /^[a-z0-9-]{4,40}$/;
+$("nick").value = store.get("ov_nick") || "";
+function needNick(errEl){
+  const n = $("nick").value.trim();
+  if (!n){ errEl.textContent = "先取一個暱稱"; $("nick").focus(); return null; }
+  store.set("ov_nick", n); return n;
+}
+function newCode(){
+  const a = "abcdefghjkmnpqrstuvwxyz23456789", r = crypto.getRandomValues(new Uint8Array(8));
+  let s = ""; r.forEach((v, i) => { s += a[v % a.length]; if (i === 3) s += "-"; }); return s;
+}
+$("new").onclick = () => { $("h-err").textContent = ""; if (!needNick($("h-err"))) return; location.hash = newCode(); };
+$("go").onclick = () => {
+  $("h-err").textContent = "";
+  let c = $("code").value.trim().toLowerCase();
+  const m = c.match(/#([a-z0-9-]{4,40})\s*$/); if (m) c = m[1];   // 貼整條連結也可以
+  if (!CODE_RE.test(c)){ $("h-err").textContent = "房間代碼是 4 到 40 個英文小寫、數字或 -"; return; }
+  if (!needNick($("h-err"))) return;
+  location.hash = c;
+};
+$("code").addEventListener("keydown", e => { if (e.key === "Enter") $("go").click(); });
+
+/* ---------- 房間 ---------- */
+let room = null, peekTimer = null;
+const S = { peer: null, key: null, after: 0, local: null, mic: true, nick: "", peers: [], pcs: new Map(), people: new Map(),
+            failed: new Map(), loop: null, ctx: null, meters: new Map(), wake: null };
+
+function route(){
+  const c = decodeURIComponent(location.hash.slice(1)).toLowerCase();
+  if (S.peer && c !== room) stop(true);
+  if (!CODE_RE.test(c)){ room = null; $("room").hidden = true; $("home").hidden = false; clearInterval(peekTimer); return; }
+  room = c; $("home").hidden = true; $("room").hidden = false;
+  $("r-code").textContent = c; $("r-err").textContent = "";
+  $("ppl").innerHTML = ""; S.people.clear();
+  idleUI(); peek();
+  clearInterval(peekTimer);
+  peekTimer = setInterval(() => { if (!S.peer && document.visibilityState === "visible") peek(); }, 4000);
+}
+window.addEventListener("hashchange", route);
+$("back").onclick = () => { location.hash = ""; };
+$("share").onclick = async () => {
+  const url = location.origin + location.pathname + "#" + room;
+  try{
+    if (navigator.share){ await navigator.share({ title: "來開放聊天室聊天", text: "用聲音聊天，點連結就能進來：", url }); return; }
+  }catch(e){ if (e.name === "AbortError") return; }
+  try{ await navigator.clipboard.writeText(url); toast("連結已複製"); }catch(e){ prompt("複製這個連結傳給朋友：", url); }
+};
+
+async function peek(){
+  let names; try{ names = await rpc("ov_room", { p_room: room }); }catch(e){ $("status").textContent = "連不上，稍後再試"; return; }
+  if (S.peer) return;
+  $("status").textContent = names.length ? `房間裡有 ${names.length} 人，按開始加入` : "房間裡還沒有人，按開始先進去等";
+  const box = $("ppl"); box.innerHTML = "";
+  if (!names.length) box.appendChild(el("div", "empty", "把連結傳給朋友，\n他們點進來按「開始」就能聊。")).style.whiteSpace = "pre-line";
+  names.forEach(n => box.appendChild(personEl(n).root));
+}
+function personEl(name, me){
+  const root = el("div", "p" + (me ? " me" : "")), av = el("div", "av", (name || "?").trim().charAt(0));
+  const mute = el("span", "mute", "靜音"); mute.hidden = true; av.appendChild(mute);
+  const nm = el("div", "nm", me ? name + "（我）" : name), st = el("div", "st");
+  root.append(av, nm, st); return { root, mute, st };
+}
+function idleUI(){ $("r-nick").value = store.get("ov_nick") || ""; $("ctl-idle").hidden = false; $("ctl-live").hidden = true; $("r-hint").hidden = false; }
+function liveUI(){ $("ctl-idle").hidden = true; $("ctl-live").hidden = false; $("r-hint").hidden = true; }
+
+$("start").onclick = start;
+$("stop").onclick = () => stop();
+$("mic").onclick = () => {
+  if (!S.local) return;
+  S.mic = !S.mic; S.local.getAudioTracks().forEach(t => t.enabled = S.mic);
+  $("mic").textContent = S.mic ? "靜音" : "取消靜音"; $("mic").classList.toggle("off", !S.mic);
+  const me = S.people.get("me"); if (me) me.mute.hidden = S.mic;
+};
+
+async function start(){
+  $("r-err").textContent = "";
+  const nick = $("r-nick").value.trim();
+  if (!nick){ $("r-err").textContent = "先取一個暱稱"; $("r-nick").focus(); return; }
+  store.set("ov_nick", nick); $("nick").value = nick;
+  if (!navigator.mediaDevices || !window.RTCPeerConnection){ $("r-err").textContent = "這個瀏覽器不能用，請改用 Safari 或 Chrome。"; return; }
+  $("start").disabled = true; S.startedAt = Date.now();
+  try{ S.ctx = S.ctx || new (window.AudioContext || window.webkitAudioContext)(); S.ctx.resume && S.ctx.resume(); }catch(e){ S.ctx = null; }
+  try{
+    S.local = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }, video: false });
+    const r = await rpc("ov_join", { p_room: room, p_nick: nick });
+    Object.assign(S, { peer: r.peer, key: r.key, after: 0, peers: [], mic: true, nick });
+    S.failed.clear();
+  }catch(e){
+    if (S.local) S.local.getTracks().forEach(t => t.stop()); S.local = null;
+    $("r-err").textContent = /NotAllowed|Permission/i.test(e.name + e.message) ? "沒有拿到麥克風權限，請在瀏覽器設定裡允許後再試。"
+      : /NotFound/i.test(e.name) ? "找不到麥克風。" : e.message;
+    $("start").disabled = false; return;
+  }
+  $("start").disabled = false;
+  $("ppl").innerHTML = ""; S.people.clear();
+  const me = personEl(nick, true); S.people.set("me", me); $("ppl").appendChild(me.root);
+  meter("me", S.local.getAudioTracks()[0]);
+  $("mic").textContent = "靜音"; $("mic").classList.remove("off");
+  liveUI(); status(); wake();
+  S.loop = setTimeout(poll, 50);
+}
+
+function status(){
+  const n = S.peers.length;
+  $("status").textContent = n ? `正在和 ${n} 人聊天` : "你在房間裡，等朋友進來…";
+}
+
+async function poll(){
+  if (!S.peer) return;
+  let r;
+  try{ r = await rpc("ov_poll", { p_peer: S.peer, p_key: S.key, p_after: S.after, p_mic: S.mic }); }
+  catch(e){ S.loop = setTimeout(poll, 2500); return; }
+  if (!S.peer) return;
+  if (r.gone){ stop(true); $("r-err").textContent = "連線中斷太久，已經離開房間。按開始可以再進去。"; return; }
+  S.peers = r.peers;
+  const live = new Set(r.peers.map(p => p.peer));
+  S.pcs.forEach((c, id) => { if (!live.has(id)) drop(id); });
+  S.people.forEach((p, id) => { if (id !== "me" && !live.has(id)){ p.root.remove(); S.people.delete(id); unmeter(id); toast((p.nick || "有人") + " 離開了"); } });
+  for (const s of r.signals){
+    S.after = Math.max(S.after, s.id);
+    if (!live.has(s.from)) continue;
+    try{
+      if (s.kind === "offer") await answer(r.peers.find(p => p.peer === s.from), s.body);
+      if (s.kind === "answer"){ const c = S.pcs.get(s.from); if (c && c.pc.signalingState === "have-local-offer") await c.pc.setRemoteDescription({ type: "answer", sdp: s.body }); }
+    }catch(e){ drop(s.from, true); }
+  }
+  const now = Date.now();
+  r.peers.forEach(p => {
+    let x = S.people.get(p.peer);
+    if (!x){ x = personEl(p.nick); x.nick = p.nick; S.people.set(p.peer, x); $("ppl").appendChild(x.root); if (now - S.startedAt > 4000) toast(p.nick + " 進來了"); }
+    x.mute.hidden = !!p.mic;
+    const c = S.pcs.get(p.peer);
+    if (!c && S.peer < p.peer){ const f = S.failed.get(p.peer); if (!f || now - f.at > Math.min(4000 * f.n, 20000)) offer(p); }
+    if (c && c.state !== "connected" && now - c.born > 25000) drop(p.peer, true);
+    const f = S.failed.get(p.peer), cs = c ? c.state : "";
+    x.st.textContent = cs === "connected" ? "" : (f && f.n >= 2 ? "連不上，重試中" : "連線中…");
+  });
+  status();
+  S.loop = setTimeout(poll, document.visibilityState === "visible" ? 1200 : 2500);
+}
+
+function conn(p){
+  const pc = new RTCPeerConnection({ iceServers: CFG.ICE_SERVERS });
+  const c = { pc, born: Date.now(), state: "new", audio: new Audio() };
+  c.audio.autoplay = true; c.audio.setAttribute("playsinline", "");
+  pc.ontrack = e => {
+    c.audio.srcObject = new MediaStream([e.track]);
+    const pr = c.audio.play(); if (pr && pr.catch) pr.catch(() => { $("r-err").textContent = "點一下畫面任何地方就能聽到聲音"; document.addEventListener("click", () => { S.pcs.forEach(x => x.audio.play().catch(() => {})); $("r-err").textContent = ""; }, { once: true }); });
+    meter(p.peer, e.track);
+  };
+  pc.onconnectionstatechange = () => {
+    c.state = pc.connectionState;
+    if (c.state === "connected") S.failed.delete(p.peer);
+    if (c.state === "failed") drop(p.peer, true);
+  };
+  S.pcs.set(p.peer, c); return c;
+}
+function attach(c){
+  c.pc.getTransceivers().forEach(t => { t.direction = "sendrecv"; t.sender.replaceTrack(S.local.getAudioTracks()[0] || null); });
+}
+function gathered(pc){
+  return new Promise(res => {
+    if (pc.iceGatheringState === "complete") return res();
+    const tm = setTimeout(res, 2500);
+    pc.addEventListener("icegatheringstatechange", () => { if (pc.iceGatheringState === "complete"){ clearTimeout(tm); res(); } });
+  });
+}
+async function offer(p){
+  const c = conn(p);
+  c.pc.addTransceiver("audio", { direction: "sendrecv" }); attach(c);
+  try{
+    await c.pc.setLocalDescription(await c.pc.createOffer()); await gathered(c.pc);
+    if (S.pcs.get(p.peer) !== c) return;
+    await rpc("ov_send", { p_peer: S.peer, p_key: S.key, p_to: p.peer, p_kind: "offer", p_body: c.pc.localDescription.sdp });
+  }catch(e){ drop(p.peer, true); }
+}
+async function answer(p, sdp){
+  if (!p) return;
+  if (S.pcs.has(p.peer)) drop(p.peer);
+  const c = conn(p);
+  await c.pc.setRemoteDescription({ type: "offer", sdp }); attach(c);
+  await c.pc.setLocalDescription(await c.pc.createAnswer()); await gathered(c.pc);
+  if (S.pcs.get(p.peer) !== c) return;
+  await rpc("ov_send", { p_peer: S.peer, p_key: S.key, p_to: p.peer, p_kind: "answer", p_body: c.pc.localDescription.sdp });
+}
+function drop(id, failed){
+  const c = S.pcs.get(id);
+  if (c){ S.pcs.delete(id); try{ c.pc.close(); }catch(e){} c.audio.srcObject = null; }
+  if (failed){ const f = S.failed.get(id) || { n: 0 }; S.failed.set(id, { n: f.n + 1, at: Date.now() }); }
+}
+
+// 誰在說話：頭像外圈亮起來
+function meter(id, track){
+  if (!S.ctx || !track) return;
+  try{
+    unmeter(id);
+    const src = S.ctx.createMediaStreamSource(new MediaStream([track])), an = S.ctx.createAnalyser();
+    an.fftSize = 512; src.connect(an); S.meters.set(id, { src, an, buf: new Uint8Array(an.fftSize) });
+  }catch(e){}
+}
+function unmeter(id){ const m = S.meters.get(id); if (m){ try{ m.src.disconnect(); }catch(e){} S.meters.delete(id); } }
+setInterval(() => {
+  if (!S.peer) return;
+  S.meters.forEach((m, id) => {
+    m.an.getByteTimeDomainData(m.buf);
+    let pk = 0; for (let i = 0; i < m.buf.length; i++) pk = Math.max(pk, Math.abs(m.buf[i] - 128));
+    const x = S.people.get(id); if (x) x.root.classList.toggle("talk", pk > 12 && !(id === "me" && !S.mic));
+  });
+}, 150);
+
+// 聊天時不讓螢幕自己關掉
+async function wake(){ try{ if (navigator.wakeLock && S.peer) S.wake = await navigator.wakeLock.request("screen"); }catch(e){} }
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && S.peer) wake(); });
+
+function stop(quiet){
+  if (!S.peer) return;
+  const peer = S.peer, key = S.key; S.peer = null;
+  clearTimeout(S.loop);
+  S.pcs.forEach((c, id) => drop(id)); S.failed.clear();
+  S.meters.forEach((m, id) => unmeter(id));
+  if (S.local) S.local.getTracks().forEach(t => t.stop()); S.local = null;
+  try{ S.wake && S.wake.release(); }catch(e){} S.wake = null;
+  rpc("ov_leave", { p_peer: peer, p_key: key }, true).catch(() => {});
+  S.peers = []; S.people.clear(); idleUI();
+  if (!quiet){ toast("已經離開房間"); }
+  if (room) setTimeout(peek, 500);
+}
+window.addEventListener("pagehide", () => stop(true));
+route();
+})();
+</script>
+</body>
+</html>
