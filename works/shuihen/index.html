@@ -550,6 +550,8 @@ const STROKE_L=(c,ch,x,y,h,lw)=>{const w=h*.7,t=y-h/2,b=y+h/2,l=x-w/2,r=x+w/2;c.
   else if(ch==='N'){c.moveTo(l,b);c.lineTo(l,t);c.lineTo(r,b);c.lineTo(r,t);}
   else if(ch==='Z'){c.moveTo(l,t);c.lineTo(r,t);c.lineTo(l,b);c.lineTo(r,b);}
   c.stroke();};
+const MINIP=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);fillE(c,0,-.3,.09,.09);fillP(c,[[-.12,-.18],[.12,-.18],[.15,.2],[-.15,.2]]);c.restore();};
+const COIN=(c,x,y,r)=>{fillE(c,x,y,r,r);};
 const TXT=(c,t,x,y,px)=>{c.save();c.scale(.01,.01);c.font='900 '+px+'px '+SERIF;c.textAlign='center';c.textBaseline='middle';c.fillText(t,x*100,y*100);c.restore();};
 const RRECT=(c,x0,y0,x1,y1,r)=>{c.beginPath();c.moveTo(x0+r,y0);c.lineTo(x1-r,y0);c.quadraticCurveTo(x1,y0,x1,y0+r);c.lineTo(x1,y1-r);c.quadraticCurveTo(x1,y1,x1-r,y1);
   c.lineTo(x0+r,y1);c.quadraticCurveTo(x0,y1,x0,y1-r);c.lineTo(x0,y0+r);c.quadraticCurveTo(x0,y0,x0+r,y0);c.closePath();c.fill();};
@@ -861,6 +863,10 @@ function shapeById(id){
   if(id==='scaleN')return {name:'天平上的 N',kind:'o',rot:0,core:[0,.05],box:[1.1,1],draw(c){c.fillRect(-.03,-.3,.06,.66);c.fillRect(-.18,.36,.36,.06);c.save();c.translate(0,-.3);c.rotate(-.28);c.fillRect(-.46,-.025,.92,.05);c.restore();c.lineWidth=.02;const L=[-.44,-.3+.126],R=[.44,-.3-.126];for(const [x,y] of [L,R]){c.beginPath();c.moveTo(x,y);c.lineTo(x-.12,y+.2);c.moveTo(x,y);c.lineTo(x+.12,y+.2);c.stroke();fillP(c,[[x-.16,y+.2],[x+.16,y+.2],[x+.1,y+.26],[x-.1,y+.26]]);}STROKE_L(c,'N',L[0],L[1]+.04,.24,.06);TXT(c,'abc',R[0],R[1]+.12,14);},cut(c){}};
   if(id==='heavyN')return {name:'壓地的 N',kind:'o',rot:0,core:[0,.05],box:[1.05,1],draw(c){TXT(c,'N',0,-.02,92);c.fillRect(-.5,.4,1,.05);},cut(c){c.lineWidth=.022;c.beginPath();c.moveTo(-.3,.42);c.lineTo(-.22,.47);c.moveTo(.26,.42);c.lineTo(.34,.47);c.stroke();}};
   if(id==='nMountain')return {name:'恩重如山',kind:'o',rot:0,core:[0,.1],box:[1.1,1],draw(c){fillP(c,[[-.52,.44],[-.2,-.2],[-.06,.0],[.14,-.36],[.52,.44]]);},cut(c){TXT(c,'N',.06,.18,40);}};
+  if(id==='aiUsers')return {name:'大家都在用 AI',kind:'o',rot:0,core:[0,.1],box:[1.1,.95],draw(c){for(const x of [-.36,0,.36]){MINIP(c,x,-.06,.8);LAPTOP(c,x,.44,.4);}c.fillRect(-.52,.48,1.04,.03);},cut(c){for(const x of [-.36,0,.36])c.fillRect(x-.065,.44-.105,.13,.08);}};
+  if(id==='aiToll')return {name:'用一次付一次',kind:'o',rot:0,core:[0,.1],box:[1.1,.95],draw(c){c.fillRect(.14,-.2,.26,.56);fillP(c,[[.1,-.2],[.44,-.2],[.4,-.3],[.14,-.3]]);c.fillRect(-.2,.04,.34,.05);MINIP(c,-.42,.2,.85);COIN(c,-.2,-.24,.09);},cut(c){c.fillRect(.2,-.12,.14,.12);c.lineWidth=.022;c.beginPath();c.arc(-.2,-.24,.055,0,7);c.stroke();c.fillRect(-.1,.045,.06,.04);}};
+  if(id==='coinsConverge')return {name:'錢流向同一處',kind:'o',rot:0,core:[0,.05],box:[1.1,1],draw(c){c.fillRect(-.12,-.1,.24,.5);fillP(c,[[-.16,-.1],[.16,-.1],[0,-.26]]);for(const [x,y] of [[-.5,-.4],[.5,-.4],[-.52,.1],[.52,.1],[-.36,.42],[.36,.42]]){COIN(c,x,y,.07);STREAM(c,x*.86,y*.86,x*.55,y*.5,x*.24,y*.22+.08,.035,.06);}},cut(c){c.fillRect(-.05,.0,.1,.12);c.fillRect(-.05,.2,.1,.12);}};
+  if(id==='bigToll')return {name:'變大的收費方',kind:'o',rot:0,core:[0,.05],box:[1.1,1.05],draw(c){c.fillRect(-.06,-.5,.4,.96);fillP(c,[[-.1,-.5],[.38,-.5],[.14,-.62]]);for(const x of [-.44,-.24])MINIP(c,x,.34,.42);c.fillRect(-.52,.44,1.04,.03);},cut(c){for(let y=-.4;y<.36;y+=.12)for(const x of [.02,.12,.22])c.fillRect(x,y,.06,.07);COIN(c,.14,-.53,.035);}};
   if(id==='hsrSelfie')return profileShape({id:'flat',fixed:1,name:'自拍出發',extra:c=>{c.save();c.translate(1.16,.36);c.scale(.36,.36);c.rotate(-.2);PHONE(c);c.restore();SNOW(c,1.36,-.02,.12);SNOW(c,1.04,-.08,.1);},cutP:SMILE,scale:.78,shift:-.22,box:[1.5,1.15],core:[-.22,0]});
   if(id==='marquee')return {name:'倒過來的跑馬燈',kind:'o',rot:0,core:[0,.1],box:[1.1,1],draw(c){c.fillRect(-.48,-.3,.96,.3);c.fillRect(-.48,.14,.28,.3);c.fillRect(.2,.14,.28,.3);c.save();c.translate(.42,-.5);c.scale(.6,.6);QMARK(c);c.restore();},cut(c){c.save();c.translate(0,-.14);c.scale(-1,1);TXT(c,'南港',0,0,32);c.restore();}};
   if(id==='iceFlirt')return pair('神魂顛島',SMILE,SMILE,c=>{HEART(c,0,-.34,.09);SNOW(c,-.22,-.4,.05);SNOW(c,.22,-.4,.05);});
@@ -2051,6 +2057,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'誰會變大',panels:[['aiUsers','大家都在用 AI。'],['aiToll','每用一次，都得付費。'],['coinsConverge','錢流向同一個地方。'],['bigToll','變大的，是收費的那一方。',0,3.5]]},
   {title:'恩重如山',panels:[['lettersHeavy','26 個字母，誰最重？'],['scaleN','放上天平秤一秤——'],['heavyN','N 最重。'],['nMountain','N（恩）重如山！',0,3.5]]},
   {title:'吃安眠藥',panels:[['bedSleep','病人睡得正熟。'],['nurseWake','「醒醒，別睡了！」'],['bedHuh','「……幹什麼？」'],['nursePill','「起來吃安眠藥了！」',0,3.5]]},
   {title:'冰山一角',panels:[['bergAsk','冰山值多少錢？'],['bergWhole','水面下大得很，'],['bergTip','但露出來的只有——'],['coinJiao','一角。',0,3.5]]},
@@ -2292,7 +2299,7 @@ const CATMAP={
   '搶匪小偷':['金口難開','負數','可能看到了','換科目','業內人士','遙控器','一起找'],
   '職場校園':['吃安眠藥','緩兵之計','呷好西瓜','有求必應','下一位','送行宴','鏡子都敢照','不會再問我','自己寫','哪邊涼快','不在人事','一個人過','仙草蜜','飢童','不忍心','美紅敢','錯的先講','吸菸區','沉默','看辦公室','可以回家','倫理學','很會說謊','烤箱手套'],
   '時事諷刺':['砍光','凱文呢','民調','太晚了','有用','重燃希望','誰是白痴','塗成藍色','我們的願望','白羊吃草','會飛的車'],
-  '故事小品':['大國者下流','說跑收活','成其大','省道','背上的字','手作禮物','只是欣賞','一片葉子','種子','不打你','慣性','颱風要來','收拾','放下','恆河','平安','等','釣','慢','午後']};
+  '故事小品':['誰會變大','大國者下流','說跑收活','成其大','省道','背上的字','手作禮物','只是欣賞','一片葉子','種子','不打你','慣性','颱風要來','收拾','放下','恆河','平安','等','釣','慢','午後']};
 STORIES.forEach(S=>{S.cats=CATS.filter(c=>(CATMAP[c]||[]).includes(S.title));if(!S.cats.length)S.cats=['日常冷笑話'];});
 let storyCat='all';
 const inCat=S=>storyCat==='all'||S.cats.includes(storyCat);
