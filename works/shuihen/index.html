@@ -560,6 +560,8 @@ const FOX=(c,x,y,k,a)=>{c.save();c.translate(x,y);c.rotate(a||0);c.scale(k,k);fi
 const PEEL=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);fillE(c,0,0,.07,.05);c.lineWidth=.06;c.lineCap='round';c.beginPath();c.moveTo(0,0);c.quadraticCurveTo(-.14,-.02,-.2,.06);c.moveTo(0,0);c.quadraticCurveTo(.14,-.02,.2,.06);c.moveTo(0,0);c.quadraticCurveTo(.02,-.12,.0,-.18);c.stroke();c.restore();};
 const ZIG=(c,x,y,a,n)=>{c.lineWidth=.035;c.lineCap='round';c.beginPath();let px=x,py=y;c.moveTo(px,py);for(let k=0;k<(n||3);k++){px+=Math.cos(a)*.05+(k%2?.03:-.03);py+=Math.sin(a)*.05;c.lineTo(px,py);}c.stroke();};
 const TXT=(c,t,x,y,px)=>{c.save();c.scale(.01,.01);c.font='900 '+px+'px '+SERIF;c.textAlign='center';c.textBaseline='middle';c.fillText(t,x*100,y*100);c.restore();};
+const BEAN=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);fillE(c,0,0,.2,.16);c.restore();};
+const BEAN_CUT=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);fillE(c,.0,-.1,.06,.018);c.restore();};
 const TXTB=(c,t,x,y,px,w)=>{c.save();c.scale(.01,.01);c.font='900 '+px+'px '+SERIF;c.textAlign='center';c.textBaseline='middle';c.lineWidth=(w||.03)*100;c.lineJoin='round';c.strokeStyle=c.fillStyle;c.fillText(t,x*100,y*100);c.strokeText(t,x*100,y*100);c.restore();};
 const RRECT=(c,x0,y0,x1,y1,r)=>{c.beginPath();c.moveTo(x0+r,y0);c.lineTo(x1-r,y0);c.quadraticCurveTo(x1,y0,x1,y0+r);c.lineTo(x1,y1-r);c.quadraticCurveTo(x1,y1,x1-r,y1);
   c.lineTo(x0+r,y1);c.quadraticCurveTo(x0,y1,x0,y1-r);c.lineTo(x0,y0+r);c.quadraticCurveTo(x0,y0,x0+r,y0);c.closePath();c.fill();};
@@ -897,6 +899,10 @@ function shapeById(id){
   if(id==='bigThree')return {name:'3',kind:'o',rot:0,core:[0,.05],box:[.9,1],draw(c){TXT(c,'3',0,.06,90);c.save();c.translate(-.5,-.6);c.scale(.6,.6);QMARK(c);c.restore();},cut(c){}};
   if(id==='threeNo')return {name:'不是 3',kind:'o',rot:0,core:[0,.05],box:[.9,1],draw(c){TXTB(c,'3',-.16,.06,80);c.lineWidth=.07;c.lineCap='round';c.beginPath();c.moveTo(.18,-.14);c.lineTo(.46,.16);c.moveTo(.46,-.14);c.lineTo(.18,.16);c.stroke();},cut(c){}};
   if(id==='andMiddle')return {name:'中間的和',kind:'o',rot:0,core:[0,.05],box:[1.1,.9],draw(c){TXTB(c,'2',-.42,.08,40);TXTB(c,'和',0,.08,40,.02);TXTB(c,'4',.42,.08,40);fillP(c,[[0,-.2],[-.09,-.32],[.09,-.32]]);c.fillRect(-.03,-.5,.06,.2);c.fillRect(-.2,.34,.4,.05);},cut(c){}};
+  if(id==='soyAsk')return {name:'一顆黃豆',kind:'o',rot:0,core:[0,.1],box:[1,1],draw(c){BEAN(c,0,.16,1.6);TXTB(c,'？',.3,-.32,44,.02);},cut(c){BEAN_CUT(c,0,.16,1.6);}};
+  if(id==='edamame')return {name:'毛豆莢',kind:'o',rot:0,core:[0,.05],box:[1.1,.9],draw(c){c.save();c.rotate(-.25);for(const x of [-.26,0,.26])fillE(c,x,0,.16,.13);c.fillRect(-.36,-.06,.72,.12);c.lineWidth=.025;c.lineCap='round';c.beginPath();for(let x=-.34;x<=.34;x+=.11){c.moveTo(x,-.14);c.lineTo(x-.01,-.18);c.moveTo(x,.14);c.lineTo(x+.01,.18);}c.stroke();c.lineWidth=.04;c.beginPath();c.moveTo(.4,0);c.quadraticCurveTo(.5,-.02,.52,-.1);c.stroke();c.restore();},cut(c){}};
+  if(id==='teenFace')return profileShape({id:'flat',fixed:1,name:'長痘痘的年輕人',extra:c=>{},cutP:c=>{MOUTH(c);for(const [x,y] of [[.68,.32],[.78,.42],[.62,.46],[.84,.26]])fillE(c,x,y,.03,.03);},box:[1.12,1.3],core:[0,.08]});
+  if(id==='teenBean')return {name:'青春豆',kind:'o',rot:0,core:[0,.1],box:[1.05,1],draw(c){BEAN(c,0,.14,1.7);STAR2(c,-.4,-.32,.07);STAR2(c,.42,-.28,.06);c.lineWidth=.035;c.lineCap='round';c.beginPath();c.moveTo(-.34,.22);c.lineTo(-.5,.06);c.moveTo(.34,.22);c.lineTo(.5,.06);c.stroke();},cut(c){fillE(c,-.1,.08,.03,.035);fillE(c,.1,.08,.03,.035);c.lineWidth=.03;c.beginPath();c.arc(0,.14,.1,.3,2.84);c.stroke();for(const [x,y] of [[-.2,.22],[.22,.2],[.16,-.04]])fillE(c,x,y,.022,.022);}};
   if(id==='hsrSelfie')return profileShape({id:'flat',fixed:1,name:'自拍出發',extra:c=>{c.save();c.translate(1.16,.36);c.scale(.36,.36);c.rotate(-.2);PHONE(c);c.restore();SNOW(c,1.36,-.02,.12);SNOW(c,1.04,-.08,.1);},cutP:SMILE,scale:.78,shift:-.22,box:[1.5,1.15],core:[-.22,0]});
   if(id==='marquee')return {name:'倒過來的跑馬燈',kind:'o',rot:0,core:[0,.1],box:[1.1,1],draw(c){c.fillRect(-.48,-.3,.96,.3);c.fillRect(-.48,.14,.28,.3);c.fillRect(.2,.14,.28,.3);c.save();c.translate(.42,-.5);c.scale(.6,.6);QMARK(c);c.restore();},cut(c){c.save();c.translate(0,-.14);c.scale(-1,1);TXT(c,'南港',0,0,32);c.restore();}};
   if(id==='iceFlirt')return pair('神魂顛島',SMILE,SMILE,c=>{HEART(c,0,-.34,.09);SNOW(c,-.22,-.4,.05);SNOW(c,.22,-.4,.05);});
@@ -2087,6 +2093,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'青春豆',panels:[['soyAsk','黃豆年輕時叫什麼？'],['edamame','毛豆？那是真的。'],['teenFace','年輕人臉上常冒的——'],['teenBean','青春豆（痘）！',0,3.5]]},
   {title:'2和4中間',panels:[['twoAndFour','2和4中間是什麼？'],['bigThree','3？'],['threeNo','不對。'],['andMiddle','是「和」。',0,3.5]]},
   {title:'不會痛的病',panels:[['ifCarThink','病在哪裡不會痛？'],['headache','頭？會痛。'],['tummyAche','肚子？也會痛。'],['otherSick','在別人身上。',0,3.5]]},
   {title:'太陽是男生',panels:[['skyThree','日月星，誰是男生？'],['moonStar','月亮溫柔，星星可愛……'],['sunSun','太陽的英文是 Sun，'],['sunSon','Son，兒子！',0,3.5]]},
@@ -2330,7 +2337,7 @@ const STORIES=[
 ];
 const CATS=['諧音梗','夫妻家庭','搶匪小偷','職場校園','時事諷刺','日常冷笑話','故事小品'];
 const CATMAP={
-  '諧音梗':['太陽是男生','腳滑','很嗆','第九天長','恩重如山','冰山一角','翻身的機會','如果的車','冰島','老當易撞','詩靈','喝T','知豬','刀削面','碰頭','容易掛','壓蛇帽','菇單','沒人理','一拍即合','最笨的字母','麥生氣','新衣耶','警察','阿拉伯','好鴨','拭十箍','矮love游','站久會酸','導魚','菇毒','雞凍','肥而不溺','擺事可樂','沒龜','猴頭菇','火腿','恁母伊郎','菊花茶','比三小','西北雨','北極的牛','地下道','下酒菜','梗多','滑馬','沒關C','在下','目光','泡你','我的天','沒氣了','南方','最甜的蜜','小氣蝦','瓦斯怎麼叫','缺陷','冰心地瓜','不在人事','多大','雨多甜','還沒滾','蟻后','坐白宮','擲筊','一個人過','鳳梨酥','仙草蜜','一波三折','八天的','飢童','美紅敢','仰式','你哪位','哈囉 win','窗戶凍住了','左右腦','換科目','業內人士','找誰接','半手李','閉眼說瞎話','誰是京都人','金口難開','看辦公室','週一休息','看穿'],
+  '諧音梗':['青春豆','太陽是男生','腳滑','很嗆','第九天長','恩重如山','冰山一角','翻身的機會','如果的車','冰島','老當易撞','詩靈','喝T','知豬','刀削面','碰頭','容易掛','壓蛇帽','菇單','沒人理','一拍即合','最笨的字母','麥生氣','新衣耶','警察','阿拉伯','好鴨','拭十箍','矮love游','站久會酸','導魚','菇毒','雞凍','肥而不溺','擺事可樂','沒龜','猴頭菇','火腿','恁母伊郎','菊花茶','比三小','西北雨','北極的牛','地下道','下酒菜','梗多','滑馬','沒關C','在下','目光','泡你','我的天','沒氣了','南方','最甜的蜜','小氣蝦','瓦斯怎麼叫','缺陷','冰心地瓜','不在人事','多大','雨多甜','還沒滾','蟻后','坐白宮','擲筊','一個人過','鳳梨酥','仙草蜜','一波三折','八天的','飢童','美紅敢','仰式','你哪位','哈囉 win','窗戶凍住了','左右腦','換科目','業內人士','找誰接','半手李','閉眼說瞎話','誰是京都人','金口難開','看辦公室','週一休息','看穿'],
   '夫妻家庭':['李拜一','四隻腳','拿掃把','湊滿一船','隔壁老王','臉色','好女子','著火了','我的天','算錯','仙女','誤點','玩夠沒','瓶蓋','最佳搭檔','帶過來的','明天減肥','我不知道','我知道','第一次','會下蛋嗎','南方','挑食','五個媽','雨多甜','還沒滾','看不到你','多生兩個','貓與虎','送回娘家','七十才開始','一模一樣','買菸','需要談談','不敢問','窗戶凍住了','一切都很好','沒安全感','所以要我留下','露台','四個孩子的爸','深夜講座','睜一隻眼','緩解疼痛','九十歲','撞到告訴我','很會說謊','很甜','兩根菸'],
   '搶匪小偷':['金口難開','負數','可能看到了','換科目','業內人士','遙控器','一起找'],
   '職場校園':['吃安眠藥','緩兵之計','呷好西瓜','有求必應','下一位','送行宴','鏡子都敢照','不會再問我','自己寫','哪邊涼快','不在人事','一個人過','仙草蜜','飢童','不忍心','美紅敢','錯的先講','吸菸區','沉默','看辦公室','可以回家','倫理學','很會說謊','烤箱手套'],
