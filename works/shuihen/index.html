@@ -2618,7 +2618,7 @@ cv.addEventListener('pointerdown',e=>{if(mode==='free')skipTo({x:e.clientX,y:e.c
 $('next').addEventListener('click',()=>skipTo(null));
 $('pause').addEventListener('click',()=>{paused=!paused;$('pause').textContent=paused?'繼續':'暫停';syncAudio();if(TTS&&narrOn){if(paused)TTS.pause();else TTS.resume();}});
 /* ---------- 旁白：用手機的語音念出標題和每一格字幕 ---------- */
-function narrVoice(){if(!TTS)return null;const vs=TTS.getVoices();return vs.find(v=>/zh[-_]TW|Hant/i.test(v.lang))||vs.find(v=>/^zh/i.test(v.lang))||null;}
+function narrVoice(){if(!TTS)return null;const vs=TTS.getVoices();const L=v=>String(v.lang||'');const yue=v=>/HK|MO|yue/i.test(L(v))||/cantonese|粵/i.test(v.name);return vs.find(v=>/zh[-_]TW/i.test(L(v))&&!yue(v))||vs.find(v=>/^(zh[-_](CN|SG)|cmn)/i.test(L(v)))||vs.find(v=>/^zh/i.test(L(v))&&!yue(v))||null;}
 function narrate(k){
   if(!TTS||!narrOn||!story)return;
   if(k===0)TTS.cancel();
@@ -2634,7 +2634,7 @@ $('narr').addEventListener('click',()=>{
   if(!narrOn){TTS.cancel();return;}
   if(round&&story&&round.k!=null){TTS.cancel();const k=round.k;const cap=String(story.S.panels[k][1]||'').replace(/[「」『』]/g,'').replace(/——/g,'，');const u=new SpeechSynthesisUtterance(story.S.title+'。'+cap);const v=narrVoice();if(v){u.voice=v;u.lang=v.lang;}else u.lang='zh-TW';TTS.speak(u);}
 });
-if(TTS&&TTS.getVoices().length===0&&'onvoiceschanged' in TTS)TTS.onvoiceschanged=()=>{};
+if(TTS){TTS.getVoices();if('onvoiceschanged' in TTS)TTS.onvoiceschanged=()=>{TTS.getVoices();};}
 $('speed').addEventListener('click',()=>{speedIdx=(speedIdx+1)%SPEEDS.length;$('speed').textContent=`速度 ${SPEEDS[speedIdx]}×`;});
 document.querySelectorAll('[data-cat]').forEach(b=>b.addEventListener('click',()=>{cat=b.dataset.cat;
   document.querySelectorAll('[data-cat]').forEach(x=>x.setAttribute('aria-pressed',x===b?'true':'false'));}));
