@@ -99,6 +99,7 @@ button:focus-visible{outline:2px solid var(--chalk);outline-offset:2px}
       <button id="next" type="button">換下一個</button>
       <button id="speed" type="button">速度 1×</button>
       <button id="sound" type="button" aria-pressed="false">開聲音</button>
+      <button id="narr" type="button" aria-pressed="false">開旁白</button>
       <div class="seg" role="group" aria-label="模式">
         <button type="button" id="m-story" data-mode="story" aria-pressed="true">四格故事</button>
         <button type="button" id="m-free" data-mode="free" aria-pressed="false">自由</button>
@@ -161,6 +162,7 @@ let W=0,H=0,DPR=1,CELL=3,GW=0,GH=0,N=0;
 let acc,accDry,wet,stain,mask,arr,dryT,rough,gloss,depth,queue,heapI,heapK,wImg,sImg;
 let anchor={x:-30,y:0},nozzle={x:0,y:0},aimAng=-.4;
 let round=null,queuedAt=null,paused=false,speedIdx=0,cat='all',lastName='';
+const TTS=window.speechSynthesis||null;let narrOn=false;
 const SPEEDS=[1,2,4];
 const FLOW=50;
 let parts=[];
@@ -2373,7 +2375,7 @@ function planStory(){
   story={S,L:storyLayout(),shapes,capA:[0,0,0,0],jit:S.panels.map(()=>Array.from({length:24},()=>rand(-1.8,1.8)))};
   startPanel(0);
 }
-function startPanel(k){const p=story.S.panels[k];planRound({sh:story.shapes[k],rect:story.L.rects[k],flip:!!p[2],k,keepAcc:k>0,lag:p[3]||0,rot:p[4]});}
+function startPanel(k){const p=story.S.panels[k];narrate(k);planRound({sh:story.shapes[k],rect:story.L.rects[k],flip:!!p[2],k,keepAcc:k>0,lag:p[3]||0,rot:p[4]});}
 function planRound(opt={}){
   const sh=opt.sh||pickShape();let sPx,cx,cy,nx,ny,flip;
   if(opt.rect){const p=opt.rect;
@@ -2614,7 +2616,25 @@ function skipTo(at){
 }
 cv.addEventListener('pointerdown',e=>{if(mode==='free')skipTo({x:e.clientX,y:e.clientY});$('hint').classList.add('gone');});
 $('next').addEventListener('click',()=>skipTo(null));
-$('pause').addEventListener('click',()=>{paused=!paused;$('pause').textContent=paused?'繼續':'暫停';syncAudio();});
+$('pause').addEventListener('click',()=>{paused=!paused;$('pause').textContent=paused?'繼續':'暫停';syncAudio();if(TTS&&narrOn){if(paused)TTS.pause();else TTS.resume();}});
+/* ---------- 旁白：用手機的語音念出標題和每一格字幕 ---------- */
+function narrVoice(){if(!TTS)return null;const vs=TTS.getVoices();return vs.find(v=>/zh[-_]TW|Hant/i.test(v.lang))||vs.find(v=>/^zh/i.test(v.lang))||null;}
+function narrate(k){
+  if(!TTS||!narrOn||!story)return;
+  if(k===0)TTS.cancel();
+  const cap=String(story.S.panels[k][1]||'').replace(/[「」『』]/g,'').replace(/——/g,'，');
+  const say=(k===0?story.S.title+'。':'')+cap;
+  const u=new SpeechSynthesisUtterance(say);const v=narrVoice();if(v){u.voice=v;u.lang=v.lang;}else u.lang='zh-TW';
+  u.rate=[1,1.15,1.3][speedIdx]||1;TTS.speak(u);
+}
+$('narr').hidden=!TTS;
+$('narr').addEventListener('click',()=>{
+  narrOn=!narrOn;try{localStorage.setItem('sh_narr',narrOn?'1':'0');}catch(e){}
+  $('narr').textContent=narrOn?'關旁白':'開旁白';$('narr').setAttribute('aria-pressed',narrOn?'true':'false');
+  if(!narrOn){TTS.cancel();return;}
+  if(round&&story&&round.k!=null){TTS.cancel();const k=round.k;const cap=String(story.S.panels[k][1]||'').replace(/[「」『』]/g,'').replace(/——/g,'，');const u=new SpeechSynthesisUtterance(story.S.title+'。'+cap);const v=narrVoice();if(v){u.voice=v;u.lang=v.lang;}else u.lang='zh-TW';TTS.speak(u);}
+});
+if(TTS&&TTS.getVoices().length===0&&'onvoiceschanged' in TTS)TTS.onvoiceschanged=()=>{};
 $('speed').addEventListener('click',()=>{speedIdx=(speedIdx+1)%SPEEDS.length;$('speed').textContent=`速度 ${SPEEDS[speedIdx]}×`;});
 document.querySelectorAll('[data-cat]').forEach(b=>b.addEventListener('click',()=>{cat=b.dataset.cat;
   document.querySelectorAll('[data-cat]').forEach(x=>x.setAttribute('aria-pressed',x===b?'true':'false'));}));
