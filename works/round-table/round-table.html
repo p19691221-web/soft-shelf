@@ -117,7 +117,8 @@ try { speakOn = localStorage.getItem("gc_speak") === "1"; } catch (e) {}
 function zhVoice() {
   if (!tts) return null;
   const vs = tts.getVoices();
-  return vs.find(v => /zh[-_]TW|Hant/i.test(v.lang)) || vs.find(v => /^zh/i.test(v.lang)) || null;
+  const L = v => String(v.lang || ""), yue = v => /HK|MO|yue/i.test(L(v)) || /cantonese|粵/i.test(v.name);   // 避開粵語
+  return vs.find(v => /zh[-_]TW/i.test(L(v)) && !yue(v)) || vs.find(v => /^(zh[-_](CN|SG)|cmn)/i.test(L(v))) || vs.find(v => /^zh/i.test(L(v)) && !yue(v)) || null;
 }
 function say(text) {
   if (!tts || !speakOn) return;

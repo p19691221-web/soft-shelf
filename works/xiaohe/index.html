@@ -207,7 +207,8 @@ function loadVoices(){
   voices = zh.length ? zh : all;
   const pick = store.get("hv_voice");
   const sel = $("voice"); sel.innerHTML = "";
-  const rank = v => /TW|Hant/i.test(v.lang) ? 0 : /^zh/i.test(v.lang) ? 1 : 2;
+  const yue = v => /HK|MO|yue/i.test(v.lang) || /cantonese|粵/i.test(v.name);   // 粵語排最後
+  const rank = v => yue(v) ? 3 : /zh[-_]TW/i.test(v.lang) ? 0 : /^(zh[-_](CN|SG)|cmn)/i.test(v.lang) ? 1 : /^zh/i.test(v.lang) ? 2 : 3;
   voices.sort((a, b) => rank(a) - rank(b)).forEach((v, i) => {
     const o = document.createElement("option"); o.value = String(i);
     o.textContent = v.name.replace(/Microsoft |Google |\(.*?\)/g, "").trim() + "・" + v.lang;
