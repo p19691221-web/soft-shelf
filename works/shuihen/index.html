@@ -942,6 +942,7 @@ function shapeById(id){
   if(id==='eggTurtle')return {name:'王八蛋',kind:'o',rot:0,core:[0,.1],box:[1.1,.95],draw(c){TURT(c,-.28,.2,.95);EGG2(c,.26,.06,1.35);c.fillRect(-.52,.38,1.04,.03);},cut(c){TXT(c,'王',.26,.0,15);TXT(c,'八',.26,.15,15);}};
   if(id==='wantAsk')return {name:'不想得到的東西',kind:'o',rot:0,core:[0,.05],box:[1.05,1],draw(c){MINIP(c,-.14,.1,1.25);c.fillRect(-.5,.42,1,.03);TXTB(c,'？',.3,-.28,48,.02);},cut(c){}};
   if(id==='giftBox')return {name:'禮物',kind:'o',rot:0,core:[0,.1],box:[1,1],draw(c){c.fillRect(-.3,-.06,.6,.46);c.fillRect(-.36,-.18,.72,.14);c.beginPath();c.ellipse(-.1,-.28,.12,.07,-.4,0,7);c.ellipse(.1,-.28,.12,.07,.4,0,7);c.fill();HEART(c,.38,-.38,.05);},cut(c){c.fillRect(-.035,-.18,.07,.58);c.fillRect(-.3,.1,.6,.05);}};
+  if(id==='docVisit')return {name:'醫生來巡房',kind:'o',rot:0,core:[0,.15],box:[1.1,.95],draw(c){c.save();c.translate(-.12,.06);c.scale(.85,.85);BED2(c);fillE(c,-.24,-.02,.09,.09);c.restore();MINIP(c,.38,.04,1.05);c.fillRect(.14,-.14,.12,.16);c.lineWidth=.04;c.lineCap='round';c.beginPath();c.moveTo(.28,-.12);c.lineTo(.22,-.06);c.stroke();},cut(c){c.lineWidth=.02;c.beginPath();c.moveTo(.33,-.18);c.quadraticCurveTo(.38,-.06,.43,-.18);c.stroke();fillE(c,.38,-.06,.02,.02);c.fillRect(.17,-.1,.06,.015);c.fillRect(.17,-.06,.06,.015);}};
   if(id==='hsrSelfie')return profileShape({id:'flat',fixed:1,name:'自拍出發',extra:c=>{c.save();c.translate(1.16,.36);c.scale(.36,.36);c.rotate(-.2);PHONE(c);c.restore();SNOW(c,1.36,-.02,.12);SNOW(c,1.04,-.08,.1);},cutP:SMILE,scale:.78,shift:-.22,box:[1.5,1.15],core:[-.22,0]});
   if(id==='marquee')return {name:'倒過來的跑馬燈',kind:'o',rot:0,core:[0,.1],box:[1.1,1],draw(c){c.fillRect(-.48,-.3,.96,.3);c.fillRect(-.48,.14,.28,.3);c.fillRect(.2,.14,.28,.3);c.save();c.translate(.42,-.5);c.scale(.6,.6);QMARK(c);c.restore();},cut(c){c.save();c.translate(0,-.14);c.scale(-1,1);TXT(c,'南港',0,0,32);c.restore();}};
   if(id==='iceFlirt')return pair('神魂顛島',SMILE,SMILE,c=>{HEART(c,0,-.34,.09);SNOW(c,-.22,-.4,.05);SNOW(c,.22,-.4,.05);});
@@ -2132,6 +2133,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'不看醫生',panels:[['wantAsk','誰生病從不看醫生？'],['careHome','去醫院？那是去看醫生。'],['hospBed','住院的人——'],['docVisit','醫生每天來看他！',0,3.5]]},
   {title:'不想得到',panels:[['wantAsk','大家都不想得到什麼？'],['giftBox','禮物？大家都想要。'],['trophyWin','獎盃？也想要。'],['hospBed','得病。',0,3.5]]},
   {title:'蛋商',panels:[['eggMan','不要小看這個人喔！'],['eggStall','他其實是個蛋商，'],['eggKinds','還專賣特別的蛋：'],['eggTurtle','笨蛋、壞蛋、王八蛋……',0,3.5]]},
   {title:'夢想家',panels:[['homeAsk','什麼人最想家？'],['homeAway','出外的遊子？'],['sleepDream','有人連睡覺都在想——'],['dreamer','夢・想家！',0,3.5]]},
