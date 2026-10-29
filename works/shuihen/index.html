@@ -2634,6 +2634,11 @@ function narrate(k){
   u.rate=[1,1.15,1.3][speedIdx]||1;TTS.speak(u);
 }
 $('narr').hidden=!TTS;
+// 記住上次開著旁白：手機要先碰一下畫面才准發聲，所以第一次點畫面時補念目前這一格
+function narrSay(text){const u=new SpeechSynthesisUtterance(text);const v=narrVoice();if(v){u.voice=v;u.lang=v.lang;}else u.lang='zh-TW';u.rate=[1,1.15,1.3][speedIdx]||1;TTS.speak(u);}
+function narrCurrent(){if(!TTS||!narrOn||!story||!round||round.k==null)return;TTS.cancel();const k=round.k;narrSay((k===0?story.S.title+'。':'')+String(story.S.panels[k][1]||'').replace(/[「」『』]/g,'').replace(/——/g,'，'));}
+try{if(TTS&&localStorage.getItem('sh_narr')==='1'){narrOn=true;$('narr').textContent='關旁白';$('narr').setAttribute('aria-pressed','true');
+  const first=e=>{document.removeEventListener('pointerdown',first,true);if(e.target&&e.target.id==='narr')return;narrCurrent();};document.addEventListener('pointerdown',first,true);}}catch(e){}
 $('narr').addEventListener('click',()=>{
   narrOn=!narrOn;try{localStorage.setItem('sh_narr',narrOn?'1':'0');}catch(e){}
   $('narr').textContent=narrOn?'關旁白':'開旁白';$('narr').setAttribute('aria-pressed',narrOn?'true':'false');
