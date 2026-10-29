@@ -1,0 +1,86 @@
+name: 投稿 AI 創作
+description: 分享 AI 輔助創作的文字、圖片、音樂或影片
+title: "[AI創作] "
+labels: ["submission"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        投稿送出後會立即成為公開 GitHub Issue，請勿填入私人資料。
+        審核後加上 listed 標籤，才會出現在收藏館。
+        文字可貼全文；圖片、音樂及影片請提供作品連結。
+  - type: input
+    id: name
+    attributes:
+      label: 名稱
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: 作品類型
+      options:
+        - 文字
+        - 圖片
+        - 音樂
+        - 影片
+    validations:
+      required: true
+  - type: input
+    id: url
+    attributes:
+      label: 網址
+      description: 圖片、音樂及影片請填作品連結；文字若已貼全文可留空。
+      placeholder: https://
+  - type: textarea
+    id: content
+    attributes:
+      label: 作品內容
+      description: 文字作品請貼全文，其他類型可補充說明。
+  - type: textarea
+    id: desc
+    attributes:
+      label: 一句話介紹
+    validations:
+      required: true
+  - type: input
+    id: maker
+    attributes:
+      label: 製作者
+    validations:
+      required: true
+  - type: input
+    id: tools
+    attributes:
+      label: AI 工具
+    validations:
+      required: true
+  - type: textarea
+    id: process
+    attributes:
+      label: 創作過程
+      description: 說明構思、生成、修改或後製，以及他人素材的來源與授權。
+    validations:
+      required: true
+  - type: input
+    id: tags
+    attributes:
+      label: 標籤
+      description: 逗號分隔，最多 5 個。
+  - type: checkboxes
+    id: own
+    attributes:
+      label: 作者
+      options:
+        - label: 這是我自己做的
+  - type: checkboxes
+    id: rights
+    attributes:
+      label: 投稿確認
+      options:
+        - label: 我有權提供本作品，並已取得人物、聲音及素材所需的同意或授權。
+          required: true
+        - label: 我同意收藏館展示本投稿的名稱、介紹、作者、創作說明與連結；權利歸屬不因投稿移轉，不包含模型訓練授權。
+          required: true
+        - label: 我理解投稿 Issue 會立即公開，撤下網站展示不代表刪除 Issue 歷史或外部作品。
+          required: true
