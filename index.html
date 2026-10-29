@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>小軟體收藏館</title>
-<meta name="description" content="收集個人開發的小工具、小網頁和實驗作品。投稿、收藏、留言交流。">
+<meta name="description" content="收集個人開發的工具，以及 AI 輔助創作的文字、圖片、音樂與影片。投稿、收藏、留言交流。">
 <meta property="og:title" content="小軟體收藏館">
-<meta property="og:description" content="收集個人開發的小工具、小網頁和實驗作品。投稿、收藏、留言交流。">
+<meta property="og:description" content="收集個人開發的工具，以及 AI 輔助創作的文字、圖片、音樂與影片。投稿、收藏、留言交流。">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=Noto+Sans+TC:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap">
 <style>
@@ -98,7 +98,7 @@ button,input,select{font:inherit;color:inherit}
   <header class="top">
     <div>
       <h1><small>INDIE&nbsp;BUILDS · 個人開發</small>小軟體收藏館</h1>
-      <p class="sub">收集一個人做出來的工具、小網頁、外掛和實驗作品。投稿、收藏、留言交流。</p>
+      <p class="sub">收集個人開發的工具，也歡迎 AI 輔助創作的文字、圖片、音樂與影片。投稿、收藏、留言交流。</p>
     </div>
     <div class="stats">
       <div><b id="st-apps">–</b>件作品</div>
@@ -113,6 +113,7 @@ button,input,select{font:inherit;color:inherit}
       <button id="v-saved" aria-pressed="false">我的收藏</button>
     </div>
     <input id="q" type="search" placeholder="搜尋名稱、介紹、作者、平台…" aria-label="搜尋">
+    <select id="kind" aria-label="作品類型"><option value="">所有作品類型</option><option value="軟體">軟體工具</option><option value="文字">AI 創作 · 文字</option><option value="圖片">AI 創作 · 圖片</option><option value="音樂">AI 創作 · 音樂</option><option value="影片">AI 創作 · 影片</option></select>
     <select id="plat" aria-label="平台">
       <option value="">所有平台</option>
       <option value="網頁">網頁</option>
@@ -124,7 +125,8 @@ button,input,select{font:inherit;color:inherit}
       <option value="likes">最多 👍</option>
       <option value="talk">最多討論</option>
     </select>
-    <a class="btn primary" id="submit-link" target="_blank" rel="noopener">＋ 投稿作品</a>
+    <a class="btn primary" id="submit-link" target="_blank" rel="noopener">＋ 投稿軟體</a>
+    <a class="btn primary" id="creative-submit" target="_blank" rel="noopener">＋ 投稿 AI 創作</a>
   </div>
 
   <div class="tags" id="tagbar"></div>
@@ -133,7 +135,7 @@ button,input,select{font:inherit;color:inherit}
     <div class="empty"><strong>正在載入收藏…</strong>作品清單來自 GitHub，第一次開啟要等一兩秒。</div>
   </div>
 
-  <p class="note">投稿和留言都在 GitHub 上進行，需要一個免費的 GitHub 帳號。投稿經整理後上架；每件作品的留言區就是它的 GitHub issue。「我的收藏」只存在你這台裝置的瀏覽器。</p>
+  <p class="note">投稿和留言都在 GitHub 上進行，需要一個免費的 GitHub 帳號。投稿內容會立即成為公開 Issue，請勿填入私人資料；審核上架不等於保證作品權利或品質。AI 創作請附作品連結，文字也可貼在表單內。投稿經整理後上架；每件作品的留言區就是它的 GitHub issue。「我的收藏」只存在你這台裝置的瀏覽器。</p>
 </div>
 
 <div class="scrim" id="scrim" hidden></div>
@@ -158,9 +160,11 @@ const API = `https://api.github.com/repos/${OWNER}/${REPO}`;
 const PLATFORMS = ["網頁","Windows","macOS","Linux","Android","iOS"];
 const GROUP = {"網頁":"網頁", "Windows":"桌機", "macOS":"桌機", "Linux":"桌機", "Android":"手機", "iOS":"手機"};
 const STATUS = {"原型":["原型","s-proto"], "可用":["可用","s-live"], "停更":["停更","s-paused"]};
-const S = { apps:[], view:"all", q:"", sort:"new", tag:null, plat:"", saved:new Set(), openId:null };
+const S = { apps:[], view:"all", q:"", sort:"new", tag:null, plat:"", kind:"", saved:new Set(), openId:null };
 
 $("#submit-link").href = `https://github.com/${OWNER}/${REPO}/issues/new?template=submit.yml`;
+
+$("#creative-submit").href = `https://github.com/${OWNER}/${REPO}/issues/new?template=creative.yml`;
 
 try{ S.saved = new Set(JSON.parse(localStorage.getItem("shelf-saved")||"[]")); }catch{}
 function persistSaved(){ try{ localStorage.setItem("shelf-saved", JSON.stringify([...S.saved])); }catch{} }
@@ -181,11 +185,13 @@ function toApp(issue){
   const tags=[...new Set((f["標籤"]||"").split(/[,，、]/).map(t=>t.trim().replace(/^#/,"")).filter(Boolean).map(t=>t.slice(0,20)))].slice(0,5);
   return {
     id: issue.number,
-    title: f["名稱"] || issue.title.replace(/^\[投稿\]\s*/,""),
+    title: f["名稱"] || issue.title.replace(/^\[(?:投稿|AI創作)\]\s*/,""),
+    kind: ["文字","圖片","音樂","影片"].includes(f["作品類型"])?f["作品類型"]:"軟體",
+    content: f["作品內容"]||"", tools:f["AI 工具"]||"", process:f["創作過程"]||"",
     url: safeUrl(f["網址"]||""),
     source: safeUrl(f["原始碼"]||""),
     /* 舊投稿沒有「平台」欄，視為網頁工具 */
-    plats: (()=>{ const p=(f["平台"]||"").split(/[,，、]/).map(t=>t.trim()).filter(t=>PLATFORMS.includes(t)); return p.length?p:["網頁"]; })(),
+    plats: (()=>{ const p=(f["平台"]||"").split(/[,，、]/).map(t=>t.trim()).filter(t=>PLATFORMS.includes(t)); return f["作品類型"]?[]:(p.length?p:["網頁"]); })(),
     desc: f["一句話介紹"]||"",
     maker: f["製作者"]||"",
     status: f["狀態"]||"可用",
@@ -198,7 +204,7 @@ function toApp(issue){
 }
 
 async function load(){
-  const KEY="shelf-cache-v2";
+  const KEY="shelf-cache-v3";
   try{ const c=JSON.parse(sessionStorage.getItem(KEY)||"null"); if(c && Date.now()-c.t<5*60*1000){ S.apps=c.apps; render(); return; } }catch{}
   try{
     const r=await fetch(`${API}/issues?labels=${encodeURIComponent(LISTED_LABEL)}&state=open&per_page=100`,{headers:{Accept:"application/vnd.github+json"}});
@@ -217,9 +223,10 @@ function filtered(){
   let list=S.apps.slice();
   if(S.view==="saved") list=list.filter(a=>S.saved.has(a.id));
   if(S.tag) list=list.filter(a=>a.tags.includes(S.tag));
+  if(S.kind) list=list.filter(a=>a.kind===S.kind);
   if(S.plat) list=list.filter(a=>a.plats.some(p=>GROUP[p]===S.plat));
   const q=S.q.trim().toLowerCase();
-  if(q) list=list.filter(a=>[a.title,a.desc,a.maker,a.tags.join(" "),a.plats.join(" ")].join(" ").toLowerCase().includes(q));
+  if(q) list=list.filter(a=>[a.title,a.desc,a.maker,a.tags.join(" "),a.plats.join(" "),a.kind,a.tools].join(" ").toLowerCase().includes(q));
   const k={new:a=>-Date.parse(a.at), likes:a=>-a.likes, talk:a=>-a.comments}[S.sort];
   return list.sort((a,b)=>k(a)-k(b) || Date.parse(b.at)-Date.parse(a.at));
 }
@@ -250,7 +257,7 @@ function render(){
           el("div",{class:"maker",text:a.maker?"by "+a.maker:""}, a.own?el("span",{class:"mine-badge",text:"作者自薦"}):null)),
         el("span",{class:"status "+st[1],text:st[0]})),
       el("p",{class:"desc",text:a.desc}),
-      el("div",{class:"plats"}, ...a.plats.map(p=>el("span",{class:"plat",text:p}))),
+      el("div",{class:"plats"}, el("span",{class:"plat",text:a.kind==="軟體"?"軟體工具":"AI 創作 · "+a.kind}), ...a.plats.map(p=>el("span",{class:"plat",text:p}))),
       a.tags.length? el("div",{class:"tags"}, ...a.tags.map(t=>el("span",{class:"chip",text:"#"+t}))) : null,
       el("div",{class:"foot"},
         el("div",{class:"who"}, a.avatar?el("img",{src:a.avatar+"&s=40",alt:""}):null, el("span",{text:"@"+a.by+" · "+ago(a.at)})),
@@ -261,7 +268,7 @@ function render(){
   }
 }
 
-const isWeb = a => a.plats.length===1 && a.plats[0]==="網頁";
+const isWeb = a => a.kind!=="軟體" || (a.plats.length===1 && a.plats[0]==="網頁");
 
 async function openSheet(id){
   const a=S.apps.find(x=>x.id===id); if(!a) return;
@@ -274,8 +281,12 @@ async function openSheet(id){
       a.url?el("a",{class:"go",href:a.url,target:"_blank",rel:"noopener noreferrer",text:isWeb(a)?"開啟作品 ↗":"下載頁 ↗"}):null,
       a.source?el("a",{class:"go",href:a.source,target:"_blank",rel:"noopener noreferrer",text:"原始碼 ↗"}):null,
       el("span",{text:`👍 ${a.likes}`})),
-    el("div",{class:"plats"}, ...a.plats.map(p=>el("span",{class:"plat",text:p}))),
+    el("div",{class:"plats"}, el("span",{class:"plat",text:a.kind==="軟體"?"軟體工具":"AI 創作 · "+a.kind}), ...a.plats.map(p=>el("span",{class:"plat",text:p}))),
     isWeb(a)?null:el("p",{class:"dl-note",text:"需要下載安裝。上架只代表整理者看過介紹與連結，不代表檢查過安裝檔；請從官方下載頁取得，執行前自行確認來源。"}));
+  if(a.kind!=="軟體"){
+    if(a.content)b.append(el("h3",{text:"作品內容"}),el("p",{style:"white-space:pre-wrap;overflow-wrap:anywhere",text:a.content}));
+    b.append(el("h3",{text:"創作說明"}),el("p",{text:"AI 工具："+(a.tools||"未填寫")}),el("p",{style:"white-space:pre-wrap",text:a.process||"未填寫"}),el("p",{class:"note",text:"作品連結與投稿說明由投稿者提供；外部音樂與影片不會自動嵌入。"}));
+  }
   const box=el("div",{class:"maker",text:a.comments?"載入留言中…":"還沒有留言。到 GitHub 說說你的使用心得或建議。"}); b.append(box);
   if(!a.comments) return;
   try{
@@ -293,6 +304,7 @@ document.addEventListener("keydown",e=>{ if(e.key==="Escape"&&S.openId) closeShe
 for(const v of ["all","saved"]) $("#v-"+v).onclick=()=>{S.view=v;render();};
 $("#q").oninput=e=>{S.q=e.target.value;render();};
 $("#sort").onchange=e=>{S.sort=e.target.value;render();};
+$("#kind").onchange=e=>{S.kind=e.target.value;render();};
 $("#plat").onchange=e=>{S.plat=e.target.value;render();};
 load();
 </script>
