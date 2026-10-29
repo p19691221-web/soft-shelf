@@ -44,6 +44,7 @@ button{font:inherit;font-size:16px;color:var(--chalk);background:var(--scrim);bo
   border-radius:3px 6px 4px 5px;padding:7px 13px;cursor:pointer;-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);
   min-height:40px;font-variant-numeric:tabular-nums}
 button:hover{border-color:var(--chalk)}
+.btnlink{box-sizing:border-box;display:inline-flex;align-items:center;font:inherit;font-size:16px;color:var(--chalk);background:var(--scrim);border:1.5px solid var(--chalk-line);border-radius:3px 6px 4px 5px;padding:7px 13px;min-height:40px;text-decoration:none;-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
 button:focus-visible{outline:2px solid var(--chalk);outline-offset:2px}
 .seg button{border-radius:0}
 .seg button:first-child{border-radius:4px 0 0 5px}
@@ -100,6 +101,7 @@ button:focus-visible{outline:2px solid var(--chalk);outline-offset:2px}
       <button id="speed" type="button">速度 1×</button>
       <button id="sound" type="button" aria-pressed="false">開聲音</button>
       <button id="narr" type="button" aria-pressed="false">開旁白</button>
+      <a id="narr-out" class="btnlink" href="https://p19691221-web.github.io/soft-shelf/works/shuihen/" target="_blank" rel="noopener" hidden>旁白：用瀏覽器開</a>
       <div class="seg" role="group" aria-label="模式">
         <button type="button" id="m-story" data-mode="story" aria-pressed="true">四格故事</button>
         <button type="button" id="m-free" data-mode="free" aria-pressed="false">自由</button>
@@ -2634,6 +2636,8 @@ function narrate(k){
   u.rate=[1,1.15,1.3][speedIdx]||1;TTS.speak(u);
 }
 $('narr').hidden=!TTS;
+// 這個環境不能念字（例如 Android 的 Claude App）：改給一顆按鈕，到瀏覽器打開同一則故事
+if(!TTS){$('narr-out').hidden=false;$('narr-out').addEventListener('click',()=>{if(story)$('narr-out').href=SHARE_BASE+'#s='+encodeURIComponent(story.S.title);});}
 // 記住上次開著旁白：手機要先碰一下畫面才准發聲，所以第一次點畫面時補念目前這一格
 function narrSay(text){const u=new SpeechSynthesisUtterance(text);const v=narrVoice();if(v){u.voice=v;u.lang=v.lang;}else u.lang='zh-TW';u.rate=[1,1.15,1.3][speedIdx]||1;TTS.speak(u);}
 function narrCurrent(){if(!TTS||!narrOn||!story||!round||round.k==null)return;TTS.cancel();const k=round.k;narrSay((k===0?story.S.title+'。':'')+String(story.S.panels[k][1]||'').replace(/[「」『』]/g,'').replace(/——/g,'，'));}
