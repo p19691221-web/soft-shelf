@@ -250,7 +250,18 @@ function render(){
   }
   for(const a of list){
     const st=STATUS[a.status]||STATUS["可用"], saved=S.saved.has(a.id);
-    const title = a.url ? el("a",{href:a.url,target:"_blank",rel:"noopener noreferrer",text:a.title}) : document.createTextNode(a.title);
+    const title = el("a", {
+  href: a.url || `#work-${a.id}`,
+  text: a.title,
+  ...(a.url
+    ? { target: "_blank", rel: "noopener noreferrer" }
+    : {
+        onclick: e => {
+          e.preventDefault();
+          openSheet(a.id);
+        }
+      })
+});
     g.append(el("article",{class:"card"},
       el("div",{class:"head"},
         el("div",{style:"min-width:0"}, el("h3",{},title),
