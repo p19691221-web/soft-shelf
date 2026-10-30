@@ -2673,7 +2673,11 @@ function narrate(k){
 }
 $('narr').hidden=!TTS;
 // 這個環境不能念字（例如 Android 的 Claude App）：改給一顆按鈕，到瀏覽器打開同一則故事
-if(!TTS){$('narr-out').hidden=false;$('narr-out').addEventListener('click',()=>{if(story)$('narr-out').href=SHARE_BASE+'#s='+encodeURIComponent(story.S.title);});}
+if(!TTS){$('narr-out').hidden=false;$('narr-out').addEventListener('click',()=>{
+  const url=SHARE_BASE+(story?'?s='+encodeURIComponent(story.S.title):'');
+  // Android 的 App 內建瀏覽器（脆、LINE、Claude App）不能念字：用 intent 連結叫出 Chrome
+  if(/Android/i.test(navigator.userAgent)){$('narr-out').target='_self';$('narr-out').href='intent://'+url.replace(/^https:\/\//,'')+'#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url='+encodeURIComponent(url)+';end';}
+  else $('narr-out').href=url;});}
 // 記住上次開著旁白：手機要先碰一下畫面才准發聲，所以第一次點畫面時補念目前這一格
 function narrSay(text){const u=new SpeechSynthesisUtterance(text);const v=narrVoice();if(v){u.voice=v;u.lang=v.lang;}else u.lang='zh-TW';u.rate=[1,1.15,1.3][speedIdx]||1;TTS.speak(u);}
 function narrCurrent(){if(!TTS||!narrOn||!story||!round||round.k==null)return;TTS.cancel();const k=round.k;narrSay((k===0?story.S.title+'。':'')+String(story.S.panels[k][1]||'').replace(/[「」『』]/g,'').replace(/——/g,'，'));}
@@ -2725,7 +2729,7 @@ let last=performance.now();
 function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;
   if(!paused)step(dt*SPEEDS[speedIdx]);render();soundTick();requestAnimationFrame(frame);}
 const SHARE_BASE='https://p19691221-web.github.io/soft-shelf/works/shuihen/';
-function storyFromHash(){try{const m=location.hash.match(/^#s=(.+)$/);if(!m)return -1;const t=decodeURIComponent(m[1]);return STORIES.findIndex(S=>S.title===t);}catch(e){return -1;}}
+function storyFromHash(){try{const m=location.hash.match(/^#s=(.+)$/);let t=m?decodeURIComponent(m[1]):'';if(!t)t=new URLSearchParams(location.search).get('s')||'';if(!t)return -1;return STORIES.findIndex(S=>S.title===t);}catch(e){return -1;}}
 {const i=storyFromHash();if(i>=0)storyIdx=i-1;}
 window.addEventListener('hashchange',()=>{const i=storyFromHash();if(i>=0&&!(story&&story.S===STORIES[i]))playStory(i);});
 function flash(t){$('hint').textContent=t;$('hint').classList.remove('gone');clearTimeout(hintT);hintT=setTimeout(()=>$('hint').classList.add('gone'),3000);}
