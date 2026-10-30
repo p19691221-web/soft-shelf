@@ -961,6 +961,10 @@ function shapeById(id){
   if(id==='mtnStill')return {name:'推不動的山',kind:'o',rot:0,core:[0,.1],box:[1.1,1],draw(c){fillP(c,[[-.2,.42],[.12,-.34],[.52,.42]]);MINIP(c,-.38,.12,.9);c.lineWidth=.06;c.lineCap='round';c.beginPath();c.moveTo(-.28,.0);c.lineTo(-.12,.02);c.stroke();c.fillRect(-.52,.42,1.04,.03);for(const [x,y] of [[-.48,-.26],[-.54,-.12]]){c.beginPath();c.moveTo(x,y-.05);c.quadraticCurveTo(x+.04,y+.02,x,y+.035);c.quadraticCurveTo(x-.04,y+.02,x,y-.05);c.fill();}},cut(c){}};
   if(id==='crowdWalk')return {name:'走動的人群',kind:'o',rot:0,core:[0,.1],box:[1.15,1],draw(c){for(const [x,y] of [[-.42,-.12],[-.14,-.12],[.14,-.12],[-.28,.16],[0,.16],[.28,.16]])MINIP(c,x,y,.62);c.lineWidth=.04;c.lineCap='round';c.beginPath();c.moveTo(-.3,.42);c.lineTo(.3,.42);c.stroke();fillP(c,[[.42,.42],[.3,.35],[.3,.49]]);},cut(c){}};
   if(id==='crowdMtnSea')return {name:'人山人海',kind:'o',rot:0,core:[0,.1],box:[1.15,1],draw(c){const P=(x,y,k)=>{fillE(c,x,y,.05*k,.05*k);c.fillRect(x-.05*k,y+.05*k,.1*k,.09*k);};for(let r=0;r<4;r++){const n=r+1;for(let i=0;i<n;i++)P(-.28+(i-(n-1)/2)*.12,-.34+r*.13,1);}for(let r=0;r<2;r++)for(let i=0;i<9;i++)P(-.48+i*.12+(r%2)*.06,.2+r*.12,.9);},cut(c){}};
+  if(id==='coupleLaw')return {name:'2019 同婚合法',kind:'o',rot:0,core:[0,.1],box:[1.1,1],draw(c){MINIP(c,-.2,.12,1.05);MINIP(c,.2,.12,1.05);c.lineWidth=.06;c.lineCap='round';c.beginPath();c.moveTo(-.08,.02);c.lineTo(.08,.02);c.stroke();HEART(c,0,-.46,.13);c.fillRect(-.52,.42,1.04,.03);},cut(c){}};
+  if(id==='lawAhead')return {name:'法律跑在前面',kind:'o',rot:0,core:[0,.1],box:[1.15,1],draw(c){BOOK(c,.3,-.04,.85);c.lineWidth=.035;c.lineCap='round';c.beginPath();for(const y of [-.14,0,.14]){c.moveTo(.0,y);c.lineTo(.1,y);}c.stroke();MINIP(c,-.42,.2,.7);MINIP(c,-.22,.2,.7);c.fillRect(-.56,.42,1.12,.03);},cut(c){c.save();c.translate(.3,-.04);c.scale(.85,.85);c.fillRect(-.14,-.18,.28,.04);c.fillRect(-.14,-.08,.28,.03);c.fillRect(-.14,0,.2,.03);c.restore();}};
+  if(id==='dinnerQuiet')return {name:'餐桌上的沉默',kind:'o',rot:0,core:[0,.1],box:[1.15,1],draw(c){MINIP(c,-.34,.08,.95);MINIP(c,.34,.08,.95);c.fillRect(-.22,.16,.44,.06);c.fillRect(-.03,.22,.06,.2);fillE(c,-.08,.12,.07,.03);fillE(c,.1,.12,.07,.03);fillE(c,0,-.34,.24,.13);fillP(c,[[-.06,-.24],[.04,-.24],[-.1,-.14]]);c.fillRect(-.52,.42,1.04,.03);},cut(c){for(const x of [-.1,0,.1])fillE(c,x,-.34,.025,.025);}};
+  if(id==='friendTell')return {name:'身邊的朋友',kind:'o',rot:0,core:[0,.1],box:[1.1,1],draw(c){MINIP(c,-.18,.12,1.1);MINIP(c,.2,.12,1.1);c.lineWidth=.06;c.lineCap='round';c.beginPath();c.moveTo(-.06,-.08);c.quadraticCurveTo(.06,-.16,.1,-.12);c.stroke();HEART(c,.0,-.46,.06);STAR2(c,-.4,-.4,.05);STAR2(c,.42,-.42,.05);c.fillRect(-.52,.42,1.04,.03);},cut(c){c.lineWidth=.02;c.beginPath();c.arc(-.18,-.22,.04,.3,2.84);c.arc(.2,-.22,.04,.3,2.84);c.stroke();}};
   if(id==='hsrSelfie')return profileShape({id:'flat',fixed:1,name:'自拍出發',extra:c=>{c.save();c.translate(1.16,.36);c.scale(.36,.36);c.rotate(-.2);PHONE(c);c.restore();SNOW(c,1.36,-.02,.12);SNOW(c,1.04,-.08,.1);},cutP:SMILE,scale:.78,shift:-.22,box:[1.5,1.15],core:[-.22,0]});
   if(id==='marquee')return {name:'倒過來的跑馬燈',kind:'o',rot:0,core:[0,.1],box:[1.1,1],draw(c){c.fillRect(-.48,-.3,.96,.3);c.fillRect(-.48,.14,.28,.3);c.fillRect(.2,.14,.28,.3);c.save();c.translate(.42,-.5);c.scale(.6,.6);QMARK(c);c.restore();},cut(c){c.save();c.translate(0,-.14);c.scale(-1,1);TXT(c,'南港',0,0,32);c.restore();}};
   if(id==='iceFlirt')return pair('神魂顛島',SMILE,SMILE,c=>{HEART(c,0,-.34,.09);SNOW(c,-.22,-.4,.05);SNOW(c,.22,-.4,.05);});
@@ -2151,6 +2155,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'轉變沒那麼快',panels:[['coupleLaw','2019，亞洲第一同婚。'],['lawAhead','但法律跑在觀念前面。'],['dinnerQuiet','歧視，常藏在玩笑裡。'],['friendTell','改變，從身邊的人開始。',0,3.5]]},
   {title:'人山人海',panels:[['mtnSea','什麼山和海會移動？'],['mtnStill','真的山，推也推不動。'],['crowdWalk','但這種會走——'],['crowdMtnSea','人山人海！',0,3.5]]},
   {title:'小人多',panels:[['princessSad','白雪公主為什麼這麼慘？'],['appleMirror','毒蘋果、壞皇后……'],['sevenGnomes','身邊還圍著七個——'],['gnomesBig','小人多嘛！',0,3.5]]},
   {title:'看不見',panels:[['swordAsk','什麼劍是透明的？'],['swordShine','寶劍？閃閃發亮。'],['swordWood','木劍？看得很清楚。'],['swordGone','看不「劍」！',0,3.5]]},
@@ -2411,7 +2416,7 @@ const CATMAP={
   '搶匪小偷':['金口難開','負數','可能看到了','換科目','業內人士','遙控器','一起找'],
   '職場校園':['高高在上','吃安眠藥','緩兵之計','呷好西瓜','有求必應','下一位','送行宴','鏡子都敢照','不會再問我','自己寫','哪邊涼快','不在人事','一個人過','仙草蜜','飢童','不忍心','美紅敢','錯的先講','吸菸區','沉默','看辦公室','可以回家','倫理學','很會說謊','烤箱手套'],
   '時事諷刺':['看不起醫生','砍光','凱文呢','民調','太晚了','有用','重燃希望','誰是白痴','塗成藍色','我們的願望','白羊吃草','會飛的車'],
-  '故事小品':['誰會變大','大國者下流','說跑收活','成其大','省道','背上的字','手作禮物','只是欣賞','一片葉子','種子','不打你','慣性','颱風要來','收拾','放下','恆河','平安','等','釣','慢','午後']};
+  '故事小品':['轉變沒那麼快','誰會變大','大國者下流','說跑收活','成其大','省道','背上的字','手作禮物','只是欣賞','一片葉子','種子','不打你','慣性','颱風要來','收拾','放下','恆河','平安','等','釣','慢','午後']};
 STORIES.forEach(S=>{S.cats=CATS.filter(c=>(CATMAP[c]||[]).includes(S.title));if(!S.cats.length)S.cats=['日常冷笑話'];});
 let storyCat='all';
 const inCat=S=>storyCat==='all'||S.cats.includes(storyCat);
