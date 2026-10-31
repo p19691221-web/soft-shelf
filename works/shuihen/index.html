@@ -570,6 +570,7 @@ const FOX=(c,x,y,k,a)=>{c.save();c.translate(x,y);c.rotate(a||0);c.scale(k,k);fi
 const PEEL=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);fillE(c,0,0,.07,.05);c.lineWidth=.06;c.lineCap='round';c.beginPath();c.moveTo(0,0);c.quadraticCurveTo(-.14,-.02,-.2,.06);c.moveTo(0,0);c.quadraticCurveTo(.14,-.02,.2,.06);c.moveTo(0,0);c.quadraticCurveTo(.02,-.12,.0,-.18);c.stroke();c.restore();};
 const ZIG=(c,x,y,a,n)=>{c.lineWidth=.035;c.lineCap='round';c.beginPath();let px=x,py=y;c.moveTo(px,py);for(let k=0;k<(n||3);k++){px+=Math.cos(a)*.05+(k%2?.03:-.03);py+=Math.sin(a)*.05;c.lineTo(px,py);}c.stroke();};
 const TXT=(c,t,x,y,px)=>{c.save();c.scale(.01,.01);c.font='900 '+px+'px '+SERIF;c.textAlign='center';c.textBaseline='middle';c.fillText(t,x*100,y*100);c.restore();};
+const BABY=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);fillE(c,0,-.1,.08,.08);fillE(c,0,.06,.11,.12);c.restore();};
 const LOG=(c,x,y,k,a)=>{c.save();c.translate(x,y);c.rotate(a||0);c.scale(k,k);c.fillRect(-.22,-.06,.44,.12);fillE(c,.22,0,.04,.06);c.restore();};
 const FLAME2=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.beginPath();c.moveTo(0,-.42);c.quadraticCurveTo(.08,-.24,.18,-.2);c.quadraticCurveTo(.16,-.32,.2,-.38);c.quadraticCurveTo(.34,-.16,.26,.04);c.quadraticCurveTo(.2,.16,0,.16);c.quadraticCurveTo(-.2,.16,-.26,.04);c.quadraticCurveTo(-.32,-.14,-.18,-.28);c.quadraticCurveTo(-.16,-.18,-.1,-.16);c.quadraticCurveTo(-.08,-.3,0,-.42);c.fill();c.restore();};
 const MINICROWN=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);fillP(c,[[-.12,.04],[-.12,-.06],[-.06,0],[0,-.1],[.06,0],[.12,-.06],[.12,.04]]);c.restore();};
@@ -994,6 +995,10 @@ function shapeById(id){
   if(id==='termiteFull')return {name:'吃飽的白蟻',kind:'o',rot:0,core:[0,.1],box:[1.05,1],draw(c){LOG(c,.0,.3,1.4);ANT(c,.02,.02,1.3);ZZ(c,.3,-.3,.8);},cut(c){c.fillRect(-.3,.24,.12,.06);}};
   if(id==='logsInFire')return {name:'木頭丟進火裡',kind:'o',rot:0,core:[0,.1],box:[1.05,1],draw(c){FLAME2(c,0,.14,1);LOG(c,-.12,.38,.8,.3);LOG(c,.12,.38,.8,-.3);LOG(c,-.36,-.36,.6,.6);LOG(c,.38,-.3,.6,-.5);c.lineWidth=.03;c.lineCap='round';c.beginPath();c.moveTo(-.28,-.26);c.lineTo(-.2,-.18);c.moveTo(.3,-.2);c.lineTo(.22,-.12);c.stroke();},cut(c){}};
   if(id==='bigFire')return {name:'吃不飽的火',kind:'o',rot:0,core:[0,.1],box:[1.05,1.05],draw(c){FLAME2(c,0,.04,1.6);LOG(c,-.14,.36,.9,.25);LOG(c,.14,.36,.9,-.25);},cut(c){fillE(c,-.1,-.06,.03,.035);fillE(c,.1,-.06,.03,.035);c.lineWidth=.03;c.beginPath();c.arc(0,.0,.09,.2,2.94);c.stroke();}};
+  if(id==='wendyBaby')return {name:'溫蒂和寶寶',kind:'o',rot:0,core:[0,.1],box:[1.05,1],draw(c){MINIP(c,-.16,.1,1.2);fillE(c,-.16,-.3,.13,.06);BABY(c,.12,.02,.9);c.fillRect(-.5,.42,1,.03);TXTB(c,'？',.38,-.34,36,.02);},cut(c){fillE(c,.12,-.08,.015,.015);}};
+  if(id==='houseHome')return {name:'住在家裡',kind:'o',rot:0,core:[0,.1],box:[1.05,1],draw(c){HOUSE(c,0,.12,1.7);c.fillRect(-.5,.46,1,.03);TXTB(c,'？',.38,-.36,32,.02);},cut(c){HOUSE_CUT(c,0,.12,1.7);}};
+  if(id==='babyName')return {name:'蒂寶',kind:'o',rot:0,core:[0,.1],box:[1.05,1],draw(c){BABY(c,-.22,.1,1.5);RRECT(c,.06,-.12,.48,.16,.04);c.lineWidth=.02;c.beginPath();c.moveTo(.06,.02);c.lineTo(-.06,.02);c.stroke();},cut(c){TXT(c,'蒂寶',.27,.02,15);}};
+  if(id==='bunker')return {name:'地堡',kind:'o',rot:0,core:[0,.1],box:[1.1,1],draw(c){c.fillRect(-.56,-.02,1.12,.04);c.beginPath();c.moveTo(-.34,-.02);c.quadraticCurveTo(0,-.32,.34,-.02);c.closePath();c.fill();c.fillRect(-.38,.08,.76,.34);},cut(c){c.fillRect(-.07,-.16,.14,.14);c.fillRect(-.05,-.02,.1,.12);BABY(c,.0,.26,.75);}};
   if(id==='hsrSelfie')return profileShape({id:'flat',fixed:1,name:'自拍出發',extra:c=>{c.save();c.translate(1.16,.36);c.scale(.36,.36);c.rotate(-.2);PHONE(c);c.restore();SNOW(c,1.36,-.02,.12);SNOW(c,1.04,-.08,.1);},cutP:SMILE,scale:.78,shift:-.22,box:[1.5,1.15],core:[-.22,0]});
   if(id==='marquee')return {name:'倒過來的跑馬燈',kind:'o',rot:0,core:[0,.1],box:[1.1,1],draw(c){c.fillRect(-.48,-.3,.96,.3);c.fillRect(-.48,.14,.28,.3);c.fillRect(.2,.14,.28,.3);c.save();c.translate(.42,-.5);c.scale(.6,.6);QMARK(c);c.restore();},cut(c){c.save();c.translate(0,-.14);c.scale(-1,1);TXT(c,'南港',0,0,32);c.restore();}};
   if(id==='iceFlirt')return pair('神魂顛島',SMILE,SMILE,c=>{HEART(c,0,-.34,.09);SNOW(c,-.22,-.4,.05);SNOW(c,.22,-.4,.05);});
@@ -2184,6 +2189,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'蒂寶',by:'陳德頤',panels:[['wendyBaby','溫蒂的寶寶住哪裡？'],['houseHome','住在家裡？'],['babyName','溫蒂的寶寶叫「蒂寶」，'],['bunker','所以住「地堡」！',0,3.5]]},
   {title:'吃不飽',panels:[['woodAsk','誰能吃木頭，卻不會飽？'],['termiteFull','白蟻？吃多了也會飽。'],['logsInFire','丟再多木頭進去——'],['bigFire','火，永遠吃不飽！',0,3.5]]},
   {title:'人不在其位',panels:[['weiChar','人不在其位，猜一個字。'],['weiSplit','「位」是人加立，'],['renLeave','人走開了——'],['liChar','剩下「立」！',0,3.5]]},
   {title:'萬聖夜',panels:[['halloweenNight','10/31 其實是萬聖「夜」。'],['maskTrick','戴上面具，騙過回來的鬼。'],['turnipLamp','燈原本刻在大頭菜上，'],['pumpkin','到了美洲才換成南瓜。',0,3.5]]},
@@ -2446,7 +2452,7 @@ const STORIES=[
 ];
 const CATS=['諧音梗','夫妻家庭','搶匪小偷','職場校園','時事諷刺','日常冷笑話','故事小品'];
 const CATMAP={
-  '諧音梗':['東海聾王','小人多','看不見','夢想家','風生水起','青春豆','太陽是男生','腳滑','很嗆','第九天長','恩重如山','冰山一角','翻身的機會','如果的車','冰島','老當易撞','詩靈','喝T','知豬','刀削面','碰頭','容易掛','壓蛇帽','菇單','沒人理','一拍即合','最笨的字母','麥生氣','新衣耶','警察','阿拉伯','好鴨','拭十箍','矮love游','站久會酸','導魚','菇毒','雞凍','肥而不溺','擺事可樂','沒龜','猴頭菇','火腿','恁母伊郎','菊花茶','比三小','西北雨','北極的牛','地下道','下酒菜','梗多','滑馬','沒關C','在下','目光','泡你','我的天','沒氣了','南方','最甜的蜜','小氣蝦','瓦斯怎麼叫','缺陷','冰心地瓜','不在人事','多大','雨多甜','還沒滾','蟻后','坐白宮','擲筊','一個人過','鳳梨酥','仙草蜜','一波三折','八天的','飢童','美紅敢','仰式','你哪位','哈囉 win','窗戶凍住了','左右腦','換科目','業內人士','找誰接','半手李','閉眼說瞎話','誰是京都人','金口難開','看辦公室','週一休息','看穿'],
+  '諧音梗':['蒂寶','東海聾王','小人多','看不見','夢想家','風生水起','青春豆','太陽是男生','腳滑','很嗆','第九天長','恩重如山','冰山一角','翻身的機會','如果的車','冰島','老當易撞','詩靈','喝T','知豬','刀削面','碰頭','容易掛','壓蛇帽','菇單','沒人理','一拍即合','最笨的字母','麥生氣','新衣耶','警察','阿拉伯','好鴨','拭十箍','矮love游','站久會酸','導魚','菇毒','雞凍','肥而不溺','擺事可樂','沒龜','猴頭菇','火腿','恁母伊郎','菊花茶','比三小','西北雨','北極的牛','地下道','下酒菜','梗多','滑馬','沒關C','在下','目光','泡你','我的天','沒氣了','南方','最甜的蜜','小氣蝦','瓦斯怎麼叫','缺陷','冰心地瓜','不在人事','多大','雨多甜','還沒滾','蟻后','坐白宮','擲筊','一個人過','鳳梨酥','仙草蜜','一波三折','八天的','飢童','美紅敢','仰式','你哪位','哈囉 win','窗戶凍住了','左右腦','換科目','業內人士','找誰接','半手李','閉眼說瞎話','誰是京都人','金口難開','看辦公室','週一休息','看穿'],
   '夫妻家庭':['李拜一','四隻腳','拿掃把','湊滿一船','隔壁老王','臉色','好女子','著火了','我的天','算錯','仙女','誤點','玩夠沒','瓶蓋','最佳搭檔','帶過來的','明天減肥','我不知道','我知道','第一次','會下蛋嗎','南方','挑食','五個媽','雨多甜','還沒滾','看不到你','多生兩個','貓與虎','送回娘家','七十才開始','一模一樣','買菸','需要談談','不敢問','窗戶凍住了','一切都很好','沒安全感','所以要我留下','露台','四個孩子的爸','深夜講座','睜一隻眼','緩解疼痛','九十歲','撞到告訴我','很會說謊','很甜','兩根菸'],
   '搶匪小偷':['金口難開','負數','可能看到了','換科目','業內人士','遙控器','一起找'],
   '職場校園':['高高在上','吃安眠藥','緩兵之計','呷好西瓜','有求必應','下一位','送行宴','鏡子都敢照','不會再問我','自己寫','哪邊涼快','不在人事','一個人過','仙草蜜','飢童','不忍心','美紅敢','錯的先講','吸菸區','沉默','看辦公室','可以回家','倫理學','很會說謊','烤箱手套'],
