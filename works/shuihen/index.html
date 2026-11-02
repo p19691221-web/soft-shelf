@@ -1171,6 +1171,10 @@ function shapeById(id){
   if(id==='gfAsk')return {name:'哪個好看',kind:'o',rot:0,core:[0,.1],box:[1.1,1],draw(c){GIRLP(c,-.24,.16,1.1);DRESSH(c,.24,.1,.9);TXTB(c,'？',-.04,-.42,28,.02);TXTB(c,'？',.4,-.3,28,.02);c.fillRect(-.54,.44,1.08,.03);},cut(c){}};
   if(id==='bfThink')return {name:'男友想了一下',kind:'o',rot:0,core:[0,.1],box:[1.1,1],draw(c){MINIP(c,-.18,.16,1.1);THINK(c,.2,-.3,.9);fillE(c,0,-.14,.03,.025);c.fillRect(-.54,.44,1.08,.03);},cut(c){TXTB(c,'…',.2,-.31,24,.015);}};
   if(id==='bfAnswer')return {name:'衣服好看',kind:'o',rot:0,core:[0,.1],box:[1.1,1],draw(c){MINIP(c,-.26,.16,1);GIRLP(c,.24,.16,1);TXTB(c,'！',.24,-.42,30,.02);c.fillRect(-.54,.44,1.08,.03);},cut(c){}};
+  if(id==='ddWu')return {name:'放下刀的人',kind:'o',rot:0,core:[0,.1],box:[1.1,1],draw(c){MINIP(c,-.24,.16,1.2);SWORD(c,.28,.12,.75,.25);c.fillRect(-.54,.44,1.08,.03);},cut(c){}};
+  if(id==='ddNu')return {name:'不生氣的臉',kind:'o',rot:0,core:[0,0],box:[1,1],draw(c){fillE(c,0,0,.32,.34);},cut(c){c.lineWidth=.035;c.lineCap='round';c.beginPath();c.moveTo(-.18,-.06);c.lineTo(-.06,-.06);c.moveTo(.06,-.06);c.lineTo(.18,-.06);c.moveTo(-.08,.14);c.lineTo(.08,.14);c.stroke();}};
+  if(id==='ddYu')return {name:'不正面硬碰',kind:'o',rot:0,core:[0,.1],box:[1.1,1],draw(c){MINIP(c,-.36,.16,1);MINIP(c,.06,.16,1);c.lineWidth=.04;c.lineCap='round';c.lineJoin='round';c.beginPath();c.moveTo(.18,-.02);c.lineTo(.44,-.02);c.moveTo(.36,-.1);c.lineTo(.46,-.02);c.lineTo(.36,.06);c.stroke();c.fillRect(-.54,.44,1.08,.03);},cut(c){}};
+  if(id==='ddXia')return {name:'把人撐上去',kind:'o',rot:0,core:[0,.1],box:[1.1,1],draw(c){c.fillRect(-.42,-.04,.84,.05);MINIP(c,-.24,-.1,.75);MINIP(c,.24,-.1,.75);fillE(c,0,.14,.07,.07);fillP(c,[[-.12,.22],[.12,.22],[.14,.42],[-.14,.42]]);c.lineWidth=.05;c.lineCap='round';c.beginPath();c.moveTo(-.1,.26);c.lineTo(-.16,.02);c.moveTo(.1,.26);c.lineTo(.16,.02);c.stroke();c.fillRect(-.54,.44,1.08,.03);},cut(c){}};
   if(id==='hsrSelfie')return profileShape({id:'flat',fixed:1,name:'自拍出發',extra:c=>{c.save();c.translate(1.16,.36);c.scale(.36,.36);c.rotate(-.2);PHONE(c);c.restore();SNOW(c,1.36,-.02,.12);SNOW(c,1.04,-.08,.1);},cutP:SMILE,scale:.78,shift:-.22,box:[1.5,1.15],core:[-.22,0]});
   if(id==='marquee')return {name:'倒過來的跑馬燈',kind:'o',rot:0,core:[0,.1],box:[1.1,1],draw(c){c.fillRect(-.48,-.3,.96,.3);c.fillRect(-.48,.14,.28,.3);c.fillRect(.2,.14,.28,.3);c.save();c.translate(.42,-.5);c.scale(.6,.6);QMARK(c);c.restore();},cut(c){c.save();c.translate(0,-.14);c.scale(-1,1);TXT(c,'南港',0,0,32);c.restore();}};
   if(id==='iceFlirt')return pair('神魂顛島',SMILE,SMILE,c=>{HEART(c,0,-.34,.09);SNOW(c,-.22,-.4,.05);SNOW(c,.22,-.4,.05);});
@@ -2361,6 +2365,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'為之下',panels:[['ddWu','善為士者，不武。'],['ddNu','善戰者，不怒。'],['ddYu','善勝敵者，不與。'],['ddXia','善用人者，為之下。',0,3.5]]},
   {title:'哪個好看',panels:[['gfDress','女友買了一件新衣服。'],['gfAsk','「我和衣服，哪個好看？」'],['bfThink','男友認真想了一下……'],['bfAnswer','「衣服啊，不然你幹嘛買？」',0,3.5]]},
   {title:'刀槍blue',panels:[['bxWeapons','義和團的武器是什麼顏色？'],['bxBounce','號稱刀槍「不入」——'],['bxBuru','不入、不入，唸快一點……'],['bxBlue','藍色！因為刀槍 blue。',0,3.5]]},
   {title:'沒四',panels:[['m4Nums','1235，猜兩個字。'],['m4Gap','仔細看，少了一個數字。'],['m4No','少了 4，就是「沒四」——'],['m4Fine','沒四＝沒事！',0,3.5]]},
@@ -2659,7 +2664,7 @@ const CATMAP={
   '搶匪小偷':['金口難開','負數','可能看到了','換科目','業內人士','遙控器','一起找'],
   '職場校園':['活著','研究所','數研','高高在上','吃安眠藥','緩兵之計','呷好西瓜','有求必應','下一位','送行宴','鏡子都敢照','不會再問我','自己寫','哪邊涼快','不在人事','一個人過','仙草蜜','飢童','不忍心','美紅敢','錯的先講','吸菸區','沉默','看辦公室','可以回家','倫理學','很會說謊','烤箱手套'],
   '時事諷刺':['看不起醫生','砍光','凱文呢','民調','太晚了','有用','重燃希望','誰是白痴','塗成藍色','我們的願望','白羊吃草','會飛的車'],
-  '故事小品':['先選日子','漏掉','只是塊木頭','撕下面具','莎翁的墓誌銘','萬聖夜','轉變沒那麼快','誰會變大','大國者下流','說跑收活','成其大','省道','背上的字','手作禮物','只是欣賞','一片葉子','種子','不打你','慣性','颱風要來','收拾','放下','恆河','平安','等','釣','慢','午後']};
+  '故事小品':['為之下','先選日子','漏掉','只是塊木頭','撕下面具','莎翁的墓誌銘','萬聖夜','轉變沒那麼快','誰會變大','大國者下流','說跑收活','成其大','省道','背上的字','手作禮物','只是欣賞','一片葉子','種子','不打你','慣性','颱風要來','收拾','放下','恆河','平安','等','釣','慢','午後']};
 STORIES.forEach(S=>{S.cats=CATS.filter(c=>(CATMAP[c]||[]).includes(S.title));if(!S.cats.length)S.cats=['日常冷笑話'];});
 let storyCat='all';
 const inCat=S=>storyCat==='all'||S.cats.includes(storyCat);
