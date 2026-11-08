@@ -62,6 +62,8 @@ figcaption{font-size:16px;line-height:1.45;margin-top:8px;min-height:2.9em}
   <button data-m="papercut">紙雕</button>
   <button data-m="origami">折紙</button>
   <button data-m="clay">紙黏土</button>
+  <button data-m="felt">羊毛氈</button>
+  <button data-m="yarn">毛線</button>
 </div>
 <div class="story-title" id="title"></div>
 <div class="grid" id="grid"></div>
@@ -105,7 +107,7 @@ const fbm=(x,y)=>nz(x,y)*.6+nz(x*2.1+17,y*2.1+9)*.28+nz(x*4.3+3,y*4.3+41)*.12;
 
 /* ---------- state ---------- */
 let W=0,H=0,DPR=1,CELL=3,GW=0,GH=0,N=0;
-let acc,accDry,wet,stain,mask,arr,dryT,rough,gloss,depth,queue,heapI,heapK,wImg,sImg;
+let pool,skyR,skyG,skyB,acc,accDry,wet,stain,mask,arr,dryT,rough,gloss,depth,queue,heapI,heapK,wImg,sImg;
 let anchor={x:-30,y:0},nozzle={x:0,y:0},aimAng=-.4;
 let round=null,queuedAt=null,paused=false,speedIdx=0,cat='all',lastName='';
 const TTS=window.speechSynthesis||null;let narrOn=false;
@@ -514,6 +516,9 @@ const FOX=(c,x,y,k,a)=>{c.save();c.translate(x,y);c.rotate(a||0);c.scale(k,k);fi
 const PEEL=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);fillE(c,0,0,.07,.05);c.lineWidth=.06;c.lineCap='round';c.beginPath();c.moveTo(0,0);c.quadraticCurveTo(-.14,-.02,-.2,.06);c.moveTo(0,0);c.quadraticCurveTo(.14,-.02,.2,.06);c.moveTo(0,0);c.quadraticCurveTo(.02,-.12,.0,-.18);c.stroke();c.restore();};
 const ZIG=(c,x,y,a,n)=>{c.lineWidth=.035;c.lineCap='round';c.beginPath();let px=x,py=y;c.moveTo(px,py);for(let k=0;k<(n||3);k++){px+=Math.cos(a)*.05+(k%2?.03:-.03);py+=Math.sin(a)*.05;c.lineTo(px,py);}c.stroke();};
 const TXT=(c,t,x,y,px)=>{c.save();c.scale(.01,.01);c.font='900 '+px+'px '+SERIF;c.textAlign='center';c.textBaseline='middle';c.fillText(t,x*100,y*100);c.restore();};
+
+const MPHONE=(c,x,y,k,a)=>{c.save();c.translate(x,y);c.rotate(a||0);c.scale(k,k);c.beginPath();c.roundRect(-.1,-.18,.2,.36,.03);c.fill();c.restore();};
+const MPHONE_CUT=(c,x,y,k,a)=>{c.save();c.translate(x,y);c.rotate(a||0);c.scale(k,k);c.fillRect(-.075,-.14,.15,.25);c.restore();};
 
 const GLYPH_REN=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.lineWidth=.08;c.lineCap='round';c.lineJoin='round';c.beginPath();c.moveTo(.08,-.38);c.lineTo(-.16,-.04);c.moveTo(-.02,-.16);c.lineTo(-.02,.38);c.stroke();c.restore();};
 const GLYPH_GE=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.lineWidth=.07;c.lineCap='round';c.lineJoin='round';c.beginPath();c.moveTo(-.32,-.12);c.lineTo(.3,-.17);c.moveTo(-.1,-.38);c.quadraticCurveTo(0,.1,.32,.34);c.lineTo(.34,.2);c.moveTo(.22,.0);c.lineTo(-.24,.32);c.moveTo(.16,-.36);c.lineTo(.24,-.28);c.stroke();c.restore();};
@@ -1198,6 +1203,10 @@ function shapeById(id){
   if(id==='faRen')return {name:'亻',kind:'o',rot:0,core:[0,0],box:[1,1],draw(c){GLYPH_REN(c,0,0,1.2);},cut(c){}};
   if(id==='faGe')return {name:'戈',kind:'o',rot:0,core:[0,0],box:[1,1],draw(c){GLYPH_GE(c,0,0,1.15);},cut(c){}};
   if(id==='faFa')return {name:'伐',kind:'o',rot:0,core:[0,0],box:[1.1,1],draw(c){GLYPH_REN(c,-.3,0,1);GLYPH_GE(c,.14,0,1);},cut(c){}};
+  if(id==='scRing')return {name:'詐騙電話',kind:'o',rot:0,core:[0,0],box:[1.1,1],draw(c){MPHONE(c,0,.04,1.6);c.lineWidth=.035;c.lineCap='round';for(const sx of [-1,1])for(const r of [.24,.32]){const a0=sx>0?-.5:Math.PI-.5;c.beginPath();c.arc(0,.04,r,a0,a0+1);c.stroke();}},cut(c){MPHONE_CUT(c,0,.04,1.6);}};
+  if(id==='scThink')return {name:'他想了想',kind:'o',rot:0,core:[0,.1],box:[1.1,1],draw(c){MINIP(c,-.12,.16,1.2);MPHONE(c,.14,-.16,.55,.3);TXTB(c,'…',.34,-.4,28,.02);c.fillRect(-.54,.44,1.08,.03);},cut(c){}};
+  if(id==='scWin')return {name:'我剛中一千萬',kind:'o',rot:0,core:[0,.1],box:[1.1,1],draw(c){MINIP(c,-.2,.16,1.2);MPHONE(c,.06,-.16,.55,.3);TXTB(c,'$',.34,-.3,30,.02);TXTB(c,'$',.4,-.06,22,.02);c.fillRect(-.54,.44,1.08,.03);},cut(c){}};
+  if(id==='scSpeechless')return {name:'詐騙集團愣住',kind:'o',rot:0,core:[0,.1],box:[1.1,1],draw(c){MINIP(c,0,.16,1.2);MPHONE(c,.24,-.14,.55,-.3);TXTB(c,'…',0,-.4,34,.02);c.lineWidth=.03;c.lineCap='round';c.beginPath();c.moveTo(-.2,-.26);c.quadraticCurveTo(-.16,-.2,-.19,-.16);c.stroke();c.fillRect(-.54,.44,1.08,.03);},cut(c){}};
   if(id==='hsrSelfie')return profileShape({id:'flat',fixed:1,name:'自拍出發',extra:c=>{c.save();c.translate(1.16,.36);c.scale(.36,.36);c.rotate(-.2);PHONE(c);c.restore();SNOW(c,1.36,-.02,.12);SNOW(c,1.04,-.08,.1);},cutP:SMILE,scale:.78,shift:-.22,box:[1.5,1.15],core:[-.22,0]});
   if(id==='marquee')return {name:'倒過來的跑馬燈',kind:'o',rot:0,core:[0,.1],box:[1.1,1],draw(c){c.fillRect(-.48,-.3,.96,.3);c.fillRect(-.48,.14,.28,.3);c.fillRect(.2,.14,.28,.3);c.save();c.translate(.42,-.5);c.scale(.6,.6);QMARK(c);c.restore();},cut(c){c.save();c.translate(0,-.14);c.scale(-1,1);TXT(c,'南港',0,0,32);c.restore();}};
   if(id==='iceFlirt')return pair('神魂顛島',SMILE,SMILE,c=>{HEART(c,0,-.34,.09);SNOW(c,-.22,-.4,.05);SNOW(c,.22,-.4,.05);});
@@ -2388,6 +2397,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'一次領',panels:[['scRing','電話：「恭喜中了五百萬！」'],['scThink','他想了想……'],['scWin','「我剛剛才中一千萬，」'],['scSpeechless','「可以一次一起領嗎？」',0,3.5]]},
   {title:'你我各一半',panels:[['faHalf','你我各一半，打一字。'],['faRen','「你」的一半：亻'],['faGe','「我」的一半：戈'],['faFa','合起來：伐！',0,3.5]]},
   {title:'走路回家',panels:[['wkLeave','他出門說：「走路回家。」'],['wkFar','翻山越嶺，走了五萬公里。'],['wkSwim','不太會游泳，也游過了海。'],['wkHug','二十八年後，抱住媽媽。',0,3.5]]},
   {title:'欸唉床',panels:[['aiBed','A：「你家的床很貴？」'],['aiSmart','B：「這是 AI 智能床！」'],['aiSit','床發出：「欸～唉～」'],['aiEiai','「欸唉床，難怪貴！」',0,3.5]]},
@@ -2698,7 +2708,7 @@ const CATS=['諧音梗','夫妻家庭','搶匪小偷','職場校園','時事諷�
 const CATMAP={
   '諧音梗':['欸唉床','難呱','委屈求拳','臺南缺什麼','蚊質彬彬','充電','刀槍blue','沒四','IKE鴨','筆記泥','避暑','半倒體','醉有陰德','野莓','老子有錢','代禱','喙很痛','狒到校','twenty too','士在哈囉','亞洲舞王','鴿聚院','蒂寶','東海聾王','小人多','看不見','夢想家','風生水起','青春豆','太陽是男生','腳滑','很嗆','第九天長','恩重如山','冰山一角','翻身的機會','如果的車','冰島','老當易撞','詩靈','喝T','知豬','刀削面','碰頭','容易掛','壓蛇帽','菇單','沒人理','一拍即合','最笨的字母','麥生氣','新衣耶','警察','阿拉伯','好鴨','拭十箍','矮love游','站久會酸','導魚','菇毒','雞凍','肥而不溺','擺事可樂','沒龜','猴頭菇','火腿','恁母伊郎','菊花茶','比三小','西北雨','北極的牛','地下道','下酒菜','梗多','滑馬','沒關C','在下','目光','泡你','我的天','沒氣了','南方','最甜的蜜','小氣蝦','瓦斯怎麼叫','缺陷','冰心地瓜','不在人事','多大','雨多甜','還沒滾','蟻后','坐白宮','擲筊','一個人過','鳳梨酥','仙草蜜','一波三折','八天的','飢童','美紅敢','仰式','你哪位','哈囉 win','窗戶凍住了','左右腦','換科目','業內人士','找誰接','半手李','閉眼說瞎話','誰是京都人','金口難開','看辦公室','週一休息','看穿'],
   '夫妻家庭':['偶爾','哪個好看','李拜一','四隻腳','拿掃把','湊滿一船','隔壁老王','臉色','好女子','著火了','我的天','算錯','仙女','誤點','玩夠沒','瓶蓋','最佳搭檔','帶過來的','明天減肥','我不知道','我知道','第一次','會下蛋嗎','南方','挑食','五個媽','雨多甜','還沒滾','看不到你','多生兩個','貓與虎','送回娘家','七十才開始','一模一樣','買菸','需要談談','不敢問','窗戶凍住了','一切都很好','沒安全感','所以要我留下','露台','四個孩子的爸','深夜講座','睜一隻眼','緩解疼痛','九十歲','撞到告訴我','很會說謊','很甜','兩根菸'],
-  '搶匪小偷':['金口難開','負數','可能看到了','換科目','業內人士','遙控器','一起找'],
+  '搶匪小偷':['一次領','金口難開','負數','可能看到了','換科目','業內人士','遙控器','一起找'],
   '職場校園':['放下','快成專家','活著','研究所','數研','高高在上','吃安眠藥','緩兵之計','呷好西瓜','有求必應','下一位','送行宴','鏡子都敢照','不會再問我','自己寫','哪邊涼快','不在人事','一個人過','仙草蜜','飢童','不忍心','美紅敢','錯的先講','吸菸區','沉默','看辦公室','可以回家','倫理學','很會說謊','烤箱手套'],
   '時事諷刺':['看不起醫生','砍光','凱文呢','民調','太晚了','有用','重燃希望','誰是白痴','塗成藍色','我們的願望','白羊吃草','會飛的車'],
   '故事小品':['走路回家','大同','燈和蛾','為之下','先選日子','漏掉','只是塊木頭','撕下面具','莎翁的墓誌銘','萬聖夜','轉變沒那麼快','誰會變大','大國者下流','說跑收活','成其大','省道','背上的字','手作禮物','只是欣賞','一片葉子','種子','不打你','慣性','颱風要來','收拾','放下','恆河','平安','等','釣','慢','午後']};
@@ -2708,7 +2718,7 @@ const inCat=S=>storyCat==='all'||S.cats.includes(storyCat);
 
 /* ================= 四格手作 ================= */
 const $=id=>document.getElementById(id);
-const MATS={wire:'折鐵線',papercut:'紙雕',origami:'折紙',clay:'紙黏土'};
+const MATS={wire:'折鐵線',papercut:'紙雕',origami:'折紙',clay:'紙黏土',felt:'羊毛氈',yarn:'毛線'};
 let mat='wire',idx=0,renderToken=0;
 
 function seeded(seed){let s=seed>>>0||1;return()=>{s^=s<<13;s>>>=0;s^=s>>17;s^=s<<5;s>>>=0;return s/4294967296;};}
@@ -2754,10 +2764,13 @@ function paintBg(x,w,h,kind,rnd){
     x.beginPath();for(let p=g/2;p<w;p+=g){x.moveTo(p,0);x.lineTo(p,h);}for(let p=g/2;p<h;p+=g){x.moveTo(0,p);x.lineTo(w,p);}x.stroke();
     x.strokeStyle='rgba(255,255,255,.4)';x.beginPath();for(let p=g/2;p<w;p+=g*5){x.moveTo(p,0);x.lineTo(p,h);}for(let p=g/2;p<h;p+=g*5){x.moveTo(0,p);x.lineTo(w,p);}x.stroke();}
   else if(kind==='table'){x.fillStyle='#d9dde2';x.fillRect(0,0,w,h);}
-  const img=x.getImageData(0,0,w,h),d=img.data,amp=kind==='kraft'?26:kind==='mat'?10:14,sc=kind==='kraft'?2.2:3;
+  else if(kind==='linen'){x.fillStyle='#e9e1d2';x.fillRect(0,0,w,h);x.globalAlpha=.07;x.fillStyle='#6b5a40';const st=Math.max(2,w/240);for(let p=0;p<w;p+=st*2)x.fillRect(p,0,st*.6,h);for(let p=0;p<h;p+=st*2)x.fillRect(0,p,w,st*.6);x.globalAlpha=1;}
+  else if(kind==='wood'){x.fillStyle='#b98a5c';x.fillRect(0,0,w,h);const g=w/6;for(let p=0;p<w;p+=g){x.fillStyle='rgba(60,35,15,.25)';x.fillRect(p,0,Math.max(1,w/300),h);}}
+  const img=x.getImageData(0,0,w,h),d=img.data,amp=kind==='kraft'||kind==='wood'?26:kind==='mat'?10:14,sc=kind==='kraft'?2.2:3;
   const ox=rnd()*200,oy=rnd()*200;
   for(let y=0;y<h;y++)for(let xx=0;xx<w;xx++){const j=(y*w+xx)*4;let v=(fbm(xx/sc/6+ox,y/sc/6+oy)-.5)*amp+(Math.random()-.5)*amp*.5;
     if(kind==='kraft')v+=(nz(xx/1.5+ox,y/40+oy)-.5)*14;
+    if(kind==='wood')v+=(nz(xx/3+ox,y/90+oy)-.5)*34+Math.sin(xx/9+fbm(xx/40,y/120)*8)*6;
     d[j]+=v;d[j+1]+=v;d[j+2]+=v;}
   x.putImageData(img,0,0);
   const g=x.createRadialGradient(w*.4,h*.35,w*.1,w*.5,h*.5,w*.9);g.addColorStop(0,'rgba(255,255,255,.08)');g.addColorStop(1,'rgba(0,0,0,.14)');x.fillStyle=g;x.fillRect(0,0,w,h);
@@ -2773,7 +2786,9 @@ const PAL={
   wire:['#9aa1a8','#b0805a','#a7adb3','#c29b5a'],
   papercut:['#b8322a','#1f5f8b','#c9822b','#2f6b3a'],
   origami:['#d9483b','#3b7dd8','#e8b730','#3f9a5c'],
-  clay:['#f2a07b','#86c5da','#f5d06f','#a3d39c']
+  clay:['#f2a07b','#86c5da','#f5d06f','#a3d39c'],
+  felt:['#c96f5a','#5f8fb4','#d9a441','#7aa36b'],
+  yarn:['#d2544a','#3f78b5','#e2a73a','#4f9a6a']
 };
 
 function renderWire(x,A,w,h,k,rnd){
@@ -2849,7 +2864,55 @@ function renderClay(x,A,w,h,k,rnd){
   heightShade(img,w,h,H,al,base,{bump:r*1.6,amb:.5,dif:.6,spec:.22,shine:14,tex:(xx,y)=>1+(Math.random()-.5)*.04});
   x.putImageData(img,0,0);
 }
-const RENDER={wire:renderWire,papercut:renderPapercut,origami:renderOrigami,clay:renderClay};
+
+function renderFelt(x,A,w,h,k,rnd){
+  paintBg(x,w,h,'linen',rnd);
+  const base=hex(PAL.felt[k%4]),ox=rnd()*100,oy=rnd()*100;
+  // fuzzy edge: perturb the mask with fine noise before thresholding
+  const M=new Float32Array(A.length);for(let i=0;i<A.length;i++)M[i]=A[i]>.5?1:0;
+  const r0=Math.max(2,Math.round(w/120));const S=blurN(M,w,h,r0,2),al=new Float32Array(A.length);
+  for(let i=0;i<A.length;i++){if(S[i]<.02)continue;const xx=i%w,y=(i/w)|0;const n=(nz(xx/1.6+ox,y/1.6+oy)-.5)*.5+(Math.random()-.5)*.35;al[i]=sstep(.36,.5,S[i]+n);}
+  const H=blurN(Float32Array.from(al),w,h,Math.max(2,Math.round(w/50)),2);
+  dropShadow(x,al,w,h,Math.round(w/160),Math.round(w/120),Math.round(w/100),.25);
+  const img=x.getImageData(0,0,w,h);
+  heightShade(img,w,h,H,al,base,{bump:w/60,amb:.62,dif:.45,spec:0,shine:1,tex:(xx,y)=>.9+fbm(xx/2.2+ox,y/2.2+oy)*.2+(Math.random()-.5)*.12});
+  x.putImageData(img,0,0);
+  // stray fibres
+  x.save();x.lineWidth=Math.max(.6,w/700);x.lineCap='round';const c2=base.map(v=>Math.min(255,v+30));
+  for(let n=0;n<w*1.6;n++){const i=(rnd()*A.length)|0;if(al[i]<.2||al[i]>.8)continue;const xx=i%w,y=(i/w)|0,a=rnd()*6.28,l=w/90*(.5+rnd());
+    x.strokeStyle=`rgba(${c2},${(.35+rnd()*.4).toFixed(2)})`;x.beginPath();x.moveTo(xx,y);x.quadraticCurveTo(xx+Math.cos(a+1)*l*.5,y+Math.sin(a+1)*l*.5,xx+Math.cos(a)*l,y+Math.sin(a)*l);x.stroke();}
+  x.restore();
+}
+
+function renderYarn(x,A,w,h,k,rnd){
+  paintBg(x,w,h,'wood',rnd);
+  const base=hex(PAL.yarn[k%4]);
+  const front=new Float32Array(A.length);for(let i=0;i<A.length;i++)front[i]=sstep(.4,.6,A[i]);
+  dropShadow(x,front,w,h,Math.round(w/160),Math.round(w/120),Math.round(w/110),.38);
+  // fill: rows of twisted yarn on an offscreen layer, clipped to the shape
+  const f=document.createElement('canvas');f.width=w;f.height=h;const fx=f.getContext('2d',{willReadFrequently:true});
+  const sp=Math.max(5,w/34),dk=`rgb(${base.map(v=>v*.55|0)})`,md=`rgb(${base})`,lt=`rgb(${base.map(v=>Math.min(255,v*1.25+25)|0)})`;
+  fx.lineCap='round';
+  for(let y=sp/2,row=0;y<h+sp;y+=sp,row++){
+    const wob=(xx)=>y+Math.sin(xx/(sp*3)+row)*sp*.12;
+    fx.strokeStyle=dk;fx.lineWidth=sp*.98;fx.beginPath();for(let xx=-sp;xx<=w+sp;xx+=sp/2)xx<0?fx.moveTo(xx,wob(xx)):fx.lineTo(xx,wob(xx));fx.stroke();
+    fx.strokeStyle=md;fx.lineWidth=sp*.72;fx.stroke();
+    fx.strokeStyle=lt;fx.lineWidth=Math.max(1,sp*.16);
+    for(let xx=(row%2)*sp*.25;xx<w;xx+=sp*.5){const yy=wob(xx);fx.beginPath();fx.moveTo(xx-sp*.14,yy-sp*.24);fx.lineTo(xx+sp*.14,yy+sp*.2);fx.stroke();}
+  }
+  const fi=fx.getImageData(0,0,w,h).data,img=x.getImageData(0,0,w,h),d=img.data;
+  for(let i=0;i<A.length;i++){const a=front[i];if(!a)continue;const j=i*4;d[j]=d[j]*(1-a)+fi[j]*a;d[j+1]=d[j+1]*(1-a)+fi[j+1]*a;d[j+2]=d[j+2]*(1-a)+fi[j+2]*a;}
+  x.putImageData(img,0,0);
+  // outline: one thicker strand around every edge
+  const r=Math.max(2,Math.round(w/120));const M=new Float32Array(A.length);for(let i=0;i<A.length;i++)M[i]=A[i]>.5?1:0;
+  const B=blurN(M,w,h,r,2),T=new Float32Array(A.length),al=new Float32Array(A.length);
+  for(let i=0;i<A.length;i++){const t=1-Math.abs(B[i]-.5)*2.4;T[i]=t>0?Math.sqrt(t):0;al[i]=sstep(0,.2,t);}
+  const ed=base.map(v=>v*.8|0),per=r*3.2;
+  const img2=x.getImageData(0,0,w,h);
+  heightShade(img2,w,h,blurN(T,w,h,1,1),al,ed,{bump:r*2.6,amb:.45,dif:.6,spec:.12,shine:8,tex:(xx,y)=>.82+.28*(.5+.5*Math.sin((xx+y)/per*6.28))});
+  x.putImageData(img2,0,0);
+}
+const RENDER={wire:renderWire,papercut:renderPapercut,origami:renderOrigami,clay:renderClay,felt:renderFelt,yarn:renderYarn};
 
 function buildPanel(fig,S,k,token){
   const p=S.panels[k],sh=shapeById(p[0]);const cv=fig.querySelector('canvas');
@@ -2867,7 +2930,7 @@ function render(){
   $('title').innerHTML='';const t=document.createElement('span');t.textContent='〈'+S.title+'〉';$('title').append(t);
   const sm=document.createElement('small');sm.textContent=MATS[mat]+(S.by?'・投稿：'+S.by:'');$('title').append(sm);
   const grid=$('grid');grid.replaceChildren();
-  const figs=S.panels.map((p,k)=>{const f=document.createElement('figure');f.style.setProperty('--tilt',(mat==='papercut'||mat==='origami'?((k%2?1:-1)*.6):0)+'deg');
+  const figs=S.panels.map((p,k)=>{const f=document.createElement('figure');f.style.setProperty('--tilt',(mat==='papercut'||mat==='origami'||mat==='felt'?((k%2?1:-1)*.6):0)+'deg');
     f.innerHTML='<div class="frame"><canvas></canvas><span class="num"></span></div><figcaption></figcaption>';
     f.querySelector('.num').textContent=k+1;f.querySelector('figcaption').textContent=p[1];grid.append(f);return f;});
   let k=0;const next=()=>{if(token!==renderToken||k>=figs.length)return;try{buildPanel(figs[k],S,k,token);}catch(e){console.error(e);}figs[k].classList.add('on');k++;setTimeout(next,260);};
