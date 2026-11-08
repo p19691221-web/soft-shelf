@@ -589,6 +589,9 @@ const PEEL=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);fillE(c,0,0,.07,.0
 const ZIG=(c,x,y,a,n)=>{c.lineWidth=.035;c.lineCap='round';c.beginPath();let px=x,py=y;c.moveTo(px,py);for(let k=0;k<(n||3);k++){px+=Math.cos(a)*.05+(k%2?.03:-.03);py+=Math.sin(a)*.05;c.lineTo(px,py);}c.stroke();};
 const TXT=(c,t,x,y,px)=>{c.save();c.scale(.01,.01);c.font='900 '+px+'px '+SERIF;c.textAlign='center';c.textBaseline='middle';c.fillText(t,x*100,y*100);c.restore();};
 
+const DUFFEL=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.beginPath();c.roundRect(-.3,-.1,.6,.26,.1);c.fill();c.lineWidth=.035;c.beginPath();c.arc(0,-.1,.12,Math.PI,0);c.stroke();c.restore();};
+const BILLS=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);for(let i=0;i<3;i++){c.save();c.translate(-.12+i*.12,-.02*i);c.rotate(-.2+i*.18);c.fillRect(-.07,-.04,.14,.08);c.restore();}c.restore();};
+
 const RIDER=(c,x,y,k,a)=>{c.save();c.translate(x,y);c.rotate(a||0);c.scale(k,k);BIKE(c,0,0,1);c.lineWidth=.04;c.lineCap='round';c.beginPath();c.moveTo(.12,-.06);c.lineTo(.14,-.15);c.stroke();c.lineWidth=.07;c.beginPath();c.moveTo(-.05,-.1);c.lineTo(.04,-.3);c.stroke();fillE(c,.08,-.39,.065,.065);c.lineWidth=.045;c.beginPath();c.moveTo(.04,-.26);c.lineTo(.14,-.15);c.moveTo(-.05,-.1);c.lineTo(.04,.0);c.lineTo(0,.12);c.stroke();c.restore();};
 const OFFBLD=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.fillRect(-.18,-.46,.36,.8);c.restore();};
 const OFFBLD_CUT=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);for(let r=0;r<4;r++)for(let q=0;q<3;q++)c.fillRect(-.13+q*.1,-.4+r*.14,.06,.08);c.fillRect(-.05,.18,.1,.16);c.restore();};
@@ -1287,6 +1290,10 @@ function shapeById(id){
   if(id==='g2Hill')return {name:'遇到上坡',kind:'o',rot:0,core:[0,.1],box:[1.1,1],draw(c){c.lineWidth=.05;c.lineCap='round';c.beginPath();c.moveTo(-.54,.44);c.lineTo(.54,-.04);c.stroke();RIDER(c,-.04,-.06,1,-.42);c.lineWidth=.03;c.beginPath();c.moveTo(-.24,-.34);c.quadraticCurveTo(-.2,-.28,-.23,-.24);c.moveTo(-.3,-.26);c.quadraticCurveTo(-.26,-.2,-.29,-.16);c.stroke();},cut(c){}};
   if(id==='g2Gear')return {name:'開二檔',kind:'o',rot:0,core:[0,.1],box:[1.1,1],draw(c){RIDER(c,.12,.2,1.25);c.lineWidth=.035;c.lineCap='round';c.beginPath();for(const [y,l] of [[-.2,.26],[-.04,.34],[.12,.22],[.28,.3]]){c.moveTo(-.5,y);c.lineTo(-.5+l,y);}c.stroke();TXTB(c,'2',.4,-.34,34,.025);c.fillRect(-.54,.44,1.08,.03);},cut(c){}};
   if(id==='g2Pass')return {name:'衝過公司',kind:'o',rot:0,core:[0,.1],box:[1.1,1],draw(c){OFFBLD(c,-.34,.1,1);RIDER(c,.3,.24,.75);c.lineWidth=.03;c.lineCap='round';c.beginPath();for(const y of [.0,.14,.28])c.moveTo(-.1,y),c.lineTo(.08,y);c.stroke();TXTB(c,'？',-.06,-.4,26,.02);c.fillRect(-.54,.44,1.08,.03);},cut(c){OFFBLD_CUT(c,-.34,.1,1);}};
+  if(id==='fmBag')return {name:'路邊的袋子',kind:'o',rot:0,core:[0,.1],box:[1.1,1],draw(c){DUFFEL(c,.18,.26,1);MINIP(c,-.36,.16,.9);TXTB(c,'！',-.16,-.34,28,.02);c.fillRect(-.54,.44,1.08,.03);},cut(c){c.fillRect(-.12,.24,.6,.02);TXTB(c,'$',.18,.36,20,.015);}};
+  if(id==='fmGift')return {name:'老天給的',kind:'o',rot:0,core:[0,.1],box:[1.1,1],draw(c){MINIP(c,-.2,.16,1.1);DUFFEL(c,.24,.32,.6);CLOUD(c,.22,-.34,.9);c.lineWidth=.03;c.lineCap='round';c.beginPath();for(const x of [.12,.22,.32]){c.moveTo(x,-.22);c.lineTo(x-.02,-.08);}c.stroke();c.fillRect(-.54,.44,1.08,.03);},cut(c){}};
+  if(id==='fmSpend')return {name:'花掉大半',kind:'o',rot:0,core:[0,.1],box:[1.1,1],draw(c){PLANE(c,.1,-.3,.7);MINIP(c,-.26,.18,.9);BILLS(c,.22,.06,1.1);BILLS(c,.3,.24,.9);c.fillRect(-.54,.44,1.08,.03);},cut(c){}};
+  if(id==='fmRepay')return {name:'要還五十年',kind:'o',rot:0,core:[0,.1],box:[1.1,1],draw(c){CALPAGE(c,.24,-.08,1.1);MINIP(c,-.28,.16,1);TXTB(c,'…',-.28,-.4,28,.02);c.fillRect(-.54,.44,1.08,.03);},cut(c){TXTB(c,'50',.24,-.02,26,.02);}};
   if(id==='hsrSelfie')return profileShape({id:'flat',fixed:1,name:'自拍出發',extra:c=>{c.save();c.translate(1.16,.36);c.scale(.36,.36);c.rotate(-.2);PHONE(c);c.restore();SNOW(c,1.36,-.02,.12);SNOW(c,1.04,-.08,.1);},cutP:SMILE,scale:.78,shift:-.22,box:[1.5,1.15],core:[-.22,0]});
   if(id==='marquee')return {name:'倒過來的跑馬燈',kind:'o',rot:0,core:[0,.1],box:[1.1,1],draw(c){c.fillRect(-.48,-.3,.96,.3);c.fillRect(-.48,.14,.28,.3);c.fillRect(.2,.14,.28,.3);c.save();c.translate(.42,-.5);c.scale(.6,.6);QMARK(c);c.restore();},cut(c){c.save();c.translate(0,-.14);c.scale(-1,1);TXT(c,'南港',0,0,32);c.restore();}};
   if(id==='iceFlirt')return pair('神魂顛島',SMILE,SMILE,c=>{HEART(c,0,-.34,.09);SNOW(c,-.22,-.4,.05);SNOW(c,.22,-.4,.05);});
@@ -2477,6 +2484,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'老天給的',panels:[['fmBag','路邊撿到一袋現金。'],['fmGift','他想：「是老天給的。」'],['fmSpend','幾個月就花掉一大半。'],['fmRepay','錢是別人的，得還50年。',0,3.5]]},
   {title:'開二檔',panels:[['g2Ride','騎腳踏車去上班。'],['g2Hill','遇到上坡，有點吃力。'],['g2Gear','換到二檔，越踩越快——'],['g2Pass','一路衝過公司門口。',0,3.5]]},
   {title:'一次領',panels:[['scRing','電話：「恭喜中了五百萬！」'],['scThink','他想了想……'],['scWin','「我剛剛才中一千萬，」'],['scSpeechless','「可以一次一起領嗎？」',0,3.5]]},
   {title:'你我各一半',panels:[['faHalf','你我各一半，打一字。'],['faRen','「你」的一半：亻'],['faGe','「我」的一半：戈'],['faFa','合起來：伐！',0,3.5]]},
@@ -2792,7 +2800,7 @@ const CATMAP={
   '搶匪小偷':['一次領','金口難開','負數','可能看到了','換科目','業內人士','遙控器','一起找'],
   '職場校園':['放下','快成專家','活著','研究所','數研','高高在上','吃安眠藥','緩兵之計','呷好西瓜','有求必應','下一位','送行宴','鏡子都敢照','不會再問我','自己寫','哪邊涼快','不在人事','一個人過','仙草蜜','飢童','不忍心','美紅敢','錯的先講','吸菸區','沉默','看辦公室','可以回家','倫理學','很會說謊','烤箱手套'],
   '時事諷刺':['看不起醫生','砍光','凱文呢','民調','太晚了','有用','重燃希望','誰是白痴','塗成藍色','我們的願望','白羊吃草','會飛的車'],
-  '故事小品':['走路回家','大同','燈和蛾','為之下','先選日子','漏掉','只是塊木頭','撕下面具','莎翁的墓誌銘','萬聖夜','轉變沒那麼快','誰會變大','大國者下流','說跑收活','成其大','省道','背上的字','手作禮物','只是欣賞','一片葉子','種子','不打你','慣性','颱風要來','收拾','放下','恆河','平安','等','釣','慢','午後']};
+  '故事小品':['老天給的','走路回家','大同','燈和蛾','為之下','先選日子','漏掉','只是塊木頭','撕下面具','莎翁的墓誌銘','萬聖夜','轉變沒那麼快','誰會變大','大國者下流','說跑收活','成其大','省道','背上的字','手作禮物','只是欣賞','一片葉子','種子','不打你','慣性','颱風要來','收拾','放下','恆河','平安','等','釣','慢','午後']};
 STORIES.forEach(S=>{S.cats=CATS.filter(c=>(CATMAP[c]||[]).includes(S.title));if(!S.cats.length)S.cats=['日常冷笑話'];});
 let storyCat='all';
 const inCat=S=>storyCat==='all'||S.cats.includes(storyCat);
