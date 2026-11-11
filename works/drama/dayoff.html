@@ -211,7 +211,7 @@ function sceneStorm(){const g=c.createLinearGradient(0,0,0,H);g.addColorStop(0,'
   c.strokeStyle='rgba(200,220,255,.55)';c.lineWidth=4;for(let i=0;i<70;i++){const x=(i*97+T*900)%1300-100,y=(i*173+T*1600)%1900;c.beginPath();c.moveTo(x,y);c.lineTo(x-40,y+90);c.stroke();}
   c.save();c.translate(560,430);c.fillStyle='#fff7e0';rr(-200,-170,400,330,30);c.fill();c.restore();
   person({...OLD,x:540,y:560,s:1,expr:'happy',pose:'down'});c.fillStyle='#fff';rr(610,450,50,50,8);c.fill();
-  c.fillStyle='#8a5a2b';c.font='bold 38px "PingFang TC",sans-serif';c.textAlign='center';c.fillText('（老鳥在家）',560,310);}
+  c.fillStyle='#fff';c.font='bold 38px sans-serif';c.textAlign='center';c.fillText('（老鳥在家）',560,235);}
 const SCENES=[sceneBoard,sceneMark,sceneRookie,sceneStorm];
 
 /* ---------- particles ---------- */
