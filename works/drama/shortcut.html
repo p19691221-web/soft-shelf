@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>四格短劇・捷徑</title>
+<meta property="og:title" content="四格短劇〈捷徑〉">
+<meta property="og:description" content="水彩課上，有人問老師：學水彩有什麼捷徑？">
+<style>
+:root{--bg:#0e0d12;--ink:#fff;--muted:#b9b4c6;--accent:#ff4d6d}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#1a1820}}
+:root[data-theme="light"]{--bg:#1a1820}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:"PingFang TC","Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif;overflow:hidden}
+#wrap{position:fixed;inset:0;display:grid;place-items:center}
+#stage{position:relative;height:100%;aspect-ratio:9/16;max-width:100%;background:#000;overflow:hidden}
+@media (max-aspect-ratio:9/16){#stage{width:100%;height:auto}}
+canvas{display:block;width:100%;height:100%}
+#bars{position:absolute;left:12px;right:12px;top:calc(10px + env(safe-area-inset-top,0px));display:flex;gap:4px;z-index:3}
+#bars i{flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,.3);overflow:hidden}
+#bars b{display:block;height:100%;width:0;background:#fff}
+#top{position:absolute;left:14px;right:14px;top:calc(22px + env(safe-area-inset-top,0px));z-index:3;display:flex;align-items:center;gap:8px;font-size:14px;text-shadow:0 1px 3px rgba(0,0,0,.6)}
+#top .ep{background:var(--accent);padding:2px 8px;border-radius:4px;font-weight:700}
+#top .t{font-weight:700}
+#ctl{position:absolute;right:12px;top:34%;z-index:4;display:flex;flex-direction:column;gap:10px}
+#ctl button{width:46px;height:46px;border-radius:50%;border:none;background:rgba(0,0,0,.45);color:#fff;font-size:13px;font-family:inherit;cursor:pointer;line-height:1.1}
+#ctl button[aria-pressed="false"]{opacity:.55}
+#start,#end{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:rgba(10,8,16,.72);text-align:center;padding:24px}
+#start[hidden],#end[hidden]{display:none}
+#start h1,#end h2{margin:0;font-size:30px;letter-spacing:.06em}
+#start p,#end p{margin:0;color:var(--muted);font-size:16px;line-height:1.6}
+.big{font:inherit;font-size:18px;font-weight:700;color:#fff;background:var(--accent);border:none;border-radius:999px;padding:12px 28px;cursor:pointer;min-height:48px}
+.ghost{font:inherit;font-size:16px;color:#fff;background:transparent;border:1.5px solid rgba(255,255,255,.5);border-radius:999px;padding:10px 22px;cursor:pointer;min-height:44px;text-decoration:none}
+.row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.toast{position:absolute;left:50%;bottom:90px;transform:translateX(-50%);background:rgba(0,0,0,.75);padding:8px 16px;border-radius:999px;font-size:14px;opacity:0;transition:opacity .3s;z-index:6;pointer-events:none}
+.toast.on{opacity:1}
+</style>
+</head>
+<body>
+<div id="wrap"><div id="stage">
+  <canvas id="cv" width="1080" height="1920" aria-label="四格短劇畫面"></canvas>
+  <div id="bars"><i><b></b></i><i><b></b></i><i><b></b></i><i><b></b></i></div>
+  <div id="top"><span class="ep">第11集</span><span class="t">捷徑</span></div>
+  <div id="ctl">
+    <button id="bPause" type="button" aria-label="暫停">暫停</button>
+    <button id="bVoice" type="button" aria-pressed="true" aria-label="配音">配音</button>
+    <button id="bShare" type="button" aria-label="分享">分享</button>
+  </div>
+  <div id="start">
+    <h1>四格短劇〈捷徑〉</h1>
+    <p>補習班術科畫室，水彩課。<br>「老師，有什麼捷徑嗎？」</p>
+    <button class="big" id="bStart" type="button">▶ 開始看</button>
+    <p style="font-size:13px">有配音和音效，建議開聲音</p>
+  </div>
+  <div id="end" hidden>
+    <h2>第11集・完</h2>
+    <p>上一集：<a class="ghost" style="padding:4px 12px" href="atm.html">提款機</a></p>
+    <div class="row"><button class="big" id="bAgain" type="button">再看一次</button><button class="ghost" id="bShare2" type="button">分享</button></div>
+  </div>
+  <div class="toast" id="toast"></div>
+</div></div>
+<script>
+(()=>{
+const cv=document.getElementById('cv'),c=cv.getContext('2d'),W=1080,H=1920;
+const $=id=>document.getElementById(id);
+const clamp=(v,a,b)=>v<a?a:v>b?b:v,lerp=(a,b,t)=>a+(b-a)*t,ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+let rs=1;const rnd=()=>{rs=(rs*16807)%2147483647;return rs/2147483647;};
+
+/* ---------- audio ---------- */
+let AC=null,soundOn=true;
+function ac(){if(!AC){try{AC=new (window.AudioContext||window.webkitAudioContext)();}catch(e){}}if(AC&&AC.state==='suspended')AC.resume();return AC;}
+function noise(dur,f0,f1,vol,q){const a=ac();if(!a||!soundOn)return;const n=a.createBufferSource(),b=a.createBuffer(1,a.sampleRate*dur,a.sampleRate),d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;n.buffer=b;
+  const f=a.createBiquadFilter();f.type='bandpass';f.Q.value=q||.8;f.frequency.setValueAtTime(f0,a.currentTime);f.frequency.linearRampToValueAtTime(f1,a.currentTime+dur);
+  const g=a.createGain();g.gain.setValueAtTime(0,a.currentTime);g.gain.linearRampToValueAtTime(vol,a.currentTime+dur*.3);g.gain.linearRampToValueAtTime(0,a.currentTime+dur);n.connect(f);f.connect(g);g.connect(a.destination);n.start();}
+function tone(freq,dur,type,vol,delay,slide){const a=ac();if(!a||!soundOn)return;const o=a.createOscillator(),g=a.createGain(),t0=a.currentTime+(delay||0);o.type=type||'sine';o.frequency.setValueAtTime(freq,t0);if(slide)o.frequency.exponentialRampToValueAtTime(slide,t0+dur);
+  g.gain.setValueAtTime(0,t0);g.gain.linearRampToValueAtTime(vol,t0+.01);g.gain.exponentialRampToValueAtTime(.0001,t0+dur);o.connect(g);g.connect(a.destination);o.start(t0);o.stop(t0+dur+.05);}
+const SFX={
+  cheer(){noise(2.2,800,1400,.35,.5);noise(2.2,2200,2600,.12,.7);},
+  sparkle(){[1568,2093,2637,3136].forEach((f,i)=>tone(f,.35,'triangle',.08,i*.07));},
+  scream(){noise(1.4,1500,2400,.3,1.2);},
+  door(){tone(220,.15,'square',.08);tone(180,.2,'square',.08,.18);},
+  huh(){tone(330,.25,'triangle',.12,0,520);},
+  dun(){tone(98,.7,'sawtooth',.18);tone(92,1.1,'sawtooth',.18,.75);noise(1.5,120,80,.2,1);},
+  rooster(){tone(600,.18,'square',.07,0,900);tone(900,.5,'square',.07,.2,700);},
+  cluck(){for(let i=0;i<4;i++)tone(700+Math.random()*300,.07,'square',.06,i*.13+Math.random()*.05,500);},
+  toss(){noise(.4,3000,5000,.12,2);},
+  brush(){noise(.5,2500,1800,.08,.8);},
+  crow(){tone(500,.15,'square',.05);tone(420,.2,'square',.05,.2);},
+  beep(){tone(880,.12,'square',.08);tone(660,.2,'square',.08,.15);},
+  cash(){for(let i=0;i<10;i++)noise(.05,3000,4000,.15,2);tone(1320,.3,'sine',.08,.4);},
+  sigh(){noise(1.2,400,250,.2,.6);},
+  rain(){noise(2.5,1500,1200,.25,.4);},
+  stamp(){tone(90,.25,'square',.2);noise(.15,600,300,.3,1);},
+  steps(){for(let i=0;i<4;i++)tone(120,.08,'triangle',.18,i*.35);},
+  rustle(){noise(.6,3000,5000,.18,1.2);noise(.4,1800,2600,.1,1);},
+  blow(){noise(.7,400,300,.2,.6);},
+  snap(){noise(.12,2500,1800,.5,1.5);tone(900,.06,'square',.08);},
+  ouch(){tone(1200,.4,'sawtooth',.08,0,1800);noise(.3,3000,4000,.15,2);},
+  engine(){noise(1.6,120,200,.25,.8);tone(70,1.4,'sawtooth',.06);},
+  honk(){tone(440,.25,'square',.08);tone(554,.25,'square',.08);tone(440,.3,'square',.08,.35);tone(554,.3,'square',.08,.35);},
+  rip(){noise(.35,2500,6500,.35,.7);noise(.2,900,1500,.15,1);},
+  kettle(){tone(1650,1.2,'sine',.05,0,1700);tone(2200,1.2,'sine',.03,.1,2250);},
+  keys(){for(let i=0;i<12;i++)tone(1800+Math.random()*900,.03,'square',.035,i*.07);},
+  powerdown(){tone(620,.7,'sine',.16,0,40);noise(.4,400,100,.12,1);},
+  whistle(){tone(1200,.25,'sine',.09,0,1500);tone(1500,.35,'sine',.09,.3,1100);},
+  pop(){tone(880,.12,'sine',.12,0,1320);}
+};
+
+/* ---------- voice ---------- */
+const TTS=window.speechSynthesis||null;let voiceOn=true;
+function pickVoice(){if(!TTS)return null;const vs=TTS.getVoices(),L=v=>String(v.lang||''),yue=v=>/HK|MO|yue/i.test(L(v))||/cantonese|粵/i.test(v.name);
+  return vs.find(v=>/zh[-_]TW/i.test(L(v))&&!yue(v))||vs.find(v=>/^(zh[-_](CN|SG)|cmn)/i.test(L(v)))||vs.find(v=>/^zh/i.test(L(v))&&!yue(v))||null;}
+if(TTS){TTS.getVoices();if('onvoiceschanged' in TTS)TTS.onvoiceschanged=()=>TTS.getVoices();}
+const VO={'老師':{p:.85,r:.95},'A同學':{p:1.2,r:1.1},'老鳥':{p:.8,r:.95},'菜鳥':{p:1.2,r:1.1},'主管':{p:.85,r:1},'小陳':{p:1.15,r:1.1},'老闆':{p:.8,r:1},'送貨小哥':{p:1.2,r:1.25},'我':{p:1,r:1.05},'阿傑':{p:.9,r:1.12},'旁白':{p:1,r:1.05},'小美':{p:1.45,r:1.12},'阿嬤':{p:.75,r:.92},'偶像':{p:1.1,r:1}};
+function speak(who,text,done){if(!TTS||!voiceOn||!text||!VO[who]){done&&done();return;}
+  try{TTS.cancel();const u=new SpeechSynthesisUtterance(text.replace(/[（(].*?[)）]/g,'').replace(/——|…+/g,'，'));const v=pickVoice();if(v){u.voice=v;u.lang=v.lang;}else u.lang='zh-TW';
+    u.pitch=VO[who].p;u.rate=VO[who].r;let fin=false;const f=()=>{if(!fin){fin=true;done&&done();}};u.onend=f;u.onerror=f;TTS.speak(u);}catch(e){done&&done();}}
+
+/* ---------- script ---------- */
+const BEATS=[
+ {s:0,who:'旁白',t:'補習班術科畫室，水彩課。',cam:[540,1000,1],sfx:'brush',hold:2.4},
+ {s:0,who:'老師',t:'水要多，筆要快，讓顏色自己走。',cam:[640,960,1.2],sfx:'brush',act:'demo',hold:2.8},
+ {s:1,who:'A同學',t:'老師，學水彩有什麼捷徑？',cam:[540,960,1.15],act:'ask',hold:2.6},
+ {s:2,who:'旁白',t:'老師聽到了。',cam:[540,960,1.1],hold:1.8},
+ {s:2,who:'旁白',t:'……然後繼續畫。',cam:[560,1000,1.25],sfx:'brush',act:'silent',hold:2.4},
+ {s:3,who:'旁白',t:'旁邊的 B 同學，送上一個白眼。',cam:[620,960,1.15],sfx:'crow',act:'eye',hold:2.8},
+ {s:3,who:'旁白',t:'牆上，掛著一百張老師的練習稿。',cam:[540,800,1],act:'wall',hold:2.8},
+ {s:3,who:'旁白',t:'最短的捷徑，就是繞遠路。',cam:[540,900,1.02],sfx:'sparkle',hold:3}
+];
+
+/* ---------- state ---------- */
+let bi=-1,bt=0,playing=false,paused=false,last=0,speechDone=true,camA=[540,960,1],camB=[540,960,1],camT=1,shake=0,parts=[],actT={},T=0;
+
+/* ---------- drawing helpers ---------- */
+function rr(x,y,w,h,r){c.beginPath();c.roundRect(x,y,w,h,r);}
+function ell(x,y,rx,ry,col){c.fillStyle=col;c.beginPath();c.ellipse(x,y,rx,ry,0,0,7);c.fill();}
+function line(pts,w,col){c.strokeStyle=col;c.lineWidth=w;c.lineCap='round';c.lineJoin='round';c.beginPath();pts.forEach((p,i)=>i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]));c.stroke();}
+function heart(x,y,s,col){c.save();c.translate(x,y);c.scale(s,s);c.fillStyle=col;c.beginPath();c.moveTo(0,12);c.bezierCurveTo(-26,-6,-14,-28,0,-14);c.bezierCurveTo(14,-28,26,-6,0,12);c.fill();c.restore();}
+function star(x,y,r,col){c.fillStyle=col;c.beginPath();for(let i=0;i<8;i++){const a=i*Math.PI/4,rr2=i%2?r*.38:r;c.lineTo(x+Math.cos(a)*rr2,y+Math.sin(a)*rr2);}c.fill();}
+
+// person: origin at feet
+function person(o){const {x,y,s=1,face=1}=o;c.save();c.translate(x,y);c.scale(s*face,s);
+  const skin=o.skin||'#f6d2b4',top=o.top||'#5b6ee1',bot=o.bot||'#33384a',t=T;
+  const bob=o.bob?Math.sin(t*o.bob)*6:0;c.translate(0,bob);
+  // legs
+  if(o.run){const a=Math.sin(t*14)*22;line([[-14,-70],[-14+a,0]],20,bot);line([[14,-70],[14-a,0]],20,bot);}
+  else{c.fillStyle=bot;rr(-34,-72,28,72,10);c.fill();rr(6,-72,28,72,10);c.fill();}
+  // torso
+  c.fillStyle=top;rr(-44,-168,88,104,30);c.fill();
+  if(o.skirt){c.fillStyle=o.skirt;c.beginPath();c.moveTo(-46,-86);c.lineTo(46,-86);c.lineTo(58,-36);c.lineTo(-58,-36);c.fill();}
+  // arms
+  const arm=(pts)=>{line(pts,18,top);const e=pts[pts.length-1];ell(e[0],e[1],11,11,skin);};
+  const p=o.pose||'down';
+  if(p==='down'){arm([[-40,-150],[-52,-88]]);arm([[40,-150],[52,-88]]);}
+  else if(p==='heart'){arm([[-40,-152],[-78,-226],[-8,-292]]);arm([[40,-152],[78,-226],[8,-292]]);}
+  else if(p==='sign'){arm([[-40,-150],[-66,-230],[-70,-286]]);arm([[40,-150],[66,-230],[70,-286]]);
+    c.fillStyle='#fff7a8';rr(-140,-420,280,150,12);c.fill();c.strokeStyle='#ff4d6d';c.lineWidth=8;c.stroke();
+    c.fillStyle='#e0245e';c.font='bold 52px "PingFang TC","Noto Sans TC",sans-serif';c.textAlign='center';c.textBaseline='middle';c.fillText('看我！',0,-372);c.font='bold 36px "PingFang TC","Noto Sans TC",sans-serif';c.fillText('比愛心 ♥',0,-314);}
+  else if(p==='cheer'){const a=Math.sin(t*12)*10;arm([[-40,-152],[-80,-220+a],[-90,-290+a]]);arm([[40,-152],[80,-220-a],[90,-290-a]]);}
+  else if(p==='run'){const a=Math.sin(t*14)*30;arm([[-40,-150],[-50-a*.4,-95+a*.3]]);arm([[40,-150],[50+a*.4,-95-a*.3]]);}
+  else if(p==='hip'){arm([[-40,-150],[-70,-110],[-42,-92]]);arm([[40,-150],[70,-110],[42,-92]]);}
+  else if(p==='throw'){const k=o.throwK||0;arm([[-40,-150],[-40,-108],[-10,-100]]);ell(-4,-96,42,14,'#e8e2d4');ell(-4,-104,34,9,'#fffdf5');
+    arm([[40,-150],[40+60*k+20,-150-80*k],[60+90*k,-180-70*k]]);}
+  else if(p==='facepalm'){arm([[-40,-150],[-52,-88]]);arm([[40,-150],[30,-205],[-6,-236]]);}
+  // head
+  const hy=-226;
+  if(o.hair==='pony'){const sw=Math.sin(t*6)*10;ell(-58,hy-10+sw*.3,24,46,o.hc||'#2b1d16');}
+  ell(0,hy,62,62,skin);
+  c.fillStyle=o.hc||'#2b1d16';
+  if(o.hair==='pony'){c.beginPath();c.ellipse(0,hy-18,66,50,0,Math.PI,0);c.fill();c.beginPath();c.moveTo(-64,hy-18);c.quadraticCurveTo(-20,hy-6,6,hy-34);c.quadraticCurveTo(30,hy-6,64,hy-18);c.lineTo(64,hy-30);c.lineTo(-64,hy-30);c.fill();}
+  else if(o.hair==='bun'){c.beginPath();c.ellipse(0,hy-18,66,48,0,Math.PI,0);c.fill();ell(0,hy-78,30,26,o.hc);c.beginPath();c.ellipse(-56,hy-4,12,28,0,0,7);c.fill();c.beginPath();c.ellipse(56,hy-4,12,28,0,0,7);c.fill();}
+  else if(o.hair==='idol'){c.beginPath();c.moveTo(-66,hy+4);c.quadraticCurveTo(-74,hy-80,0,hy-74);c.quadraticCurveTo(74,hy-80,66,hy+4);c.quadraticCurveTo(40,hy-40,10,hy-26);c.quadraticCurveTo(-30,hy-50,-66,hy+4);c.fill();}
+  if(o.cap){c.fillStyle='#1f3a68';c.beginPath();c.ellipse(0,hy-34,68,46,0,Math.PI,0);c.fill();c.fillRect(-68,hy-38,160,18);c.fillStyle='#f2c94c';c.beginPath();c.arc(0,hy-60,12,0,7);c.fill();}
+  if(o.headset){const h2=hy-(o.hsY||0);c.strokeStyle='#15151c';c.lineWidth=16;c.beginPath();c.arc(0,h2-6,74,Math.PI*1.08,Math.PI*1.92);c.stroke();ell(-66,h2+6,20,32,'#15151c');ell(66,h2+6,20,32,'#15151c');ell(-66,h2+6,7,12,'#5ff');ell(66,h2+6,7,12,'#5ff');}
+  // face
+  const e=o.expr||'smile',ey=hy+4;c.fillStyle='#2a1f1c';c.strokeStyle='#2a1f1c';c.lineWidth=6;c.lineCap='round';
+  if(o.glasses){c.lineWidth=4;c.beginPath();c.arc(-24,ey,15,0,7);c.moveTo(39,ey);c.arc(24,ey,15,0,7);c.moveTo(-9,ey);c.lineTo(9,ey);c.stroke();c.lineWidth=6;}
+  if(e==='smile'||e==='happy'){c.beginPath();c.arc(-24,ey+4,9,Math.PI*1.1,Math.PI*1.9);c.moveTo(33,ey+4);c.arc(24,ey+4,9,Math.PI*1.1,Math.PI*1.9);c.stroke();c.beginPath();c.arc(0,ey+20,e==='happy'?18:12,.2,Math.PI-.2);c.stroke();}
+  else if(e==='sparkle'){star(-24,ey,15,'#ffd34d');star(24,ey,15,'#ffd34d');c.fillStyle='#c0392b';c.beginPath();c.ellipse(0,ey+30,16,13,0,0,7);c.fill();}
+  else if(e==='shock'){ell(-24,ey,9,11,'#2a1f1c');ell(24,ey,9,11,'#2a1f1c');ell(0,ey+30,10,13,'#2a1f1c');}
+  else if(e==='huh'){ell(-24,ey,7,7,'#2a1f1c');c.beginPath();c.moveTo(14,ey-2);c.lineTo(34,ey+2);c.stroke();c.beginPath();c.moveTo(-36,ey-20);c.lineTo(-12,ey-24);c.moveTo(12,ey-28);c.lineTo(36,ey-16);c.stroke();c.beginPath();c.moveTo(-10,ey+30);c.quadraticCurveTo(4,ey+22,14,ey+32);c.stroke();}
+  else if(e==='serious'){c.beginPath();c.moveTo(-38,ey-22);c.lineTo(-12,ey-12);c.moveTo(38,ey-22);c.lineTo(12,ey-12);c.stroke();ell(-24,ey+2,7,7,'#2a1f1c');ell(24,ey+2,7,7,'#2a1f1c');c.beginPath();c.moveTo(-14,ey+32);c.lineTo(14,ey+32);c.stroke();}
+  else if(e==='wink'){c.beginPath();c.arc(-24,ey+4,9,Math.PI*1.1,Math.PI*1.9);c.stroke();ell(24,ey,7,8,'#2a1f1c');c.beginPath();c.arc(0,ey+20,12,.2,Math.PI-.2);c.stroke();}
+  else if(e==='sweat'){ell(-24,ey,7,7,'#2a1f1c');ell(24,ey,7,7,'#2a1f1c');c.beginPath();c.moveTo(-12,ey+30);c.lineTo(12,ey+26);c.stroke();ell(58,ey-30,9,14,'#7cc4ff');}
+  else if(e==='whistle'){c.beginPath();c.arc(-24,ey+4,9,Math.PI*1.1,Math.PI*1.9);c.moveTo(33,ey+4);c.arc(24,ey+4,9,Math.PI*1.1,Math.PI*1.9);c.stroke();c.beginPath();c.arc(14,ey+28,8,0,7);c.stroke();}
+  if(o.blush){ell(-40,ey+18,12,7,'rgba(255,110,130,.45)');ell(40,ey+18,12,7,'rgba(255,110,130,.45)');}
+  c.restore();}
+
+function chicken(x,y,s,face,t,ph){c.save();c.translate(x,y);c.scale(s*face,s);const b=Math.abs(Math.sin(t*8+ph))*-10;c.translate(0,b);
+  line([[-10,-20],[-14,0]],6,'#e39b2d');line([[10,-20],[14,0]],6,'#e39b2d');
+  ell(0,-52,48,36,'#fffaf0');ell(-34,-66,20,26,'#fffaf0');c.fillStyle='#fffaf0';c.beginPath();c.moveTo(-40,-60);c.lineTo(-74,-84);c.lineTo(-62,-48);c.fill();
+  ell(30,-90,24,24,'#fffaf0');c.fillStyle='#e8453c';c.beginPath();c.arc(24,-114,8,0,7);c.arc(34,-116,8,0,7);c.fill();
+  c.fillStyle='#f2a93b';c.beginPath();c.moveTo(52,-92);c.lineTo(68,-86);c.lineTo(52,-80);c.fill();ell(36,-94,4,4,'#222');ell(46,-76,5,8,'#e8453c');
+  c.strokeStyle='rgba(0,0,0,.12)';c.lineWidth=3;c.beginPath();c.ellipse(0,-52,48,36,0,0,7);c.stroke();c.restore();}
+
+/* ---------- scenes ---------- */
+const TCH={hair:'bun',hc:'#777',top:'#8a5a2b',bot:'#333',glasses:true};
+const SA={hair:'idol',hc:'#2b1d16',top:'#3f8f5a',bot:'#1f2a3a'};
+const SB={hair:'pony',hc:'#2b1d16',top:'#c0567a',bot:'#333'};
+function bgStudio(wall){const g=c.createLinearGradient(0,0,0,H);g.addColorStop(0,'#f6f1e7');g.addColorStop(1,'#e7dcc8');c.fillStyle=g;c.fillRect(0,0,W,H);c.fillStyle='#c9b48f';c.fillRect(0,1180,W,H-1180);
+  const n=wall?30:8;for(let i=0;i<n;i++){const x=40+(i%10)*104,y=180+((i/10)|0)*130;c.fillStyle='#fff';c.fillRect(x,y,90,110);const hue=(i*47)%360;c.fillStyle=`hsla(${hue},60%,60%,.55)`;ell(x+45,y+55,30,28,`hsla(${hue},60%,60%,.55)`);}}
+function easel(x,y,s,paint){c.save();c.translate(x,y);c.scale(s,s);c.strokeStyle='#8b5e3c';c.lineWidth=14;c.beginPath();c.moveTo(-120,320);c.lineTo(0,-260);c.lineTo(120,320);c.moveTo(0,-260);c.lineTo(0,320);c.stroke();
+  c.fillStyle='#fff';c.fillRect(-170,-220,340,300);if(paint>0){const g=c.createLinearGradient(-170,-220,170,80);g.addColorStop(0,'rgba(90,150,220,.8)');g.addColorStop(1,'rgba(240,160,80,.7)');c.fillStyle=g;c.fillRect(-160,-210,320*paint,140);ell(60,10,70*paint,40*paint,'rgba(80,160,90,.7)');}c.restore();}
+function sceneDemo(){bgStudio(0);const p=actT.demo==null?.3:clamp(.3+(T-actT.demo)/3,0,1);easel(640,1100,1.2,p);person({...TCH,x:330,y:1500,s:1.5,expr:'smile',pose:'down'});
+  c.fillStyle='#5a8fd6';ell(470,1160,14,14,'#5a8fd6');}
+function sceneAsk(){bgStudio(0);person({...SA,x:540,y:1640,s:2.3,expr:'happy',pose:'cheer',bob:4});}
+function sceneSilent(){bgStudio(0);easel(640,1100,1.3,.8);person({...TCH,x:320,y:1520,s:1.6,expr:'serious',pose:'down'});
+  if(actT.silent!=null){c.fillStyle='#555';c.font='900 120px sans-serif';c.textAlign='center';c.fillText('……',320,700);}}
+function sceneEye(){const w=actT.wall!=null;bgStudio(w);
+  person({...SA,x:330,y:1560,s:1.4,expr:'sweat',pose:'down'});person({...SB,x:760,y:1560,s:1.4,expr:'serious',pose:'hip'});
+  if(actT.eye!=null&&!w){ell(734,1220,12,12,'#fff');ell(786,1220,12,12,'#fff');ell(734,1211,7,5,'#2a1f1c');ell(786,1211,7,5,'#2a1f1c');c.fillStyle='#c0567a';c.font='900 56px "PingFang TC",sans-serif';c.textAlign='center';c.fillText('（白眼）',760,960);}}
+const SCENES=[sceneDemo,sceneAsk,sceneSilent,sceneEye];
+
+/* ---------- particles ---------- */
+function addHearts(x,y,n){for(let i=0;i<n;i++)parts.push({k:'h',x:x+(rnd()-.5)*160,y,vx:(rnd()-.5)*120,vy:-200-rnd()*260,l:1.6,a:0,s:1.2+rnd()*1.4});}
+function addRice(){for(let i=0;i<40;i++)parts.push({k:'r',x:420,y:1380,vx:200+rnd()*480,vy:-380-rnd()*260,l:1.4,a:0,g:900});}
+function stepParts(dt){for(const p of parts){p.a+=dt;p.x+=p.vx*dt;p.y+=p.vy*dt;if(p.g)p.vy+=p.g*dt;}parts=parts.filter(p=>p.a<p.l);}
+function drawParts(){for(const p of parts){const al=1-p.a/p.l;if(p.k==='h')heart(p.x,p.y,p.s,`rgba(255,90,130,${al})`);else if(p.k==='n'){c.fillStyle=`rgba(255,230,120,${al})`;c.font='bold 90px sans-serif';c.textAlign='center';c.fillText('♪',p.x,p.y);}else ell(p.x,p.y,6,4,`rgba(255,253,240,${al})`);}}
+
+/* ---------- subtitles ---------- */
+function drawSub(b){if(!b||!b.t)return;const al=clamp(bt*4,0,1);c.globalAlpha=al;
+  const name=b.who==='旁白'?'':b.who;const fs=58;c.font=`900 ${fs}px "PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif`;c.textAlign='center';c.textBaseline='middle';
+  const lines=[];let cur='';for(const ch of b.t){if(c.measureText(cur+ch).width>W-140){lines.push(cur);cur=ch;}else cur+=ch;}lines.push(cur);
+  const y0=H-330-(lines.length-1)*fs*1.25;
+  if(name){c.font='bold 40px "PingFang TC","Noto Sans TC",sans-serif';const nw=c.measureText(name).width+40;const col={老師:'#8a5a2b',A同學:'#3f8f5a',B同學:'#c0567a',老鳥:'#8a5a2b',菜鳥:'#3f8f5a',主管:'#7a4fb5',小陳:'#2f4f7f',老闆:'#7a4fb5',送貨小哥:'#d9822b',我:'#3f8f5a',阿傑:'#3a7bd5',小美:'#ff4d6d',阿嬤:'#8a3b4f',偶像:'#5b6ee1',雞:'#e39b2d'}[name]||'#444';
+    c.fillStyle=col;rr(540-nw/2,y0-fs-34,nw,56,28);c.fill();c.fillStyle='#fff';c.fillText(name,540,y0-fs-5);}
+  c.font=`900 ${fs}px "PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif`;c.lineJoin='round';
+  lines.forEach((ln,i)=>{const y=y0+i*fs*1.25;c.lineWidth=14;c.strokeStyle='rgba(0,0,0,.85)';c.strokeText(ln,540,y);c.fillStyle=b.who==='旁白'?'#ffe680':'#fff';c.fillText(ln,540,y);});
+  c.globalAlpha=1;}
+
+/* ---------- timeline ---------- */
+const bars=[...document.querySelectorAll('#bars b')];
+function sceneRange(s){const idx=BEATS.map((b,i)=>b.s===s?i:-1).filter(i=>i>=0);return [idx[0],idx[idx.length-1]];}
+function startBeat(i){bi=i;bt=0;const b=BEATS[i];camA=curCam();camB=b.cam;camT=0;speechDone=false;
+  if(b.sfx)SFX[b.sfx]();
+  if(b.act){actT[b.act]=T;}
+  if(i>0&&BEATS[i-1].s!==b.s){/* scene change resets scene-local acts */}
+  speak(b.who,b.t,()=>{speechDone=true;});
+  if(b.who==='雞'||b.who==='偶像'&&!voiceOn)speechDone=true;}
+function curCam(){const k=ease(clamp(camT,0,1));return [lerp(camA[0],camB[0],k),lerp(camA[1],camB[1],k),lerp(camA[2],camB[2],k)];}
+function updateBars(){const b=BEATS[bi];if(!b)return;bars.forEach((el,s)=>{const [a,z]=sceneRange(s);let p=0;if(bi>z)p=1;else if(bi>=a){p=(bi-a+clamp(bt/b.hold,0,1))/(z-a+1);}el.style.width=(p*100).toFixed(1)+'%';});}
+
+function frame(now){const dt=Math.min(.05,(now-last)/1000||0);last=now;
+  if(playing&&!paused){T+=dt;bt+=dt;camT+=dt/.8;stepParts(dt);if(shake>0)shake-=dt;
+    const b=BEATS[bi];if(b&&bt>=b.hold&&(speechDone||bt>b.hold+4)){if(bi+1<BEATS.length)startBeat(bi+1);else finish();}}
+  render();updateBars();requestAnimationFrame(frame);}
+function render(){const b=BEATS[Math.max(0,bi)];c.setTransform(1,0,0,1,0,0);c.fillStyle='#000';c.fillRect(0,0,W,H);
+  const [cx,cy,z]=curCam();const sx=shake>0?(Math.random()-.5)*30*shake:0,sy=shake>0?(Math.random()-.5)*30*shake:0;
+  c.save();c.translate(W/2+sx,H/2+sy);c.scale(z,z);c.translate(-cx,-cy);
+  SCENES[b.s](b);drawParts();c.restore();
+  // scene transition flash
+  if(bi>0&&BEATS[bi-1].s!==b.s&&bt<.35){c.fillStyle=`rgba(0,0,0,${1-bt/.35})`;c.fillRect(0,0,W,H);}
+  // vignette
+  const g=c.createRadialGradient(W/2,H/2,H*.3,W/2,H/2,H*.75);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(0,0,0,.35)');c.fillStyle=g;c.fillRect(0,0,W,H);
+  drawSub(playing||bi>=0?b:null);}
+
+function begin(){ac();$('start').hidden=true;$('end').hidden=true;bi=-1;T=0;actT={};parts=[];camA=camB=[540,1000,1];camT=1;playing=true;paused=false;$('bPause').textContent='暫停';startBeat(0);}
+function finish(){playing=false;$('end').hidden=false;try{TTS&&TTS.cancel();}catch(e){}}
+$('bStart').onclick=begin;$('bAgain').onclick=begin;
+$('bPause').onclick=()=>{if(!playing)return;paused=!paused;$('bPause').textContent=paused?'播放':'暫停';try{if(TTS){paused?TTS.pause():TTS.resume();}}catch(e){}};
+$('bVoice').onclick=()=>{voiceOn=!voiceOn;$('bVoice').setAttribute('aria-pressed',String(voiceOn));if(!voiceOn){try{TTS&&TTS.cancel();}catch(e){}speechDone=true;}};
+function toast(t){const el=$('toast');el.textContent=t;el.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove('on'),2200);}
+const URL_PUB='https://p19691221-web.github.io/soft-shelf/works/drama/shortcut.html';
+async function share(){const text='四格短劇〈捷徑〉：學水彩有什麼捷徑？老師沒回答。';
+  if(navigator.share&&window.top===window.self){try{await navigator.share({title:'四格短劇〈捷徑〉',text,url:URL_PUB});return;}catch(e){if(e&&e.name==='AbortError')return;}}
+  try{await navigator.clipboard.writeText(URL_PUB);toast('連結已複製');}catch(e){toast(URL_PUB);}}
+$('bShare').onclick=share;$('bShare2').onclick=share;
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&playing&&!paused)$('bPause').click();});
+// preview frame behind the start screen
+bi=0;actT={};T=1;render();bi=-1;
+requestAnimationFrame(t=>{last=t;requestAnimationFrame(frame);});
+window.__seek=(i,extra)=>{ac;$('start').hidden=true;playing=true;voiceOn=false;startBeat(i);for(let k=0;k<(extra||60);k++){T+=.033;bt+=.033;camT+=.033/.8;stepParts(.033);}render();};
+})();
+</script>
+</body>
+</html>
