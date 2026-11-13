@@ -50,6 +50,7 @@ nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--
 .slip .no{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;letter-spacing:.06em}
 .slip .q{white-space:pre-line;font-size:17px;font-weight:500}
 .slip .a{white-space:pre-line;border-top:1px dashed var(--line);padding-top:8px;font-family:var(--display);font-size:19px}
+.slip .by{font-size:12px;color:var(--muted);justify-self:end}
 .slip .hint{font-size:13px;color:var(--ice)}
 .slip.open .hint{display:none}
 .slip:not(.open) .a{display:none}
@@ -82,7 +83,7 @@ footer{color:var(--muted);font-size:13px;padding-block:8px 24px}
 <header><h1>來點笑話<span class="deg">−5°C</span></h1><p class="sub" id="sub"></p></header>
 <nav aria-label="章節"><div class="tabs" id="tabs"></div></nav>
 <main id="main"></main>
-<footer>收錄整理：林水吉。文字皆重新改寫。</footer>
+<footer>收錄整理：林水吉。讀者投稿：朱宜萱、陳德頤、李彥佐、峻鍏。文字皆重新改寫。</footer>
 </div>
 <button class="draw" id="draw">抽一則</button>
 <div class="sheet" id="sheet" hidden><div class="card" role="dialog" aria-modal="true" aria-labelledby="rq">
@@ -161,13 +162,13 @@ const BOOK=[
 ["雨後春筍，猜一個地名。","新竹。"],
 ["中國哪裡打不出電話？","寧波。打過去都是空號。（零撥）"],
 ["鞋子穿歪了怎麼辦？","改鞋歸正。（改邪歸正）"],
-["東海龍王聽不到了，叫什麼？","東海聾王。"],
+["東海龍王聽不到了，叫什麼？","東海聾王。","朱宜萱"],
 ["小明回家說：「今天班上來了轉學生。」","「好暈喔。」（轉）"],
-["溫蒂的寶寶住哪裡？","地堡。（蒂寶）"],
-["台灣哪裡鴿子最多？","台中，因為有歌劇院。（鴿聚）"],
+["溫蒂的寶寶住哪裡？","地堡。（蒂寶）","陳德頤"],
+["台灣哪裡鴿子最多？","台中，因為有歌劇院。（鴿聚）","李彥佐"],
 ["數學所的研究生為什麼不化妝？","因為他們是素顏的。（數研）"],
 ["門鎖壞了要找誰？","研究所學長。他們是「研究鎖」的。"],
-["從前有一個人叫小明。","然後小明沒聽到。"],
+["從前有一個人叫小明。","然後小明沒聽到。","峻鍏"],
 ["象棋裡誰最愛打招呼？","士。士在哈囉。"],
 ["踩到地雷怎麼脫困？","假死。（假裝避雷）"],
 ["10＋10 為什麼等於 11＋11？","Ten plus ten is twenty.\nEleven plus eleven is twenty-two（too）."],
@@ -629,7 +630,7 @@ function show(k,scroll){cur=k;const c=BOOK[k];tabs();
   const word=c.id==='word';
   $('main').innerHTML=`<div class="chap"><h2>${c.t}</h2><p>${c.s}</p></div>
   <div class="tools"><button id="openAll">全部翻開</button><button id="closeAll">全部蓋上</button></div>
-  <div class="list ${word?'grid':''}">${c.i.map((x,n)=>`<button class="slip" aria-expanded="false"><span class="no">${c.t}・${String(n+1).padStart(3,'0')}</span><span class="q">${esc(x[0])}${word?'<br><small style="color:var(--muted);font-size:12px">打一字</small>':''}</span><span class="a">${ans(x[1],word)}</span><span class="hint">點一下看答案</span></button>`).join('')}</div>
+  <div class="list ${word?'grid':''}">${c.i.map((x,n)=>`<button class="slip" aria-expanded="false"><span class="no">${c.t}・${String(n+1).padStart(3,'0')}</span><span class="q">${esc(x[0])}${word?'<br><small style="color:var(--muted);font-size:12px">打一字</small>':''}</span><span class="a">${ans(x[1],word)}</span>${x[2]?`<span class="by">讀者投稿：${esc(x[2])}</span>`:''}<span class="hint">點一下看答案</span></button>`).join('')}</div>
   <div class="pager"><button id="prev" ${k?'':'hidden'}>← ${k?BOOK[k-1].t:''}</button><span></span><button id="next" ${k<BOOK.length-1?'':'hidden'}>${k<BOOK.length-1?BOOK[k+1].t:''} →</button></div>`;
   if(word)document.querySelectorAll('.grid .slip .q small').forEach(e=>e.remove());
   const t=document.querySelector(`.tab[data-k="${k}"]`);t&&t.scrollIntoView({inline:'center',block:'nearest'});
@@ -649,7 +650,7 @@ let start=fromHash();if(start<0){try{const id=localStorage.getItem('jb-ch');star
 show(Math.max(0,start),false);
 // random
 function draw(){const k=Math.floor(Math.random()*BOOK.length);const c=BOOK[k];const x=c.i[Math.floor(Math.random()*c.i.length)];
-  $('rfrom').textContent=c.t+(c.id==='word'?'・打一字':'');$('rq').textContent=x[0];$('ra').textContent=x[1];$('ra').hidden=true;$('rbtn').hidden=false;$('sheet').hidden=false;$('rbtn').focus();}
+  $('rfrom').textContent=c.t+(c.id==='word'?'・打一字':'');$('rq').textContent=x[0];$('ra').textContent=x[1]+(x[2]?`\n\n讀者投稿：${x[2]}`:'');$('ra').hidden=true;$('rbtn').hidden=false;$('sheet').hidden=false;$('rbtn').focus();}
 $('draw').onclick=draw;$('rnext').onclick=draw;
 $('rbtn').onclick=()=>{$('ra').hidden=false;$('rbtn').hidden=true;$('rnext').focus()};
 $('rclose').onclick=()=>{$('sheet').hidden=true};
