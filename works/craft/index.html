@@ -516,6 +516,8 @@ const FOX=(c,x,y,k,a)=>{c.save();c.translate(x,y);c.rotate(a||0);c.scale(k,k);fi
 const PEEL=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);fillE(c,0,0,.07,.05);c.lineWidth=.06;c.lineCap='round';c.beginPath();c.moveTo(0,0);c.quadraticCurveTo(-.14,-.02,-.2,.06);c.moveTo(0,0);c.quadraticCurveTo(.14,-.02,.2,.06);c.moveTo(0,0);c.quadraticCurveTo(.02,-.12,.0,-.18);c.stroke();c.restore();};
 const ZIG=(c,x,y,a,n)=>{c.lineWidth=.035;c.lineCap='round';c.beginPath();let px=x,py=y;c.moveTo(px,py);for(let k=0;k<(n||3);k++){px+=Math.cos(a)*.05+(k%2?.03:-.03);py+=Math.sin(a)*.05;c.lineTo(px,py);}c.stroke();};
 const TXT=(c,t,x,y,px)=>{c.save();c.scale(.01,.01);c.font='900 '+px+'px '+SERIF;c.textAlign='center';c.textBaseline='middle';c.fillText(t,x*100,y*100);c.restore();};
+const VNHAT=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);fillP(c,[[-.5,0],[0,-.3],[.5,0],[.46,.05],[-.46,.05]]);c.restore();};
+const VNHAT_CUT=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.lineWidth=.025;c.beginPath();for(const t of [-.3,-.12,.06]){c.moveTo(t,-.26+Math.abs(t)*.5);c.lineTo(t*1.5,-.02);}c.moveTo(-.38,-.06);c.lineTo(.38,-.06);c.stroke();c.restore();};
 
 const MTN=(c)=>{c.lineWidth=.035;c.lineCap='round';c.lineJoin='round';c.beginPath();c.moveTo(-.54,.42);c.lineTo(0,-.36);c.lineTo(.54,.42);c.stroke();};
 const SFLAG=(c,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);c.fillRect(-.01,-.2,.02,.2);fillP(c,[[.01,-.2],[.14,-.15],[.01,-.1]]);c.restore();};
@@ -1295,6 +1297,11 @@ function shapeById(id){
   if(id==='scStuck')return {name:'捷徑卡住',kind:'o',rot:0,core:[0,.1],box:[1.1,1],draw(c){c.fillRect(-.5,-.06,.5,.5);c.fillRect(.14,-.06,.36,.5);MINIP(c,-.18,-.14,.6);TXTB(c,'！',-.18,-.42,26,.02);c.lineWidth=.03;c.lineCap='round';c.beginPath();for(const y of [.1,.2,.3])c.moveTo(.04,y),c.quadraticCurveTo(.07,y+.03,.1,y);c.stroke();},cut(c){}};
   if(id==='scWind')return {name:'繞遠路',kind:'o',rot:0,core:[0,.1],box:[1.1,1],draw(c){c.lineWidth=.035;c.lineCap='round';c.lineJoin='round';c.beginPath();c.moveTo(-.46,.4);c.lineTo(.4,.3);c.lineTo(-.3,.1);c.lineTo(.36,-.08);c.lineTo(-.2,-.26);c.stroke();MINIP(c,-.26,-.4,.42);},cut(c){}};
   if(id==='scTop')return {name:'先到山頂',kind:'o',rot:0,core:[0,.1],box:[1.1,1],draw(c){c.lineWidth=.035;c.lineCap='round';c.beginPath();c.moveTo(-.54,.44);c.lineTo(0,-.1);c.lineTo(.54,.44);c.stroke();MINIP(c,-.04,-.2,.7);SFLAG(c,.16,-.1,1.4);},cut(c){}};
+  if(id==='vnBye')return {name:'告別越南',kind:'o',rot:0,core:[0,.1],box:[1.1,1],draw(c){VNHAT(c,-.12,.2,1);PLANE(c,.3,-.34,.7);c.lineWidth=.03;c.lineCap='round';c.beginPath();c.moveTo(-.44,.42);c.lineTo(.44,.42);c.stroke();},cut(c){VNHAT_CUT(c,-.12,.2,1);}};
+  if(id==='vnDesk')return {name:'回來上班',kind:'o',rot:0,core:[0,.1],box:[1.1,1],draw(c){LAPTOP(c,-.22,.2,1.05);for(let k=0;k<5;k++)c.fillRect(.18+(k%2)*.03,.3-k*.1,.3,.07);c.lineWidth=.03;c.lineCap='round';c.beginPath();c.moveTo(-.5,.44);c.lineTo(.5,.44);c.stroke();},cut(c){}};
+  const VNSLOPE=c=>{c.lineWidth=.05;c.lineCap='round';c.beginPath();c.moveTo(-.56,.44);c.lineTo(.56,0);c.stroke();fillE(c,.12,-.06,.2,.2);MINIP(c,-.32,.08,.6);c.lineWidth=.035;c.beginPath();c.moveTo(-.24,.06);c.lineTo(-.1,.0);c.stroke();};
+  if(id==='vnPush')return {name:'越來越難',kind:'o',rot:0,core:[0,.1],box:[1.15,1],draw(c){VNSLOPE(c);DROP(c,-.46,-.2,.04);},cut(c){}};
+  if(id==='vnStay')return {name:'越難沒離開',kind:'o',rot:0,core:[0,.1],box:[1.15,1],draw(c){VNSLOPE(c);VNHAT(c,.12,-.29,.5);DROP(c,-.46,-.2,.04);DROP(c,-.52,-.06,.035);},cut(c){VNHAT_CUT(c,.12,-.29,.5);}};
   if(id==='hsrSelfie')return profileShape({id:'flat',fixed:1,name:'自拍出發',extra:c=>{c.save();c.translate(1.16,.36);c.scale(.36,.36);c.rotate(-.2);PHONE(c);c.restore();SNOW(c,1.36,-.02,.12);SNOW(c,1.04,-.08,.1);},cutP:SMILE,scale:.78,shift:-.22,box:[1.5,1.15],core:[-.22,0]});
   if(id==='marquee')return {name:'倒過來的跑馬燈',kind:'o',rot:0,core:[0,.1],box:[1.1,1],draw(c){c.fillRect(-.48,-.3,.96,.3);c.fillRect(-.48,.14,.28,.3);c.fillRect(.2,.14,.28,.3);c.save();c.translate(.42,-.5);c.scale(.6,.6);QMARK(c);c.restore();},cut(c){c.save();c.translate(0,-.14);c.scale(-1,1);TXT(c,'南港',0,0,32);c.restore();}};
   if(id==='iceFlirt')return pair('神魂顛島',SMILE,SMILE,c=>{HEART(c,0,-.34,.09);SNOW(c,-.22,-.4,.05);SNOW(c,.22,-.4,.05);});
@@ -2485,6 +2492,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'越難',panels:[['vnBye','玩完越南，搭飛機回家。'],['vnDesk','隔天上班，事情一堆。'],['vnPush','房租帳單，越來越難。'],['vnStay','離開越南，越難沒離開。',0,3.5]]},
   {title:'繞遠路',panels:[['scTwo','上山兩條路：直的、彎的。'],['scStuck','直的那條，走到斷崖。'],['scWind','彎的那條，慢慢繞上去。'],['scTop','最短的捷徑，就是繞遠路。',0,3.5]]},
   {title:'振聾發聵',panels:[['zlDeaf','大家都聽不進去。'],['zlBell','他敲響一口大鐘——'],['zlWave','聲音大到，聾的都聽見。'],['zlAwake','這叫：振聾發聵。',0,3.5]]},
   {title:'有趣的靈魂',panels:[['slSame','美麗的軀殼，'],['slMany','千篇一律；'],['slOdd','有趣的靈魂，'],['slOne','萬中選一。',0,3.5]]},
@@ -2810,7 +2818,7 @@ const STORIES=[
 ];
 const CATS=['諧音梗','夫妻家庭','搶匪小偷','職場校園','時事諷刺','日常冷笑話','故事小品'];
 const CATMAP={
-  '諧音梗':['好light','Ex Box','飯撒','欸唉床','難呱','委屈求拳','臺南缺什麼','蚊質彬彬','充電','刀槍blue','沒四','IKE鴨','筆記泥','避暑','半倒體','醉有陰德','野莓','老子有錢','代禱','喙很痛','狒到校','twenty too','士在哈囉','亞洲舞王','鴿聚院','蒂寶','東海聾王','小人多','看不見','夢想家','風生水起','青春豆','太陽是男生','腳滑','很嗆','第九天長','恩重如山','冰山一角','翻身的機會','如果的車','冰島','老當易撞','詩靈','喝T','知豬','刀削面','碰頭','容易掛','壓蛇帽','菇單','沒人理','一拍即合','最笨的字母','麥生氣','新衣耶','警察','阿拉伯','好鴨','拭十箍','矮love游','站久會酸','導魚','菇毒','雞凍','肥而不溺','擺事可樂','沒龜','猴頭菇','火腿','恁母伊郎','菊花茶','比三小','西北雨','北極的牛','地下道','下酒菜','梗多','滑馬','沒關C','在下','目光','泡你','我的天','沒氣了','南方','最甜的蜜','小氣蝦','瓦斯怎麼叫','缺陷','冰心地瓜','不在人事','多大','雨多甜','還沒滾','蟻后','坐白宮','擲筊','一個人過','鳳梨酥','仙草蜜','一波三折','八天的','飢童','美紅敢','仰式','你哪位','哈囉 win','窗戶凍住了','左右腦','換科目','業內人士','找誰接','半手李','閉眼說瞎話','誰是京都人','金口難開','看辦公室','週一休息','看穿'],
+  '諧音梗':['越難','好light','Ex Box','飯撒','欸唉床','難呱','委屈求拳','臺南缺什麼','蚊質彬彬','充電','刀槍blue','沒四','IKE鴨','筆記泥','避暑','半倒體','醉有陰德','野莓','老子有錢','代禱','喙很痛','狒到校','twenty too','士在哈囉','亞洲舞王','鴿聚院','蒂寶','東海聾王','小人多','看不見','夢想家','風生水起','青春豆','太陽是男生','腳滑','很嗆','第九天長','恩重如山','冰山一角','翻身的機會','如果的車','冰島','老當易撞','詩靈','喝T','知豬','刀削面','碰頭','容易掛','壓蛇帽','菇單','沒人理','一拍即合','最笨的字母','麥生氣','新衣耶','警察','阿拉伯','好鴨','拭十箍','矮love游','站久會酸','導魚','菇毒','雞凍','肥而不溺','擺事可樂','沒龜','猴頭菇','火腿','恁母伊郎','菊花茶','比三小','西北雨','北極的牛','地下道','下酒菜','梗多','滑馬','沒關C','在下','目光','泡你','我的天','沒氣了','南方','最甜的蜜','小氣蝦','瓦斯怎麼叫','缺陷','冰心地瓜','不在人事','多大','雨多甜','還沒滾','蟻后','坐白宮','擲筊','一個人過','鳳梨酥','仙草蜜','一波三折','八天的','飢童','美紅敢','仰式','你哪位','哈囉 win','窗戶凍住了','左右腦','換科目','業內人士','找誰接','半手李','閉眼說瞎話','誰是京都人','金口難開','看辦公室','週一休息','看穿'],
   '夫妻家庭':['人家可以','偶爾','哪個好看','李拜一','四隻腳','拿掃把','湊滿一船','隔壁老王','臉色','好女子','著火了','我的天','算錯','仙女','誤點','玩夠沒','瓶蓋','最佳搭檔','帶過來的','明天減肥','我不知道','我知道','第一次','會下蛋嗎','南方','挑食','五個媽','雨多甜','還沒滾','看不到你','多生兩個','貓與虎','送回娘家','七十才開始','一模一樣','買菸','需要談談','不敢問','窗戶凍住了','一切都很好','沒安全感','所以要我留下','露台','四個孩子的爸','深夜講座','睜一隻眼','緩解疼痛','九十歲','撞到告訴我','很會說謊','很甜','兩根菸'],
   '搶匪小偷':['一次領','金口難開','負數','可能看到了','換科目','業內人士','遙控器','一起找'],
   '職場校園':['走下坡','對賭','放下','快成專家','活著','研究所','數研','高高在上','吃安眠藥','緩兵之計','呷好西瓜','有求必應','下一位','送行宴','鏡子都敢照','不會再問我','自己寫','哪邊涼快','不在人事','一個人過','仙草蜜','飢童','不忍心','美紅敢','錯的先講','吸菸區','沉默','看辦公室','可以回家','倫理學','很會說謊','烤箱手套'],
