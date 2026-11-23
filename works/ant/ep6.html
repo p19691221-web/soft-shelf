@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>阿粒的想像・瓶蓋是飛碟</title>
-<meta property="og:title" content="阿粒的想像 第6集〈瓶蓋是飛碟〉">
-<meta property="og:description" content="草叢裡走出一隻紅螞蟻，大家說牠是外星人。阿粒想跟牠做朋友。">
+<title>阿粒的想像・瓶蓋真的是飛碟</title>
+<meta property="og:title" content="阿粒的想像 第6集〈瓶蓋真的是飛碟〉">
+<meta property="og:description" content="草叢裡走出一隻紅螞蟻。這次不用想像——牠真的是外星人。">
 <style>
 :root{--bg:#0e0d12;--ink:#fff;--muted:#b9b4c6;--accent:#ff4d6d}
 @media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#1a1820}}
@@ -40,21 +40,21 @@ canvas{display:block;width:100%;height:100%}
 <div id="wrap"><div id="stage">
   <canvas id="cv" width="1080" height="1920" aria-label="阿粒的想像畫面"></canvas>
   <div id="bars"><i><b></b></i><i><b></b></i><i><b></b></i><i><b></b></i></div>
-  <div id="top"><span class="ep">阿粒的想像 6</span><span class="t">瓶蓋是飛碟</span></div>
+  <div id="top"><span class="ep">阿粒的想像 6</span><span class="t">瓶蓋真的是飛碟</span></div>
   <div id="ctl">
     <button id="bPause" type="button" aria-label="暫停">暫停</button>
     <button id="bVoice" type="button" aria-pressed="true" aria-label="配音">配音</button>
     <button id="bShare" type="button" aria-label="分享">分享</button>
   </div>
   <div id="start">
-    <h1>阿粒的想像<br>第6集〈瓶蓋是飛碟〉</h1>
+    <h1>阿粒的想像<br>第6集〈瓶蓋真的是飛碟〉</h1>
     <p>草叢裡走出一隻<br>顏色不一樣的螞蟻。</p>
     <button class="big" id="bStart" type="button">▶ 開始看</button>
     <p style="font-size:13px">有配音和音效，建議開聲音</p>
   </div>
   <div id="end" hidden>
     <h2>第6集・完</h2>
-    <p><a class="ghost" style="padding:4px 12px" href="ep5.html">上一集：路燈是月亮</a></p><p>下一集：〈餅乾屑是城堡〉，製作中</p>
+    <p><a class="ghost" style="padding:4px 12px" href="ep5.html">上一集：路燈是月亮</a></p><p>下一集：〈第一顆星球〉，製作中</p>
     <div class="row"><button class="big" id="bAgain" type="button">再看一次</button><button class="ghost" id="bShare2" type="button">分享</button></div>
   </div>
   <div class="toast" id="toast"></div>
@@ -122,19 +122,19 @@ function speak(who,text,done){if(!TTS||!voiceOn||!text||!VO[who]){done&&done();r
 const BEATS=[
  {s:0,who:'旁白',t:'草叢裡，走出一隻紅螞蟻。',cam:[540,1000,1],act:'red',hold:2.6},
  {s:0,who:'隊長',t:'顏色不對！是外星人！',cam:[540,1000,1],sfx:'huh',act:'cap',hold:2.4},
- {s:0,who:'紅螞蟻',t:'嘰哩咕嚕？',cam:[600,1050,1.1],hold:2},
- {s:0,who:'阿粒',t:'外星人……？',cam:[540,1050,1.1],act:'think',hold:2.2},
- {s:1,who:'旁白',t:'瓶蓋，變成了飛碟。',cam:[540,1000,1],sfx:'pop',act:'ufo',hold:2.6},
- {s:1,who:'旁白',t:'草葉變星星，地面變月球。',cam:[540,1000,1],hold:2.6},
- {s:1,who:'紅螞蟻',t:'嘰哩咕嚕！',cam:[540,1000,1],hold:1.8},
+ {s:0,who:'阿粒',t:'外星人？我來想像一下……',cam:[540,1050,1.1],act:'think',hold:2.4},
+ {s:0,who:'旁白',t:'可是這次，不用想像。',cam:[540,1000,1],sfx:'ding',act:'real',hold:2.8},
+ {s:1,who:'紅螞蟻',t:'嘰哩咕嚕！',cam:[540,1050,1.1],hold:1.8},
  {s:1,who:'阿粒',t:'聽不懂……那碰碰觸角！',cam:[540,1050,1.1],sfx:'ding',act:'touch',hold:2.6},
- {s:2,who:'旁白',t:'觸角一碰，就說上話了。',cam:[540,1000,1],act:'hearts',hold:2.6},
- {s:2,who:'阿粒',t:'這是地球的飯粒，請你吃。',cam:[540,1050,1.1],act:'share',hold:2.6},
- {s:2,who:'紅螞蟻',t:'好吃！',cam:[540,1050,1.1],sfx:'pop',act:'yum',hold:2},
- {s:3,who:'旁白',t:'原來，牠從花圃另一邊迷路來。',cam:[540,1000,1],act:'back',hold:2.8},
- {s:3,who:'隊長',t:'牠說什麼，你聽得懂？',cam:[540,1000,1],act:'ask',hold:2.4},
- {s:3,who:'阿粒',t:'聽不懂。可是牠說好吃。',cam:[540,1050,1.1],act:'end',hold:2.6},
- {s:3,who:'旁白',t:'外星人很遠，朋友在花圃那邊。',cam:[540,1000,1],hold:3.4}
+ {s:1,who:'旁白',t:'觸角一碰，就說上話了。',cam:[540,1000,1],act:'hearts',hold:2.4},
+ {s:1,who:'紅螞蟻',t:'我的飛碟沒油，回不了家。',cam:[540,1000,1],hold:2.6},
+ {s:1,who:'阿粒',t:'飯粒給你，當燃料！',cam:[540,1000,1],sfx:'pop',act:'fuel',hold:2.6},
+ {s:2,who:'旁白',t:'飛碟亮了起來！',cam:[540,1000,1],sfx:'ding',act:'lit',hold:2.6},
+ {s:2,who:'紅螞蟻',t:'要不要一起去看星星？',cam:[540,1000,1],hold:2.4},
+ {s:2,who:'隊長',t:'晚餐前要回來喔！',cam:[540,1000,1],act:'wave',hold:2.2},
+ {s:2,who:'阿粒',t:'出發！',cam:[540,1000,1],sfx:'pop',act:'launch',hold:3},
+ {s:3,who:'旁白',t:'花圃變小了，地球變小了。',cam:[540,1000,1],act:'fly',hold:2.8},
+ {s:3,who:'旁白',t:'阿粒的星際旅行，開始了。',cam:[540,1000,1],sfx:'ding',act:'end',hold:3.6}
 ];
 
 /* ---------- state ---------- */
@@ -395,34 +395,39 @@ function ep5Scene3(){nightGround(1);lampPost(1,1);hill(640,1260);ant(470,1320,1.
 const RED='#b8402a';
 function af(x,y,s,o){c.save();c.translate(x,0);c.scale(-1,1);ant(0,y,s,o);c.restore();}
 function cap(x,y,k){c.save();c.translate(x,y);c.scale(k,k);c.fillStyle='#2f6fd0';rr(-80,-50,160,50,10);c.fill();c.fillStyle='#1f4fa0';for(let i=-70;i<=70;i+=14)c.fillRect(i,-50,6,50);ell(0,-50,80,14,'#5a90e8');c.restore();}
-function heart(x,y,r,col){c.fillStyle=col||'#ff6b8a';ell(x-r*.5,y,r*.6,r*.6,c.fillStyle);ell(x+r*.5,y,r*.6,r*.6,c.fillStyle);c.beginPath();c.moveTo(x-r*1.08,y+r*.15);c.lineTo(x,y+r*1.25);c.lineTo(x+r*1.08,y+r*.15);c.fill();}
-function space(){const g=c.createLinearGradient(0,0,0,H);g.addColorStop(0,'#0b1030');g.addColorStop(1,'#2a2050');c.fillStyle=g;c.fillRect(0,0,W,H);
-  for(let i=0;i<70;i++){const x=(i*233)%W,y=(i*151)%1200,tw=.5+.5*Math.sin(T*3+i);c.fillStyle=`rgba(255,255,255,${.3+.6*tw})`;c.fillRect(x,y,4,4);}
-  for(let i=0;i<6;i++){const x=120+i*170,y=260+(i*97)%500;c.save();c.translate(x,y);c.rotate(T+i);c.fillStyle='#a0e86f';c.fillRect(-14,-3,28,6);c.fillRect(-3,-14,6,28);c.restore();}
-  ell(230,440,80,80,'#e8a05a');c.strokeStyle='#f6d39a';c.lineWidth=8;c.beginPath();c.ellipse(230,440,150,34,-.3,0,7);c.stroke();
-  c.fillStyle='#b9b4c8';c.fillRect(0,1240,W,H);ell(540,1240,700,60,'#b9b4c8');for(const [x,y,r] of [[160,1450,60],[820,1520,80],[460,1700,50],[700,1380,36]]){ell(x,y,r,r*.4,'#9a94ac');ell(x,y-4,r*.8,r*.3,'#a7a1b8');}}
+function lights(x,y,k,on){for(let i=0;i<5;i++)ell(x+(-60+i*30)*k,y-16*k,8*k,8*k,on?((Math.floor(T*4)+i)%2?'#ffd84d':'#7fd3ff'):'#3a5a90');}
+function heart(x,y,r){c.fillStyle='#ff6b8a';ell(x-r*.5,y,r*.6,r*.6,'#ff6b8a');ell(x+r*.5,y,r*.6,r*.6,'#ff6b8a');c.beginPath();c.moveTo(x-r*1.08,y+r*.15);c.lineTo(x,y+r*1.25);c.lineTo(x+r*1.08,y+r*.15);c.fill();}
 function glow(x,y,s){for(const dx of [-128,-40]){const a=.5+.5*Math.sin(T*6+dx);ell(x+dx*s,y-(dx<-100?168:172)*s,(10+a*8)*s,(10+a*8)*s,'rgba(160,255,140,.8)');}}
-function helmet(x,y,s,flip){c.strokeStyle='rgba(200,240,255,.85)';c.lineWidth=5;c.fillStyle='rgba(200,240,255,.15)';c.beginPath();c.arc(x+(flip?-1:1)*82*s,y-110*s,78*s,0,7);c.fill();c.stroke();}
-function ufo(x,y,k){c.save();c.translate(x,y+Math.sin(T*2)*14);c.scale(k,k);c.fillStyle='rgba(255,240,140,.25)';c.beginPath();c.moveTo(-50,0);c.lineTo(50,0);c.lineTo(120,260);c.lineTo(-120,260);c.fill();
-  ell(0,-40,70,52,'rgba(180,230,255,.8)');c.fillStyle='#2f6fd0';rr(-140,-30,280,50,24);c.fill();c.fillStyle='#1f4fa0';for(let i=-120;i<=120;i+=20)c.fillRect(i,-26,8,42);
+function ufo(x,y,k,o){o=o||{};c.save();c.translate(x,y);c.scale(k,k);
+  if(o.beam){c.fillStyle='rgba(255,240,140,.3)';c.beginPath();c.moveTo(-50,0);c.lineTo(50,0);c.lineTo(160,o.beam);c.lineTo(-160,o.beam);c.fill();}
+  ell(0,-50,110,72,'rgba(180,230,255,.85)');if(o.inside){ant(-50,-28,.42,{expr:'happy'});c.save();c.scale(-1,1);ant(-50,-28,.42,{col:RED,expr:'happy'});c.restore();}
+  c.fillStyle='#2f6fd0';rr(-140,-30,280,50,24);c.fill();c.fillStyle='#1f4fa0';for(let i=-120;i<=120;i+=20)c.fillRect(i,-26,8,42);
   for(let i=0;i<5;i++)ell(-100+i*50,22,9,9,(Math.floor(T*4)+i)%2?'#ffd84d':'#7fd3ff');c.restore();}
-function scene0(){ground();cap(960,1262,1);const r=actT.red!=null?clamp((T-actT.red)*.8,0,1):0;
-  af(lerp(1080,720,r),1320,1.2,{col:RED,walk:r<1,expr:'open'});
-  ant(330,1320,1.3,{rice:1,expr:actT.think!=null?'flat':'smile'});
-  if(actT.cap!=null)ant(180,1520,1,{capt:1,col:'#4a3226',expr:'open'});
-  if(actT.think!=null){c.fillStyle='#fff';ell(470,1080,12,12,'#fff');ell(510,1020,20,20,'#fff');ell(600,900,130,90,'#fff');ufo(600,890,.4);}}
-function scene1(){space();if(actT.ufo!=null)ufo(700,420,.9*clamp((T-actT.ufo)*2,0,1));
+function space(){const g=c.createLinearGradient(0,0,0,H);g.addColorStop(0,'#0b1030');g.addColorStop(1,'#2a2050');c.fillStyle=g;c.fillRect(0,0,W,H);
+  for(let i=0;i<70;i++){const x=(i*233)%W,y=(i*151)%H,tw=.5+.5*Math.sin(T*3+i);c.fillStyle=`rgba(255,255,255,${.3+.6*tw})`;c.fillRect(x,y,4,4);}
+  ell(230,440,80,80,'#e8a05a');c.strokeStyle='#f6d39a';c.lineWidth=8;c.beginPath();c.ellipse(230,440,150,34,-.3,0,7);c.stroke();}
+function capper(x){ant(x,1520,1,{capt:1,col:'#4a3226',expr:'open'});}
+function scene0(){ground();const r=actT.red!=null?clamp((T-actT.red)*.8,0,1):0,real=actT.real!=null;
+  if(real){const k=clamp((T-actT.real)*1.2,0,1);for(let i=0;i<3;i++){c.strokeStyle=`rgba(255,240,140,${.7-i*.2})`;c.lineWidth=6;c.beginPath();c.arc(960,1240,60+((T*90+i*40)%120),0,7);c.stroke();}cap(960,1262-k*30,1);lights(960,1262-k*30,1,1);}else cap(960,1262,1);
+  af(lerp(1080,720,r),1320,1.2,{col:RED,walk:r<1,expr:'open'});if(real)glow(720,1320,1.2);
+  ant(330,1320,1.3,{rice:1,expr:real?'open':actT.think!=null?'flat':'smile'});
+  if(actT.cap!=null)capper(180);
+  if(actT.think!=null&&!real){ell(470,1080,12,12,'#fff');ell(510,1020,20,20,'#fff');ell(600,900,130,90,'#fff');ufo(600,890,.4);}}
+function scene1(){ground();const fu=actT.fuel!=null?clamp((T-actT.fuel)*1.2,0,1):0;cap(960,1232,1);lights(960,1232,1,fu>=1);
   const tch=actT.touch!=null?clamp((T-actT.touch)*1.5,0,1):0;const ax=lerp(320,370,tch),bx=lerp(740,700,tch);
-  ant(ax,1320,1.3,{rice:1,expr:tch?'happy':'open'});af(bx,1320,1.3,{col:RED,expr:'open'});glow(bx,1320,1.3);
-  if(tch>=1){const a=.5+.5*Math.sin(T*10);ell(536,1100,26+a*14,26+a*14,'rgba(255,230,120,.7)');}}
-function scene2(){space();ufo(700,420,.9);ant(370,1320,1.3,{rice:actT.share==null,expr:'happy',blush:1});
-  af(700,1320,1.3,{col:RED,expr:actT.yum!=null?'happy':'smile',blush:1});glow(700,1320,1.3);
-  for(let i=0;i<4;i++){const t=(T*.5+i*.25)%1;c.globalAlpha=1-t;heart(470+i*45,1000-t*260,22);c.globalAlpha=1;}
-  if(actT.share!=null){const k=clamp((T-actT.share)*1.2,0,1);c.save();c.translate(lerp(300,590,k),lerp(1170,1250,k)-Math.sin(k*Math.PI)*120);ell(0,0,46,20,'#fbf7ea');c.restore();}}
-function scene3(){ground();cap(960,1262,1);ant(330,1320,1.25,{expr:actT.end!=null?'happy':'smile',blush:1});af(700,1320,1.25,{col:RED,expr:'happy',blush:1});
-  ell(590,1300,46,20,'#fbf7ea');
-  if(actT.ask!=null)ant(180,1520,1,{capt:1,col:'#4a3226',expr:'open'});
-  c.fillStyle='#5a4a30';c.font='900 40px "PingFang TC",sans-serif';c.textAlign='center';c.fillText('花圃 →',900,1420);}
+  ant(ax,1320,1.3,{rice:actT.fuel==null,expr:tch?'happy':'open'});af(bx,1320,1.3,{col:RED,expr:fu>=1?'happy':'open'});glow(bx,1320,1.3);
+  if(tch>=1&&actT.hearts==null){const a=.5+.5*Math.sin(T*10);ell(536,1100,26+a*14,26+a*14,'rgba(255,230,120,.7)');}
+  if(actT.hearts!=null&&actT.fuel==null)for(let i=0;i<4;i++){const t=(T*.5+i*.25)%1;c.globalAlpha=1-t;heart(470+i*45,1000-t*260,22);c.globalAlpha=1;}
+  if(actT.fuel!=null&&fu<1){c.save();c.translate(lerp(290,960,fu),lerp(1170,1190,fu)-Math.sin(fu*Math.PI)*260);c.rotate(fu*6);ell(0,0,46,20,'#fbf7ea');c.restore();}}
+function scene2(){ground();const l=clamp((T-actT.lit)*1,0,1);let uy=lerp(1232,880,l),ux=lerp(960,540,l);
+  const L=actT.launch!=null?T-actT.launch:-1;const p=clamp(L*1,0,1);if(L>1.3)uy-=(L-1.3)*900;
+  if(l<1&&actT.launch==null){cap(ux,uy,lerp(1,.9,l));lights(ux,uy,lerp(1,.9,l),1);}else ufo(ux,uy,.9,{beam:L<1.3?(1330-uy)/.9:0,inside:L>1.1});
+  if(L<1.1){const y=lerp(1320,uy,p),s=lerp(1.3,.3,p);ant(lerp(370,520,p),y,s,{expr:'happy'});af(lerp(700,560,p),y,s,{col:RED,expr:'happy'});}
+  if(actT.wave!=null)capper(180);}
+function scene3(){space();const f=clamp((T-actT.fly)*.35,0,1),r=lerp(760,160,f),ey=lerp(1900,1650,f);
+  ell(540,ey,r,r,'#3a7ad0');ell(540-r*.3,ey-r*.4,r*.35,r*.22,'#5aa860');ell(540+r*.35,ey-r*.1,r*.25,r*.3,'#5aa860');ell(540,ey,r*1.05,r*1.05,'rgba(120,180,255,.15)');
+  ufo(540+Math.sin(T)*40,lerp(1000,780,f),1.3,{inside:1});
+  }
 const SCENES=[scene0,scene1,scene2,scene3];
 
 /* ---------- particles ---------- */
@@ -475,8 +480,8 @@ $('bPause').onclick=()=>{if(!playing)return;paused=!paused;$('bPause').textConte
 $('bVoice').onclick=()=>{voiceOn=!voiceOn;$('bVoice').setAttribute('aria-pressed',String(voiceOn));if(!voiceOn){try{TTS&&TTS.cancel();}catch(e){}speechDone=true;}};
 function toast(t){const el=$('toast');el.textContent=t;el.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove('on'),2200);}
 const URL_PUB='https://p19691221-web.github.io/soft-shelf/works/ant/ep6.html';
-async function share(){const text='阿粒的想像 第6集〈瓶蓋是飛碟〉：外星人很遠，朋友在花圃那邊。';
-  if(navigator.share&&window.top===window.self){try{await navigator.share({title:'阿粒的想像〈瓶蓋是飛碟〉',text,url:URL_PUB});return;}catch(e){if(e&&e.name==='AbortError')return;}}
+async function share(){const text='阿粒的想像 第6集〈瓶蓋真的是飛碟〉：阿粒的星際旅行，開始了。';
+  if(navigator.share&&window.top===window.self){try{await navigator.share({title:'阿粒的想像〈瓶蓋真的是飛碟〉',text,url:URL_PUB});return;}catch(e){if(e&&e.name==='AbortError')return;}}
   try{await navigator.clipboard.writeText(URL_PUB);toast('連結已複製');}catch(e){toast(URL_PUB);}}
 $('bShare').onclick=share;$('bShare2').onclick=share;
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&playing&&!paused)$('bPause').click();});
