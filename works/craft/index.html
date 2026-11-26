@@ -1336,6 +1336,12 @@ function shapeById(id){
     fillE(c,-.32,-.06,.06,.06);fillP(c,[[-.38,.0],[-.26,.0],[-.2,.18],[-.44,.18]]);fillE(c,-.32,.2,.17,.05);c.lineWidth=.035;c.beginPath();c.arc(-.32,-.06,.13,0,7);c.stroke();
     fillE(c,0,-.38,.07,.07);c.lineWidth=.025;c.lineCap='round';for(let k=0;k<8;k++){const a=k*Math.PI/4;c.beginPath();c.moveTo(Math.cos(a)*.11,-.38+Math.sin(a)*.11);c.lineTo(Math.cos(a)*.19,-.38+Math.sin(a)*.19);c.stroke();}
     for(let k=0;k<3;k++)c.fillRect(.22,.14-k*.09,.22-k*.02,.07);},cut(c){}};
+  if(id==='npProud')return {name:'驕傲',kind:'o',rot:0,core:[0,.1],box:[1.15,1],draw(c){MINIP(c,-.16,.18,1.25);c.fillRect(.14,-.46,.035,.72);fillP(c,[[.175,-.46],[.46,-.38],[.175,-.24]]);},cut(c){}};
+  if(id==='npGreat')return {name:'偉大的國家',kind:'o',rot:0,core:[0,.1],box:[1.15,1],draw(c){c.fillRect(-.3,-.46,.04,.86);c.beginPath();c.moveTo(-.26,-.46);for(let i=0;i<=10;i++){const x=-.26+i*.06;c.lineTo(x,-.46+Math.sin(i*.8)*.04);}for(let i=10;i>=0;i--){const x=-.26+i*.06;c.lineTo(x,-.1+Math.sin(i*.8)*.04);}c.closePath();c.fill();STAR(c,.38,.12,.07);STAR(c,-.42,.22,.06);STAR(c,.2,.3,.05);},cut(c){STAR(c,.04,-.28,.06);}};
+  if(id==='npWhere')return {name:'從何而來',kind:'o',rot:0,core:[0,.1],box:[1.15,1],draw(c){MINIP(c,-.2,.18,1.15);MINIP(c,.26,.2,1.05);c.save();c.translate(.3,-.36);c.scale(.5,.5);c.translate(-1.08,-.18);QMARK(c);c.restore();},cut(c){}};
+  if(id==='npParty')return {name:'養得起',kind:'o',rot:0,core:[0,.1],box:[1.15,1],draw(c){c.beginPath();c.arc(0,.14,.24,0,Math.PI);c.closePath();c.fill();c.fillRect(-.28,.1,.56,.05);
+    for(const [x,y] of [[-.4,-.08],[-.2,-.26],[.2,-.26],[.4,-.08],[-.42,.3],[.42,.3]])MINIP(c,x,y,.5);
+    c.lineWidth=.022;c.lineCap='round';for(const [x,y] of [[0,-.4],[-.32,-.5],[.32,-.5]]){c.beginPath();c.moveTo(x-.05,y);c.lineTo(x,y-.05);c.lineTo(x+.02,y+.02);c.lineTo(x+.06,y-.04);c.stroke();}},cut(c){}};
   if(id==='hsrSelfie')return profileShape({id:'flat',fixed:1,name:'自拍出發',extra:c=>{c.save();c.translate(1.16,.36);c.scale(.36,.36);c.rotate(-.2);PHONE(c);c.restore();SNOW(c,1.36,-.02,.12);SNOW(c,1.04,-.08,.1);},cutP:SMILE,scale:.78,shift:-.22,box:[1.5,1.15],core:[-.22,0]});
   if(id==='marquee')return {name:'倒過來的跑馬燈',kind:'o',rot:0,core:[0,.1],box:[1.1,1],draw(c){c.fillRect(-.48,-.3,.96,.3);c.fillRect(-.48,.14,.28,.3);c.fillRect(.2,.14,.28,.3);c.save();c.translate(.42,-.5);c.scale(.6,.6);QMARK(c);c.restore();},cut(c){c.save();c.translate(0,-.14);c.scale(-1,1);TXT(c,'南港',0,0,32);c.restore();}};
   if(id==='iceFlirt')return pair('神魂顛島',SMILE,SMILE,c=>{HEART(c,0,-.34,.09);SNOW(c,-.22,-.4,.05);SNOW(c,.22,-.4,.05);});
@@ -2526,6 +2532,7 @@ function shapeById(id){
   if(id==='ladyWow')return profileShape({id:'long',name:'閨蜜Ａ',extra:WOW,box:[1.25,1.2]});
   if(id==='ladyAim')return profileShape({id:'plain',bun:1,name:'瞄準中的閨蜜Ｂ',extra:RIFLE,scale:.42,shift:-.15,core:[-.15,0],box:[.92,.5]});if(id==='mom')return profileShape({id:'mom',name:'媽媽'});const v=PV.find(p=>p.id===id);if(v)return profileShape(v);return Object.assign({kind:'o',rot:rand(-.15,.15)},OTHERS[OTHER_IDX[id]]);}
 const STORIES=[
+  {title:'偉大的國家',panels:[['npProud','「你為什麼這麼驕傲？」'],['npGreat','「因為它是個偉大的國家。」'],['npWhere','「偉大從何而來？」'],['npParty','養得起吵架的政黨和選民。',0,3.5]]},
   {title:'不完全是',panels:[['pfPoor','他很窮，口袋空空。'],['pfAsk','「你好像沒什麼朋友？」'],['pfNot','「也不完全是。」'],['pfThree','「我有佛陀、上帝和書。」',0,3.5]]},
   {title:'手能生巧',panels:[['hnAsk','問：手能幹嘛？'],['hnCrane','答：生巧。'],['hnHuh','蛤？手怎麼生巧？'],['hnPun','手能——熟能生巧。',0,3.5]]},
   {title:'轉法華',panels:[['fhRead','他誦了三千遍《法華經》。'],['fhSpin','心迷：法華轉你。'],['fhStop','停下來，看看它在說什麼。'],['fhTurn','心悟：你轉法華。',0,3.5]]},
@@ -2863,7 +2870,7 @@ const CATMAP={
   '夫妻家庭':['人家可以','偶爾','哪個好看','李拜一','四隻腳','拿掃把','湊滿一船','隔壁老王','臉色','好女子','著火了','我的天','算錯','仙女','誤點','玩夠沒','瓶蓋','最佳搭檔','帶過來的','明天減肥','我不知道','我知道','第一次','會下蛋嗎','南方','挑食','五個媽','雨多甜','還沒滾','看不到你','多生兩個','貓與虎','送回娘家','七十才開始','一模一樣','買菸','需要談談','不敢問','窗戶凍住了','一切都很好','沒安全感','所以要我留下','露台','四個孩子的爸','深夜講座','睜一隻眼','緩解疼痛','九十歲','撞到告訴我','很會說謊','很甜','兩根菸'],
   '搶匪小偷':['一次領','金口難開','負數','可能看到了','換科目','業內人士','遙控器','一起找'],
   '職場校園':['走下坡','對賭','放下','快成專家','活著','研究所','數研','高高在上','吃安眠藥','緩兵之計','呷好西瓜','有求必應','下一位','送行宴','鏡子都敢照','不會再問我','自己寫','哪邊涼快','不在人事','一個人過','仙草蜜','飢童','不忍心','美紅敢','錯的先講','吸菸區','沉默','看辦公室','可以回家','倫理學','很會說謊','烤箱手套'],
-  '時事諷刺':['看不起醫生','砍光','凱文呢','民調','太晚了','有用','重燃希望','誰是白痴','塗成藍色','我們的願望','白羊吃草','會飛的車'],
+  '時事諷刺':['偉大的國家','看不起醫生','砍光','凱文呢','民調','太晚了','有用','重燃希望','誰是白痴','塗成藍色','我們的願望','白羊吃草','會飛的車'],
   '故事小品':['不完全是','轉法華','螞蟻想通了','蹲著','繞遠路','振聾發聵','有趣的靈魂','老人與海','原唱','一包報紙','老天給的','走路回家','大同','燈和蛾','為之下','先選日子','漏掉','只是塊木頭','撕下面具','莎翁的墓誌銘','萬聖夜','轉變沒那麼快','誰會變大','大國者下流','說跑收活','成其大','省道','背上的字','手作禮物','只是欣賞','一片葉子','種子','不打你','慣性','颱風要來','收拾','放下','恆河','平安','等','釣','慢','午後']};
 STORIES.forEach(S=>{S.cats=CATS.filter(c=>(CATMAP[c]||[]).includes(S.title));if(!S.cats.length)S.cats=['日常冷笑話'];});
 let storyCat='all';
